@@ -43,6 +43,18 @@ def remove_background_ai(image_bytes, filename, api_key):
     return resp.content, remaining
 
 
+def restore_semi_transparent(img_rgba, threshold=200):
+    """
+    Clipdrop API 후처리: 반투명 픽셀 복원
+    - 알파 >= threshold: 완전 불투명(255)으로 복원 (베이지/크림 스크래치 방지)
+    - 알파 < threshold: 완전 투명(0)으로 처리
+    """
+    data = np.array(img_rgba)
+    alpha = data[:, :, 3]
+    data[:, :, 3] = np.where(alpha >= threshold, 255, 0)
+    return Image.fromarray(data, 'RGBA')
+
+
 def crop_by_alpha(img_rgba):
     """RGBA 이미지에서 알파채널 기반 크롭 영역 계산 및 크롭"""
     data = np.array(img_rgba)
@@ -125,6 +137,9 @@ def process():
                 # Clipdrop API로 배경 제거
                 result_bytes, remaining_credits = remove_background_ai(img_bytes, fname, api_key)
                 img = Image.open(io.BytesIO(result_bytes)).convert('RGBA')
+                # 반투명 픽셀 복원 (베이지/크림 계열 스크래치 방지)
+                # Clipdrop이 밝은 색상 픽셀을 반투명으로 처리하는 문제 수정
+                img = restore_semi_transparent(img, threshold=200)
                 # 알파채널 기반 크롭
                 img = crop_by_alpha(img)
 
