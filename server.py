@@ -13,6 +13,7 @@ import zipfile
 import tempfile
 import math
 from collections import deque
+from PIL import ImageFilter
 
 app = Flask(__name__)
 CORS(app)
@@ -107,6 +108,34 @@ def remove_white_background_bfs(img, threshold=30):
     # 가장자리에서 연결된 밝은 픽셀만 투명 처리
     data[visited, 3] = 0
 
+    return Image.fromarray(data, 'RGBA')
+
+
+def apply_edge_antialiasing(img_rgba, radius=1.5):
+    """
+    배경 제거 후 가장자리 안티앨리어싱 적용.
+    알파 채널에만 가우시안 블러를 적용하여 경계선을 부드럽게 처리.
+
+    방법:
+      1. 원본 알파 마스크를 가우시안 블러 처리
+      2. 원본 알파가 0인 픽셀(완전 투명)은 블러 후에도 0 유지 → 오브젝트 바깥 영역 보호
+      3. 원본 알파가 255인 픽셀 내부는 블러 값 그대로 사용 → 경계 픽셀만 페더링
+
+    radius: 블러 반경 (1.0~2.0 권장, 너무 크면 가장자리가 흐려짐)
+    """
+    data = np.array(img_rgba, dtype=np.uint8).copy()
+    alpha = data[:, :, 3]
+
+    # 알파 채널만 PIL Image로 변환하여 가우시안 블러 적용
+    alpha_img = Image.fromarray(alpha, mode='L')
+    alpha_blurred = alpha_img.filter(ImageFilter.GaussianBlur(radius=radius))
+    alpha_blurred_arr = np.array(alpha_blurred)
+
+    # 원본 알파가 0인 곳(완전 투명)은 블러 후에도 0 유지
+    # → 배경 영역이 번져 들어오는 것을 방지
+    alpha_new = np.where(alpha == 0, 0, alpha_blurred_arr)
+
+    data[:, :, 3] = alpha_new.astype(np.uint8)
     return Image.fromarray(data, 'RGBA')
 
 
@@ -207,6 +236,8 @@ def process():
                 # 오브젝트 내부 흰색/크림색 털은 보호됨
                 img = Image.open(io.BytesIO(img_bytes))
                 img = remove_white_background_bfs(img, threshold=threshold)
+                # 가장자리 안티앨리어싱: 경계선 부드럽게 처리
+                img = apply_edge_antialiasing(img, radius=1.5)
                 img = crop_by_alpha(img)
 
             # 300dpi 업스케일
