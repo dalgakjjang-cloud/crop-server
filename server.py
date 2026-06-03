@@ -12,6 +12,7 @@ import os
 import zipfile
 import tempfile
 import math
+from collections import deque
 
 app = Flask(__name__)
 CORS(app)
@@ -52,6 +53,60 @@ def restore_semi_transparent(img_rgba, threshold=200):
     data = np.array(img_rgba)
     alpha = data[:, :, 3]
     data[:, :, 3] = np.where(alpha >= threshold, 255, 0)
+    return Image.fromarray(data, 'RGBA')
+
+
+def remove_white_background_bfs(img, threshold=30):
+    """
+    BFS(Flood Fill) 방식으로 이미지 가장자리에서 연결된 흰색/밝은 배경만 제거.
+    오브젝트 내부의 흰색/크림색은 보호됩니다.
+
+    threshold: 흰색 판단 기준 (낮을수록 순수 흰색만 제거, 높을수록 밝은 색까지 제거)
+    """
+    img_rgba = img.convert('RGBA')
+    data = np.array(img_rgba, dtype=np.uint8)
+    h, w = data.shape[:2]
+
+    r, g, b = data[:, :, 0], data[:, :, 1], data[:, :, 2]
+    # 흰색/밝은 배경 판단: RGB 모두 (255 - threshold) 이상
+    limit = 255 - threshold
+    is_bright = (r >= limit) & (g >= limit) & (b >= limit)
+
+    # BFS로 가장자리에서 연결된 밝은 픽셀만 마킹
+    visited = np.zeros((h, w), dtype=bool)
+    queue = deque()
+
+    # 4방향 이웃
+    def add_border_seeds():
+        for x in range(w):
+            if is_bright[0, x] and not visited[0, x]:
+                visited[0, x] = True
+                queue.append((0, x))
+            if is_bright[h - 1, x] and not visited[h - 1, x]:
+                visited[h - 1, x] = True
+                queue.append((h - 1, x))
+        for y in range(h):
+            if is_bright[y, 0] and not visited[y, 0]:
+                visited[y, 0] = True
+                queue.append((y, 0))
+            if is_bright[y, w - 1] and not visited[y, w - 1]:
+                visited[y, w - 1] = True
+                queue.append((y, w - 1))
+
+    add_border_seeds()
+
+    dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    while queue:
+        y, x = queue.popleft()
+        for dy, dx in dirs:
+            ny, nx = y + dy, x + dx
+            if 0 <= ny < h and 0 <= nx < w and not visited[ny, nx] and is_bright[ny, nx]:
+                visited[ny, nx] = True
+                queue.append((ny, nx))
+
+    # 가장자리에서 연결된 밝은 픽셀만 투명 처리
+    data[visited, 3] = 0
+
     return Image.fromarray(data, 'RGBA')
 
 
@@ -138,7 +193,6 @@ def process():
                 result_bytes, remaining_credits = remove_background_ai(img_bytes, fname, api_key)
                 img = Image.open(io.BytesIO(result_bytes)).convert('RGBA')
                 # 반투명 픽셀 복원 (베이지/크림 계열 스크래치 방지)
-                # Clipdrop이 밝은 색상 픽셀을 반투명으로 처리하는 문제 수정
                 img = restore_semi_transparent(img, threshold=200)
                 # 알파채널 기반 크롭
                 img = crop_by_alpha(img)
@@ -149,14 +203,10 @@ def process():
                 img = crop_by_alpha(img)
 
             elif mode == 'white':
-                # 흰색배경 제거 후 크롭
-                img = Image.open(io.BytesIO(img_bytes)).convert('RGBA')
-                data = np.array(img)
-                # 흰색 픽셀 (RGB 모두 255-threshold 이상) 투명 처리 (BFS 없이 간단 방식)
-                r, g, b = data[:,:,0], data[:,:,1], data[:,:,2]
-                white_mask = (r >= (255 - threshold)) & (g >= (255 - threshold)) & (b >= (255 - threshold))
-                data[:,:,3][white_mask] = 0
-                img = Image.fromarray(data, 'RGBA')
+                # BFS Flood Fill 방식으로 가장자리 연결 흰색 배경만 제거
+                # 오브젝트 내부 흰색/크림색 털은 보호됨
+                img = Image.open(io.BytesIO(img_bytes))
+                img = remove_white_background_bfs(img, threshold=threshold)
                 img = crop_by_alpha(img)
 
             # 300dpi 업스케일
