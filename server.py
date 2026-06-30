@@ -1,100 +1,61 @@
-"""
-AI 크롭 서버 - Python Flask
-Clipdrop API로 배경 제거 후 Python PIL로 크롭 처리
-"""
-from flask import Flask, request, jsonify, send_file
-from flask_cors import CORS
-from PIL import Image
-import numpy as np
-import requests
-import io
 import os
+import io
+import time
 import zipfile
-import tempfile
-import math
+import numpy as np
+from PIL import Image, ImageFilter
+from flask import Flask, request, send_file, jsonify
 from collections import deque
-from PIL import ImageFilter
+from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, expose_headers=['X-Remaining-Credits', 'X-Sizes'])
 
-MIN_PX = 2500
-MAX_PX = 9800
-MAX_FILE_BYTES = 50 * 1024 * 1024  # 50MB
+# 기본 설정
+MAX_FILE_SIZE_MB = 50
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp'}
 
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def remove_background_ai(image_bytes, filename, api_key):
-    """Clipdrop API로 배경 제거"""
-    files = {'image_file': (filename, io.BytesIO(image_bytes), 'image/png')}
-    headers = {'x-api-key': api_key}
-    resp = requests.post(
-        'https://clipdrop-api.co/remove-background/v1',
-        headers=headers,
-        files=files,
-        timeout=30
-    )
-    remaining = resp.headers.get('x-remaining-credits')
-    if resp.status_code == 402:
-        raise ValueError('크레딧이 부족합니다. clipdrop.co에서 충전해주세요.')
-    if resp.status_code in (401, 403):
-        raise ValueError(f'API 키가 올바르지 않습니다. (status: {resp.status_code})')
-    if resp.status_code == 400:
-        raise ValueError(f'잘못된 요청: {resp.text[:200]}')
-    if not resp.ok:
-        raise ValueError(f'API 오류 {resp.status_code}: {resp.text[:200]}')
-    return resp.content, remaining
-
-
-def restore_semi_transparent(img_rgba, threshold=200):
+def remove_white_background_bfs(img, threshold=10):
     """
-    Clipdrop API 후처리: 반투명 픽셀 복원
-    - 알파 >= threshold: 완전 불투명(255)으로 복원 (베이지/크림 스크래치 방지)
-    - 알파 < threshold: 완전 투명(0)으로 처리
-    """
-    data = np.array(img_rgba)
-    alpha = data[:, :, 3]
-    data[:, :, 3] = np.where(alpha >= threshold, 255, 0)
-    return Image.fromarray(data, 'RGBA')
-
-
-def remove_white_background_bfs(img, threshold=30):
-    """
-    BFS(Flood Fill) 방식으로 이미지 가장자리에서 연결된 흰색/밝은 배경만 제거.
-    오브젝트 내부의 흰색/크림색은 보호됩니다.
-
-    threshold: 흰색 판단 기준 (낮을수록 순수 흰색만 제거, 높을수록 밝은 색까지 제거)
+    개선된 BFS(Flood Fill) 배경 제거:
+    1. RGB 평균값과 개별 채널을 모두 고려하여 더 정밀하게 배경 판정.
+    2. threshold 값을 보정하여 낮은 값(10)에서도 실질적인 배경 제거 효과 제공.
     """
     img_rgba = img.convert('RGBA')
     data = np.array(img_rgba, dtype=np.uint8)
     h, w = data.shape[:2]
 
-    r, g, b = data[:, :, 0], data[:, :, 1], data[:, :, 2]
-    # 흰색/밝은 배경 판단: RGB 모두 (255 - threshold) 이상
-    limit = 255 - threshold
-    is_bright = (r >= limit) & (g >= limit) & (b >= limit)
+    # threshold 보정: 사용자가 입력한 10이 너무 약하지 않도록 매핑
+    adjusted_threshold = int(threshold * 1.2) 
+    limit = max(0, 255 - adjusted_threshold)
 
-    # BFS로 가장자리에서 연결된 밝은 픽셀만 마킹
+    r, g, b = data[:, :, 0].astype(np.int16), data[:, :, 1].astype(np.int16), data[:, :, 2].astype(np.int16)
+    
+    # 배경 판정 로직 개선: 평균값과 개별 채널 편차를 모두 고려
+    avg_rgb = (r + g + b) / 3
+    is_bright = (avg_rgb >= limit) | ((r >= limit-5) & (g >= limit-5) & (b >= limit-5))
+
     visited = np.zeros((h, w), dtype=bool)
     queue = deque()
 
-    # 4방향 이웃
-    def add_border_seeds():
-        for x in range(w):
-            if is_bright[0, x] and not visited[0, x]:
-                visited[0, x] = True
-                queue.append((0, x))
-            if is_bright[h - 1, x] and not visited[h - 1, x]:
-                visited[h - 1, x] = True
-                queue.append((h - 1, x))
-        for y in range(h):
-            if is_bright[y, 0] and not visited[y, 0]:
-                visited[y, 0] = True
-                queue.append((y, 0))
-            if is_bright[y, w - 1] and not visited[y, w - 1]:
-                visited[y, w - 1] = True
-                queue.append((y, w - 1))
-
-    add_border_seeds()
+    # 가장자리 씨앗 추가
+    for x in range(w):
+        if is_bright[0, x] and not visited[0, x]:
+            visited[0, x] = True
+            queue.append((0, x))
+        if is_bright[h - 1, x] and not visited[h - 1, x]:
+            visited[h - 1, x] = True
+            queue.append((h - 1, x))
+    for y in range(h):
+        if is_bright[y, 0] and not visited[y, 0]:
+            visited[y, 0] = True
+            queue.append((y, 0))
+        if is_bright[y, w - 1] and not visited[y, w - 1]:
+            visited[y, w - 1] = True
+            queue.append((y, w - 1))
 
     dirs = [(-1, 0), (1, 0), (0, -1), (0, 1)]
     while queue:
@@ -105,204 +66,74 @@ def remove_white_background_bfs(img, threshold=30):
                 visited[ny, nx] = True
                 queue.append((ny, nx))
 
-    # 가장자리에서 연결된 밝은 픽셀만 투명 처리
+    # 배경 투명 처리
     data[visited, 3] = 0
-
     return Image.fromarray(data, 'RGBA')
-
 
 def apply_edge_antialiasing(img_rgba, radius=1.5):
     """
-    배경 제거 후 가장자리 안티앨리어싱 적용.
-    알파 채널에만 가우시안 블러를 적용하여 경계선을 부드럽게 처리.
-
-    방법:
-      1. 원본 알파 마스크를 가우시안 블러 처리
-      2. 원본 알파가 0인 픽셀(완전 투명)은 블러 후에도 0 유지 → 오브젝트 바깥 영역 보호
-      3. 원본 알파가 255인 픽셀 내부는 블러 값 그대로 사용 → 경계 픽셀만 페더링
-
-    radius: 블러 반경 (1.0~2.0 권장, 너무 크면 가장자리가 흐려짐)
+    알파 채널에 가우시안 블러를 적용하여 경계선을 부드럽게 처리.
     """
-    data = np.array(img_rgba, dtype=np.uint8).copy()
-    alpha = data[:, :, 3]
-
-    # 알파 채널만 PIL Image로 변환하여 가우시안 블러 적용
-    alpha_img = Image.fromarray(alpha, mode='L')
-    alpha_blurred = alpha_img.filter(ImageFilter.GaussianBlur(radius=radius))
-    alpha_blurred_arr = np.array(alpha_blurred)
-
-    # 원본 알파가 0인 곳(완전 투명)은 블러 후에도 0 유지
-    # → 배경 영역이 번져 들어오는 것을 방지
-    alpha_new = np.where(alpha == 0, 0, alpha_blurred_arr)
-
-    data[:, :, 3] = alpha_new.astype(np.uint8)
-    return Image.fromarray(data, 'RGBA')
-
+    if img_rgba.mode != 'RGBA':
+        img_rgba = img_rgba.convert('RGBA')
+    r, g, b, a = img_rgba.split()
+    a_blurred = a.filter(ImageFilter.GaussianBlur(radius=radius))
+    a_arr = np.array(a)
+    a_blurred_arr = np.array(a_blurred)
+    a_final_arr = np.where(a_arr == 0, 0, a_blurred_arr)
+    a_final = Image.fromarray(a_final_arr.astype(np.uint8))
+    return Image.merge('RGBA', (r, g, b, a_final))
 
 def crop_by_alpha(img_rgba):
-    """RGBA 이미지에서 알파채널 기반 크롭 영역 계산 및 크롭"""
-    data = np.array(img_rgba)
-    alpha = data[:, :, 3]
-    mask = alpha > 10
-    if not np.any(mask):
-        return img_rgba  # 크롭 영역 없으면 원본 반환
-    rows = np.any(mask, axis=1)
-    cols = np.any(mask, axis=0)
-    y0, y1 = np.where(rows)[0][[0, -1]]
-    x0, x1 = np.where(cols)[0][[0, -1]]
-    cropped = img_rgba.crop((x0, y0, x1 + 1, y1 + 1))
-    return cropped
+    bbox = img_rgba.getbbox()
+    if not bbox: return img_rgba
+    return img_rgba.crop(bbox)
 
+def auto_fit_size(img_rgba, min_px=2500, max_px=9800):
+    w, h = img_rgba.size
+    short_side = min(w, h)
+    if short_side < min_px:
+        scale = min_px / short_side
+        img_rgba = img_rgba.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+    w, h = img_rgba.size
+    if max(w, h) > max_px:
+        scale = max_px / max(w, h)
+        img_rgba = img_rgba.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
+    return img_rgba
 
-def auto_fit_size(img):
-    """짧은 변 2500px ~ 긴 변 9800px 범위로 자동 크기 조정"""
-    w, h = img.size
-    min_side = min(w, h)
-    max_side = max(w, h)
-    scale = 1.0
-    if min_side < MIN_PX:
-        scale = MIN_PX / min_side
-    elif max_side > MAX_PX:
-        scale = MAX_PX / max_side
-    if abs(scale - 1.0) < 0.001:
-        return img
-    new_w = round(w * scale)
-    new_h = round(h * scale)
-    return img.resize((new_w, new_h), Image.LANCZOS)
-
-
-def upscale_300dpi(img):
-    """72dpi → 300dpi 업스케일 (×4.167)"""
-    sc = 300 / 72
-    new_w = round(img.width * sc)
-    new_h = round(img.height * sc)
-    return img.resize((new_w, new_h), Image.LANCZOS)
-
-
-def ensure_size_limit(img_bytes):
-    """50MB 이하 보장"""
-    if len(img_bytes) <= MAX_FILE_BYTES:
-        return img_bytes
-    # 크기 초과 시 스케일 다운
-    img = Image.open(io.BytesIO(img_bytes))
-    scale = math.sqrt(MAX_FILE_BYTES / len(img_bytes)) * 0.95
-    new_w = round(img.width * scale)
-    new_h = round(img.height * scale)
-    img = img.resize((new_w, new_h), Image.LANCZOS)
-    buf = io.BytesIO()
-    img.save(buf, format='PNG', optimize=True)
-    return buf.getvalue()
-
+@app.route('/health', methods=['GET'])
+def health(): return jsonify({"status": "ok", "time": time.time()})
 
 @app.route('/process', methods=['POST'])
 def process():
-    """이미지 처리 엔드포인트"""
-    api_key = request.form.get('api_key', '').strip()
-    mode = request.form.get('mode', 'ai')  # ai, png, white
-    use_dpi = request.form.get('dpi', 'false').lower() == 'true'
-    use_autofit = request.form.get('autofit', 'true').lower() == 'true'
-    threshold = int(request.form.get('threshold', '30'))
+    if 'images' not in request.files: return jsonify({"error": "No images provided"}), 400
     files = request.files.getlist('images')
-
-    if not files:
-        return jsonify({'error': '파일이 없습니다'}), 400
-
-    results = []
-    remaining_credits = None
-
-    for f in files:
-        fname = f.filename
-        try:
-            img_bytes = f.read()
-
-            if mode == 'ai':
-                if not api_key:
-                    raise ValueError('API 키를 입력해주세요')
-                # Clipdrop API로 배경 제거
-                result_bytes, remaining_credits = remove_background_ai(img_bytes, fname, api_key)
-                img = Image.open(io.BytesIO(result_bytes)).convert('RGBA')
-                # 반투명 픽셀 복원 (베이지/크림 계열 스크래치 방지)
-                img = restore_semi_transparent(img, threshold=200)
-                # 알파채널 기반 크롭
-                img = crop_by_alpha(img)
-
-            elif mode == 'png':
-                # 투명배경 PNG 크롭
-                img = Image.open(io.BytesIO(img_bytes)).convert('RGBA')
-                img = crop_by_alpha(img)
-
-            elif mode == 'white':
-                # BFS Flood Fill 방식으로 가장자리 연결 흰색 배경만 제거
-                # 오브젝트 내부 흰색/크림색 털은 보호됨
-                img = Image.open(io.BytesIO(img_bytes))
-                img = remove_white_background_bfs(img, threshold=threshold)
-                # 가장자리 안티앨리어싱: 경계선 부드럽게 처리
-                img = apply_edge_antialiasing(img, radius=1.5)
-                img = crop_by_alpha(img)
-
-            # 300dpi 업스케일
-            if use_dpi:
-                img = upscale_300dpi(img)
-
-            # 자동 크기 맞춤
-            if use_autofit:
-                img = auto_fit_size(img)
-
-            # PNG로 저장
-            buf = io.BytesIO()
-            img.save(buf, format='PNG', optimize=True)
-            out_bytes = ensure_size_limit(buf.getvalue())
-
-            results.append({
-                'name': 'cropped_' + os.path.splitext(fname)[0] + '.png',
-                'data': out_bytes,
-                'size': f'{img.width}x{img.height}',
-                'file_size': len(out_bytes),
-                'status': 'ok'
-            })
-
-        except Exception as e:
-            results.append({
-                'name': fname,
-                'data': None,
-                'error': str(e),
-                'status': 'error'
-            })
-
-    # ZIP으로 묶어서 반환
-    zip_buf = io.BytesIO()
-    with zipfile.ZipFile(zip_buf, 'w', zipfile.ZIP_DEFLATED) as zf:
-        for r in results:
-            if r['status'] == 'ok':
-                zf.writestr(r['name'], r['data'])
-
-    zip_buf.seek(0)
-
-    # 결과 요약 헤더
-    ok_count = sum(1 for r in results if r['status'] == 'ok')
-    fail_count = len(results) - ok_count
-    errors = [f"{r['name']}: {r['error']}" for r in results if r['status'] == 'error']
-    sizes = [f"{r['name']}: {r['size']} ({r['file_size']//1024}KB)" for r in results if r['status'] == 'ok']
-
-    response = send_file(
-        zip_buf,
-        mimetype='application/zip',
-        as_attachment=True,
-        download_name='cropped_results.zip'
-    )
-    response.headers['X-Ok-Count'] = str(ok_count)
-    response.headers['X-Fail-Count'] = str(fail_count)
-    response.headers['X-Errors'] = ' | '.join(errors) if errors else ''
-    response.headers['X-Sizes'] = ' | '.join(sizes) if sizes else ''
-    if remaining_credits:
-        response.headers['X-Remaining-Credits'] = remaining_credits
-    return response
-
-
-@app.route('/health', methods=['GET'])
-def health():
-    return jsonify({'status': 'ok'})
-
+    mode = request.form.get('mode', 'white')
+    dpi_mode = request.form.get('dpi', 'false') == 'true'
+    autofit = request.form.get('autofit', 'true') == 'true'
+    threshold = int(request.form.get('threshold', 10))
+    output_zip = io.BytesIO()
+    sizes_info = []
+    with zipfile.ZipFile(output_zip, 'w') as zf:
+        for f in files:
+            if not allowed_file(f.filename): continue
+            img = Image.open(f.stream)
+            if mode == 'white':
+                img = remove_white_background_bfs(img, threshold)
+                img = apply_edge_antialiasing(img)
+            img = crop_by_alpha(img)
+            if autofit: img = auto_fit_size(img)
+            img_io = io.BytesIO()
+            img.save(img_io, format='PNG', dpi=(300, 300) if dpi_mode else None)
+            img_io.seek(0)
+            zf.writestr(f"cropped_{os.path.splitext(f.filename)[0]}.png", img_io.read())
+            sizes_info.append(f"{img.size[0]}x{img.size[1]}")
+    output_zip.seek(0)
+    resp = send_file(output_zip, mimetype='application/zip', as_attachment=True, download_name='results.zip')
+    resp.headers['X-Remaining-Credits'] = 'Unlimited'
+    resp.headers['X-Sizes'] = ", ".join(sizes_info)
+    return resp
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5001, debug=False)
+    port = int(os.environ.get('PORT', 5001))
+    app.run(host='0.0.0.0', port=port)
