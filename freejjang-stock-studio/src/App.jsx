@@ -9,8 +9,8 @@ import * as XLSX from "xlsx";
 import JSZip from "jszip";
 
 /* ═══════════════════════════════════════════════════════════
-   FreeJJang STOCK STUDIO — 최종판 (다크 · 3중 두뇌)
-   두뇌: Claude(Fable) / GPT(Codex 계열) / Gemini — 자동 폴백
+   FreeJJang STOCK STUDIO — 최종판 (다크 · 2중 두뇌)
+   두뇌: GPT(Codex 계열) / Gemini — 자동 폴백
    손:   GPT 이미지 API(기본) / Gemini — 실제 이미지 생성
    파이프라인: 초안 승인(멈춤1) → 순차 생성 → QC(멈춤2) → 제출 팩
    ═══════════════════════════════════════════════════════════ */
@@ -128,8 +128,9 @@ const TONE_PHRASE = {
   concept: "futuristic concept aesthetic, neon accent lighting, high-tech atmosphere, stylized commercial render",
 };
 
-/* 두뇌(에이전트) 라벨 · 기본 모델 */
-const BRAIN_LABELS = { claude: "Claude(Fable)", gpt: "GPT(Codex 계열)", gemini: "Gemini" };
+/* 두뇌(에이전트) 라벨 · 기본 모델
+   Claude API는 CORS로 브라우저 직접 호출 불가 → GPT/Gemini만 지원 */
+const BRAIN_LABELS = { gpt: "GPT(Codex 계열)", gemini: "Gemini" };
 const GPT_MODEL_DEFAULT = "gpt-5-mini";
 const GEMINI_MODEL_DEFAULT = "gemini-3.1-flash";
 /* 선택 가능한 모델 프리셋 (직접 입력도 가능) */
@@ -164,23 +165,7 @@ function extractJSON(text, who) {
   return JSON.parse(clean.slice(s, e + 1));
 }
 
-/* ── 두뇌 A: Claude (내장 · 키 불필요) ── */
-async function askClaude(system, user, imageBlock) {
-  const content = imageBlock
-    ? [{ type: "image", source: { type: "base64", media_type: imageBlock.mime, data: imageBlock.data } }, { type: "text", text: user }]
-    : user;
-  const res = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ model: "claude-sonnet-4-6", max_tokens: 1400, system, messages: [{ role: "user", content }] }),
-  });
-  const data = await res.json();
-  if (data.error) throw new Error(`Claude: ${data.error.message || "요청 실패"}`);
-  const text = (data.content || []).filter((b) => b.type === "text").map((b) => b.text).join("\n");
-  return extractJSON(text, "Claude");
-}
-
-/* ── 두뇌 B: GPT (OpenAI 키 · Codex 계열) ── */
+/* ── 두뇌 A: GPT (OpenAI 키 · Codex 계열) ── */
 async function askGPT(key, model, system, user, imageBlock) {
   if (!key) throw new Error("GPT: OpenAI API 키가 없습니다.");
   const userContent = imageBlock
@@ -201,7 +186,7 @@ async function askGPT(key, model, system, user, imageBlock) {
   return extractJSON(text, "GPT");
 }
 
-/* ── 두뇌 C: Gemini (Google AI 스튜디오 키) ── */
+/* ── 두뇌 B: Gemini (Google AI 스튜디오 키) ── */
 async function askGemini(key, model, system, user, imageBlock) {
   if (!key) throw new Error("Gemini: Google API 키가 없습니다.");
   const parts = imageBlock
@@ -288,7 +273,7 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
 
 export default function App() {
   /* ── 두뇌(에이전트) 설정 ── */
-  const [brain, setBrain] = useState("claude"); // claude | gpt | gemini
+  const [brain, setBrain] = useState("gpt"); // gpt | gemini
   const [autoFallback, setAutoFallback] = useState(true);
   const [gptModel, setGptModel] = useState(GPT_MODEL_DEFAULT);
   const [geminiModel, setGeminiModel] = useState(GEMINI_MODEL_DEFAULT);
@@ -329,7 +314,8 @@ export default function App() {
         const s = JSON.parse(raw);
         if (s.openaiKey) setOpenaiKey(s.openaiKey);
         if (s.googleKey) setGoogleKey(s.googleKey);
-        if (s.brain) setBrain(s.brain);
+        if (s.brain && BRAIN_LABELS[s.brain]) setBrain(s.brain);
+        else if (s.brain === "claude") setBrain(s.googleKey && !s.openaiKey ? "gemini" : "gpt");
         if (s.provider) setProvider(s.provider);
         if (s.quality) setQuality(s.quality);
         if (s.aspect) setAspect(s.aspect);
@@ -426,23 +412,21 @@ export default function App() {
       : await genOpenAI(key, finalPrompt, aspect, quality);
   };
 
-  /* ═══ 두뇌 라우터 — 선택 두뇌 먼저 → 키 등록된 유료(GPT/Gemini) → Claude 최후 ═══ */
-  const brainUsable = (b) => (b === "claude" ? true : b === "gpt" ? !!openaiKey.trim() : !!googleKey.trim());
+  /* ═══ 두뇌 라우터 — 선택 두뇌 먼저 → 키 등록된 다른 두뇌로 폴백 ═══ */
+  const brainUsable = (b) => (b === "gpt" ? !!openaiKey.trim() : b === "gemini" ? !!googleKey.trim() : false);
   const buildBrainOrder = () => {
     const order = [];
     const push = (b) => { if (b && !order.includes(b)) order.push(b); };
-    push(brain); // 1. 선택 두뇌 (사용자 의도 존중)
+    push(brain);
     if (autoFallback) {
-      if (openaiKey.trim()) push("gpt");   // 2. 키 등록된 유료 두뇌 먼저
+      if (openaiKey.trim()) push("gpt");
       if (googleKey.trim()) push("gemini");
-      push("claude");                       // 3. Claude는 맨 마지막 안전망
     }
     return order.filter(brainUsable);
   };
   const callBrain = (b, system, user, imageBlock) => {
-    if (b === "gpt") return askGPT(openaiKey.trim(), gptModel.trim(), system, user, imageBlock);
     if (b === "gemini") return askGemini(googleKey.trim(), geminiModel.trim(), system, user, imageBlock);
-    return askClaude(system, user, imageBlock);
+    return askGPT(openaiKey.trim(), gptModel.trim(), system, user, imageBlock);
   };
   const askBrain = async (system, user, imageBlock) => {
     const order = buildBrainOrder();
@@ -900,7 +884,6 @@ Each block content = one short Korean sentence.`,
               <div>
                 <label className="block text-xs font-semibold text-neutral-400 mb-1">두뇌 (에이전트)</label>
                 <select value={brain} onChange={(e) => setBrain(e.target.value)} className={fieldCls}>
-                  <option value="claude">Claude Fable · 키 불필요 (기본)</option>
                   <option value="gpt">GPT (Codex 계열) · OpenAI 키</option>
                   <option value="gemini">Gemini · 구글 키</option>
                 </select>
