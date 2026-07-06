@@ -336,7 +336,8 @@ export default function App() {
 
   /* ── 파이프라인 상태 ── */
   const [topic, setTopic] = useState("");
-  const [topicNote, setTopicNote] = useState(""); // 보충 설명·키워드 전략 (선택 — 초안 두뇌에 그대로 전달)
+  const [priKw, setPriKw] = useState("");         // 우선 키워드 (선택 — 초안 키워드 앞줄에 반영)
+  const [handlingTip, setHandlingTip] = useState(""); // 구도·소품·인물 처리 팁 (선택 — 모든 슬롯에 적용)
   const [count, setCount] = useState(6);
   const [maxNew, setMaxNew] = useState(""); // 생성 상한 (하드캡, 선택)
   const [mode, setMode] = useState("commercial"); // commercial | wallpaper
@@ -369,7 +370,8 @@ export default function App() {
         if (typeof s.autoFallback === "boolean") setAutoFallback(s.autoFallback);
         if (s.refTone) setRefTone(s.refTone);
         if (s.refPeople) setRefPeople(s.refPeople);
-        if (s.topicNote) setTopicNote(s.topicNote);
+        if (s.priKw) setPriKw(s.priKw);
+        if (s.handlingTip) setHandlingTip(s.handlingTip);
       }
     } catch { /* 손상된 저장값 무시 */ }
     settingsLoaded.current = true;
@@ -378,16 +380,16 @@ export default function App() {
     if (!settingsLoaded.current) return;
     try {
       localStorage.setItem("freejjang_settings", JSON.stringify({
-        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, topicNote,
+        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, priKw, handlingTip,
       }));
     } catch { /* 저장 불가 환경 무시 */ }
-  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, topicNote]);
+  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, priKw, handlingTip]);
 
   /* ── Start Fresh: 파이프라인만 초기화 (키·설정은 유지) ── */
   const startFresh = () => {
     if (slots.length > 0 && !window.confirm("새로 시작할까요? 현재 슬롯·이미지·로그가 모두 지워집니다. (API 키와 설정은 유지)")) return;
     cancelRef.current = true;
-    setTopic(""); setTopicNote(""); setSlots([]); setQcRejects({}); setQcReason("");
+    setTopic(""); setPriKw(""); setHandlingTip(""); setSlots([]); setQcRejects({}); setQcReason("");
     setPhase("idle"); setProg(null); setAutoQcProg(null); setAutoQcBusy(false);
     setMaxNew(""); setLog([]); setNotice(null);
     setModeAuto(true); setMode("commercial");
@@ -403,7 +405,6 @@ export default function App() {
   const [qcRejects, setQcRejects] = useState({}); // {index: true}
   const [qcReason, setQcReason] = useState("");
   const [autoQcBusy, setAutoQcBusy] = useState(false);
-  const [strategyBusy, setStrategyBusy] = useState(false);
   const [autoQcProg, setAutoQcProg] = useState(null);
   const cancelRef = useRef(false);
 
@@ -514,34 +515,6 @@ export default function App() {
     throw lastErr || new Error("모든 두뇌 시도 실패");
   };
 
-  /* ═══ 0.5단계: AI 판매 전략 메모 자동 생성 (주제 → 전략 초안, 수정 가능) ═══ */
-  const genStrategy = async () => {
-    if (!topic.trim() || strategyBusy) return;
-    if (topicNote.trim() && !window.confirm("이미 작성된 전략 메모를 AI 생성본으로 교체할까요?")) return;
-    setStrategyBusy(true);
-    addLog(`[전략] "${topic}" 판매 전략 메모 생성 — ${brainName}`);
-    try {
-      const r = await askBrain(
-        `You are a senior stock-image market analyst (Adobe Stock / MiriCanvas). Respond ONLY compact JSON: {"note":"..."}.
-Write a concise selling-strategy memo in KOREAN for the given topic, grounded in what genuinely sells on stock marketplaces (buyer search behavior, commercial usability). Structure the note as plain text with line breaks (no markdown symbols):
-장면 변형: 4-6 distinct concrete scene variations buyers actually search for (place, time, action)
-우선 키워드: 12-15 English keywords in priority order, comma-separated — real high-volume buyer search terms for this topic
-팁: 2-3 short lines on composition/props/people handling that raise usability (e.g. hands+device over posed faces, clean background for banners, copy space placement)
-Keep the whole note under 900 Korean characters. Be specific to THIS topic, never generic filler.`,
-        `Topic: "${topic}"`
-      );
-      if (r.note) {
-        setTopicNote(String(r.note).slice(0, 2000));
-        addLog(`[전략] 메모 생성 완료 — 내용을 검토·수정한 뒤 초안 기획을 시작하세요`);
-        setNotice("AI 전략 메모를 생성했습니다. 최신 시장 데이터가 필요하면 퍼플렉시티 등에서 조사한 내용으로 덮어쓰거나 이어붙이세요.");
-      } else throw new Error("전략 메모가 비어 있습니다.");
-    } catch (err) {
-      addLog(`[오류] 전략 생성 실패: ${err.message}`);
-      setNotice(err.message);
-    }
-    setStrategyBusy(false);
-  };
-
   /* ═══ 1단계: 초안 기획 (정확 장수 · 조합 반복 금지) ═══ */
   const draftSlots = async () => {
     if (!topic.trim() || phase === "drafting") return;
@@ -562,7 +535,7 @@ RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera
 KEYWORDS (Adobe SEO, critical): "keywords" must be EXACTLY 35 English keywords, comma-separated, NO duplicates, ordered by buyer importance (Adobe weights the first ~10 most). Order groups: (1) main subject nouns, (2) specific descriptors/materials/actions, (3) concept/theme/season/emotion, (4) color and lighting, (5) composition/orientation (copy space, background, close-up, minimal), (6) use-case (banner, wallpaper, marketing, web design). Use single words or natural 2-word phrases, all lowercase, only real buyer search terms that literally describe what is visible. No text/number/logo/brand words. "keywords_kr" follows the same SEO ordering in Korean single nouns.
 CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOBE_CAT_LIST}. Choose by the dominant visible subject (e.g. scenery→11, dish/ingredient→7, festival/tradition/ritual→15, person-focused lifestyle→12 or 13, plant/flower→14, drink→4, tech/device→19). If kind is "illustration"/vector/background and nothing fits more strongly, use 8. Return category as the integer id only.
 PROPS & VARIETY (critical for a professional set — avoid templated sameness): every slot's "props" must be SPECIFIC to that exact scene and DIFFERENT from every other slot — never reuse the same generic filler (e.g. do NOT put "plastic water bottle" or "small potted plant" in more than one slot; ideally use each only once in the whole set, if at all). Choose props that genuinely belong to the subject: for FOOD, include the correct culturally-appropriate tableware and utensils that match the dish (Korean meal → spoon + chopsticks; Western plate → fork + knife; noodles/soup → spoon or chopsticks; dessert → small fork or teaspoon) plus fitting garnish, napkin, board, or sauce dish — vary these per dish. For interior/background scenes, rotate a diverse mix of secondary objects across slots (a ceramic vase, dried flowers, stacked books, a woven basket, folded linen, a wooden tray, a candle, seasonal fruit, a framed textile) so no two backgrounds feel like copies. Props must fit the mode's copy space (keep the calm area uncluttered) and the selected people/style/tone. Keep them believable and unbranded.`,
-          `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Avoid repeating any of these already-used subject|props|palette signatures: ${combos}${refinementLine()}${topicNote.trim() ? `\nUSER'S MARKET RESEARCH / STRATEGY NOTES (high priority — use these to pick scene variations AND to choose/order the keywords; they reflect current buyer demand. JSON format and all rules above stay unchanged): """${topicNote.trim()}"""` : ""}`
+          `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Avoid repeating any of these already-used subject|props|palette signatures: ${combos}${refinementLine()}${priKw.trim() ? `\nUSER PRIORITY KEYWORDS — the buyer wants these to rank first. Include EVERY one of them near the FRONT of each slot's "keywords" (and Korean equivalents in "keywords_kr"), keeping SEO order, then fill the rest as usual: ${priKw.trim()}` : ""}${handlingTip.trim() ? `\nUSER HANDLING NOTES for composition, props and people — apply to EVERY slot: ${handlingTip.trim()}` : ""}`
         );
         for (const item of r.items || []) {
           if (made.length >= count) break;
@@ -1086,25 +1059,23 @@ Each block content = one short Korean sentence.`,
                     className={`${fieldCls} w-full disabled:opacity-60`} />
                 </div>
                 <div>
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-semibold text-neutral-400">
-                      보충 설명 · 전략 메모 <span className="text-neutral-600 font-normal">(선택 — 키워드·장면 기획에 반영)</span>
-                    </label>
-                    <button onClick={genStrategy} disabled={!topic.trim() || strategyBusy || phase === "drafting" || phase === "generating"}
-                      title="주제만으로 AI가 판매 전략 메모 초안을 작성합니다 (생성 후 수정 가능)"
-                      className="text-xs font-bold px-2 py-1 rounded border border-violet-500/40 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition">
-                      {strategyBusy ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                      {strategyBusy ? "생성 중…" : "AI 전략 생성"}
-                    </button>
-                  </div>
-                  <textarea value={topicNote} onChange={(e) => setTopicNote(e.target.value.slice(0, 2000))}
+                  <label className="block text-xs font-semibold text-neutral-400 mb-1">
+                    우선 키워드 <span className="text-neutral-600 font-normal">(선택 — 앞줄에 우선 배치, 쉼표로 구분)</span>
+                  </label>
+                  <input value={priKw} onChange={(e) => setPriKw(e.target.value.slice(0, 400))}
                     disabled={phase === "drafting" || phase === "generating"}
-                    rows={4} maxLength={2000}
-                    placeholder={"판매 리서치·키워드 전략·장면 아이디어를 붙여넣거나, 위 'AI 전략 생성'으로 초안을 받으세요.\n예: 손+기기 컷이 잘 팔림 / 카페·소파·출퇴근 장면별로 / smartphone, scrolling, copy space 우선"}
+                    placeholder="예: smartphone, scrolling, copy space, lifestyle"
+                    className={`${fieldCls} w-full disabled:opacity-60`} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-400 mb-1">
+                    구도·소품·인물 팁 <span className="text-neutral-600 font-normal">(선택 — 모든 슬롯에 적용)</span>
+                  </label>
+                  <textarea value={handlingTip} onChange={(e) => setHandlingTip(e.target.value.slice(0, 500))}
+                    disabled={phase === "drafting" || phase === "generating"}
+                    rows={2} maxLength={500}
+                    placeholder="예: 손+기기 위주, 얼굴 정면 금지 / 배경 깔끔하게 / 소품 최소화"
                     className={`${fieldCls} w-full disabled:opacity-60 resize-y leading-relaxed`} />
-                  {topicNote.length > 0 && (
-                    <div className="text-right text-[10px] text-neutral-600 font-mono mt-0.5">{topicNote.length}/2000 · 새로고침해도 유지됨</div>
-                  )}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
