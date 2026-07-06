@@ -7,6 +7,12 @@
 
 > 이 프론트엔드는 저장소 루트의 Python 크롭 서버(`server.py`)와는 독립적인 별도 앱입니다.
 
+## 🆕 미리캔버스 요소 크롭 스튜디오 (`element-crop-studio/`)
+
+어떤 이미지든 **배경 제거 → 타이트 크롭 → 규격 리사이즈 → 300 DPI → 업로드 패키지(PNG+CSV ZIP)** 까지
+브라우저에서 바로 처리하는 **서버 불필요 단일 파일 웹앱**입니다.
+`element-crop-studio/index.html` 을 열기만 하면 됩니다. 자세한 내용은 [element-crop-studio/README.md](element-crop-studio/README.md) 참고.
+
 ## 개발 실행
 
 ```bash
