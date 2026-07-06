@@ -89,14 +89,25 @@ const REEDO_BG_PHRASE = {
   office: "modern office setting", outdoor: "natural outdoor environment",
   studio: "professional studio setting", solid: "clean solid color backdrop", bokeh: "soft bokeh blurred background",
 };
+/* 인물 등장 조건 4단계 (People Selector) */
 const REEDO_PEOPLE = {
-  none: "사람 없음 (권장)", hands: "손만", silhouette: "뒷모습/실루엣", with: "인물 포함",
+  auto: "선택 안함 (AI 자율)",
+  none: "인물 없음 (순수 공간/장비)",
+  few: "없거나 1~2명 (소수 집중)",
+  small: "최대 3명 (소규모 단체)",
 };
+/* 초안 브레인 주입용 (auto는 제약 없음 → 빈 문자열이라 refinementLine에서 스킵) */
 const REEDO_PEOPLE_PHRASE = {
-  none: "absolutely NO people, no faces, no hands, no body parts — no model release needed",
-  hands: "only hands visible, no faces",
-  silhouette: "people only as back-view or silhouette, no identifiable faces",
-  with: "people may appear naturally",
+  auto: "",
+  none: "absolutely NO people, no faces, no hands, no body parts, no mannequins, no reflections of humans — render pure space or equipment layout only, no model release needed",
+  few: "at most 1-2 people, calm solitary or single-person focused workout mood, never a crowd",
+  small: "a small group of at most 3 people (an intimate club vibe or a quiet one-on-one PT session), strictly NO large audience, NO bleachers of spectators, NO crowd",
+};
+/* 최종 이미지 프롬프트 주입용 — 부정 키워드까지 강하게 (auto는 미적용) */
+const PEOPLE_FINAL = {
+  none: "Strictly NO people, no persons, no humans, no faces, no hands, no body parts, no silhouettes of people, no mannequins, no crowd — clean empty space and equipment only",
+  few: "Include at most 1-2 people, quiet single-person focus, no crowd, no spectators",
+  small: "Include at most 3 people as a small group, NO large audience, NO bleachers, NO crowd",
 };
 
 /* 톤(판매 미학) — 2026 베스트셀러 조사 기반: 믿을 수 있는 실사가 팔린다.
@@ -120,7 +131,10 @@ const TONE_PHRASE = {
 /* 두뇌(에이전트) 라벨 · 기본 모델 */
 const BRAIN_LABELS = { claude: "Claude(Fable)", gpt: "GPT(Codex 계열)", gemini: "Gemini" };
 const GPT_MODEL_DEFAULT = "gpt-5-mini";
-const GEMINI_MODEL_DEFAULT = "gemini-2.5-flash";
+const GEMINI_MODEL_DEFAULT = "gemini-3.1-flash";
+/* 선택 가능한 모델 프리셋 (직접 입력도 가능) */
+const GPT_MODEL_PRESETS = ["gpt-5-mini", "gpt-5", "gpt-4.1-mini", "gpt-4o"];
+const GEMINI_MODEL_PRESETS = ["gemini-3.1-flash", "gemini-3.1-flash-lite", "gemini-3.1-pro", "gemini-2.5-flash", "gemini-2.5-pro"];
 
 const pad2 = (n) => String(n).padStart(2, "0");
 const cleanName = (s, n) => (s || "").toLowerCase().replace(/[^가-힣A-Za-z0-9-]/g, "").substring(0, n);
@@ -237,7 +251,7 @@ async function genOpenAI(key, prompt, aspect, quality) {
 }
 
 /* 슬롯 필드 → 최종 이미지 프롬프트 (전문 판매 프롬프트 규칙) */
-function buildSlotPrompt(slot, mode, tone = "realism") {
+function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   const anglePick = CAMERA_ANGLES[slot.angle]?.phrase || "";
   const isTight = slot.angle === "closeup" || slot.angle === "macro";
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
@@ -255,6 +269,7 @@ function buildSlotPrompt(slot, mode, tone = "realism") {
     ? pickRandom(BRIGHT_NEUTRAL_STYLES)
     : "";
   const toneLine = slot.kind !== "illustration" ? TONE_PHRASE[tone] || TONE_PHRASE.realism : "";
+  const peopleLine = PEOPLE_FINAL[people] || "";
   return [
     slot.subject,
     `Focal placement: ${slot.focal_placement || "center"}`,
@@ -262,6 +277,7 @@ function buildSlotPrompt(slot, mode, tone = "realism") {
     `Lighting: ${slot.lighting || "soft natural light with realistic shadows"}`,
     atmosphere,
     toneLine,
+    peopleLine,
     `Palette: ${slot.palette || "bright commercial tones"}`,
     slot.kind === "illustration" ? "professional stock illustration" : "8K photorealistic professional stock photograph, crisp detail",
     GUARD,
@@ -297,7 +313,7 @@ export default function App() {
   const [refStyle, setRefStyle] = useState("");
   const [refRegion, setRefRegion] = useState("");
   const [refBg, setRefBg] = useState("");
-  const [refPeople, setRefPeople] = useState("none"); // 기본: 사람 없음 (모델 릴리즈 회피)
+  const [refPeople, setRefPeople] = useState("none"); // 기본: 인물 없음 (모델 릴리즈 회피)
   const [refAngle, setRefAngle] = useState("auto");   // 초안 전체 기본 카메라 앵글
   const [refTone, setRefTone] = useState("realism");  // 기본: 판매 리얼 (베스트셀러 미학)
   const [saveDir, setSaveDir] = useState(null);        // 저장 폴더 핸들 (File System Access API)
@@ -504,7 +520,7 @@ CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOB
       setProg({ done: newMade, total: Math.min(targets.length, cap), stage: `슬롯 ${t.index} 생성 중` });
       setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
       try {
-        const fp = buildSlotPrompt(t, mode, refTone);
+        const fp = buildSlotPrompt(t, mode, refTone, refPeople);
         const dataUrl = await generateImage(fp);
         newMade += 1;
         setSlots((p) => p.map((s) => (s.index === t.index
@@ -662,7 +678,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `# FreeJJang 프롬프트 (간편) — 주제: ${topic || "(미지정)"} · 모드: ${mode} · 종횡비: ${aspect}\n` +
       `# 각 줄의 프롬프트에는 노텍스트 GUARD 규칙이 이미 포함되어 있습니다.\n` +
       `# Midjourney / Firefly / Stable Diffusion 등 다른 AI에 그대로 붙여넣어 쓰세요.\n\n`;
-    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode, refTone)}`).join("\n\n");
+    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople)}`).join("\n\n");
     saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-min.txt`);
     addLog(`[백업] 프롬프트 TXT(간편) 저장 완료 — ${rows.length}슬롯`);
   };
@@ -673,7 +689,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     return head + rows.map((s) => [
       `[${s.index}] ${s.title_kr || ""} / ${s.title || ""}`,
       `status: ${s.status}`,
-      `final_prompt: ${s.finalPrompt || buildSlotPrompt(s, mode, refTone)}`,
+      `final_prompt: ${s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople)}`,
       `subject: ${s.subject || ""}`,
       `kind: ${s.kind || ""}`,
       `focal_placement: ${s.focal_placement || ""}`,
@@ -740,7 +756,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
     addLog(`[재생성 ${t.index}] ${CAMERA_ANGLES[t.angle]?.label || "자동"} · 시작`);
     try {
-      const fp = buildSlotPrompt(t, mode, refTone);
+      const fp = buildSlotPrompt(t, mode, refTone, refPeople);
       const dataUrl = await generateImage(fp);
       setSlots((p) => p.map((s) => (s.index === t.index
         ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", autoFlag: "", regenCount: s.regenCount + 1 } : s)));
@@ -877,15 +893,17 @@ Each block content = one short Korean sentence.`,
               {brain === "gpt" && (
                 <div>
                   <label className="block text-xs font-semibold text-neutral-400 mb-1">GPT 모델명</label>
-                  <input value={gptModel} onChange={(e) => setGptModel(e.target.value)} placeholder={GPT_MODEL_DEFAULT}
-                    className={`${fieldCls} font-mono w-40`} />
+                  <input list="gptModels" value={gptModel} onChange={(e) => setGptModel(e.target.value)} placeholder={GPT_MODEL_DEFAULT}
+                    className={`${fieldCls} font-mono w-44`} />
+                  <datalist id="gptModels">{GPT_MODEL_PRESETS.map((m) => <option key={m} value={m} />)}</datalist>
                 </div>
               )}
               {brain === "gemini" && (
                 <div>
                   <label className="block text-xs font-semibold text-neutral-400 mb-1">Gemini 모델명</label>
-                  <input value={geminiModel} onChange={(e) => setGeminiModel(e.target.value)} placeholder={GEMINI_MODEL_DEFAULT}
-                    className={`${fieldCls} font-mono w-44`} />
+                  <input list="geminiModels" value={geminiModel} onChange={(e) => setGeminiModel(e.target.value)} placeholder={GEMINI_MODEL_DEFAULT}
+                    className={`${fieldCls} font-mono w-48`} />
+                  <datalist id="geminiModels">{GEMINI_MODEL_PRESETS.map((m) => <option key={m} value={m} />)}</datalist>
                 </div>
               )}
               <label className="flex items-center gap-2 text-xs font-semibold text-neutral-300 pb-2 cursor-pointer select-none">
