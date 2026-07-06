@@ -26,8 +26,36 @@ const WALLPAPER_RE = /배경화면|월페이퍼|wallpaper|배너|banner|카피\s
 
 const ANALYSIS_BLOCKS = ["주제","스타일","구도","조명","색감","외형","의상","포즈/표정","소품/오브젝트","배경","카메라","분위기","여백/카피스페이스"];
 
+/* Adobe Stock \uacf5\uc2dd \ucf58\ud150\uce20 \uce74\ud14c\uace0\ub9ac (1-21) \u2014 \ucd08\uc548 \uc120\uc815\u00b7CSV\u00b7\uce74\ub4dc \ud45c\uc2dc \uacf5\uc6a9 */
+const ADOBE_CATEGORIES = {
+  1: "Animals", 2: "Buildings and Architecture", 3: "Business", 4: "Drinks",
+  5: "The Environment", 6: "States of Mind", 7: "Food", 8: "Graphic Resources",
+  9: "Hobbies and Leisure", 10: "Industry", 11: "Landscapes", 12: "Lifestyle",
+  13: "People", 14: "Plants and Flowers", 15: "Culture and Religion", 16: "Science",
+  17: "Social Issues", 18: "Sports", 19: "Technology", 20: "Transport", 21: "Travel",
+};
+const ADOBE_CAT_LIST = Object.entries(ADOBE_CATEGORIES).map(([id, name]) => `${id} ${name}`).join(", ");
+const ADOBE_MAX_KEYWORDS = 35; // Adobe SEO \ud0a4\uc6cc\ub4dc \uc0c1\ud55c
+
 const pad2 = (n) => String(n).padStart(2, "0");
 const cleanName = (s, n) => (s || "").toLowerCase().replace(/[^\uac00-\ud7afA-Za-z0-9-]/g, "").substring(0, n);
+
+/* SEO \ud0a4\uc6cc\ub4dc \uc815\uaddc\ud654: \uc55e\uc21c\uc11c(\uc911\uc694\ub3c4) \uc720\uc9c0 \u00b7 \uacf5\ubc31\uc815\ub9ac \u00b7 \ub300\uc18c\ubb38\uc790 \ubb34\uc2dc \uc911\ubcf5 \uc81c\uac70 \u00b7 \uc0c1\ud55c \ucef7 */
+const normKeywords = (raw, max) => {
+  const seen = new Set();
+  return String(raw || "")
+    .split(/[,\n]/)
+    .map((k) => k.trim())
+    .filter((k) => {
+      if (!k) return false;
+      const key = k.toLowerCase();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    })
+    .slice(0, max)
+    .join(", ");
+};
 
 /* ── Claude (내장 · 키 불필요) ── */
 async function askClaude(system, user, imageBlock) {
@@ -167,8 +195,10 @@ export default function App() {
         const combos = made.slice(-4).map((s) => `${s.subject}|${s.camera}|${s.palette}`).join(" / ") || "none";
         const r = await askClaude(
           `You draft professional stock image slots. Respond ONLY compact JSON:
-{"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title","title_kr":"KR title","keywords":"20 EN keywords comma-sep","keywords_kr":"25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경)","category":11}]}
-RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": natural rule-of-thirds/leading-line/central composition, copy_space only 10-30% if needed. category: 11 landscapes, 7 food, 15 holidays, 8 graphics.`,
+{"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경)","category":11}]}
+RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": natural rule-of-thirds/leading-line/central composition, copy_space only 10-30% if needed.
+KEYWORDS (Adobe SEO, critical): "keywords" must be EXACTLY 35 English keywords, comma-separated, NO duplicates, ordered by buyer importance (Adobe weights the first ~10 most). Order groups: (1) main subject nouns, (2) specific descriptors/materials/actions, (3) concept/theme/season/emotion, (4) color and lighting, (5) composition/orientation (copy space, background, close-up, minimal), (6) use-case (banner, wallpaper, marketing, web design). Use single words or natural 2-word phrases, all lowercase, only real buyer search terms that literally describe what is visible. No text/number/logo/brand words. "keywords_kr" follows the same SEO ordering in Korean single nouns.
+CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOBE_CAT_LIST}. Choose by the dominant visible subject (e.g. scenery→11, dish/ingredient→7, festival/tradition/ritual→15, person-focused lifestyle→12 or 13, plant/flower→14, drink→4, tech/device→19). If kind is "illustration"/vector/background and nothing fits more strongly, use 8. Return category as the integer id only.`,
           `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Combos already used (avoid): ${combos}`
         );
         for (const item of r.items || []) {
@@ -335,14 +365,14 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const header = ["Filename", "Title", "Keywords", "Category", "Releases", "is_ai_generated"];
     const rows = ok.map((s) =>
-      [`${s.index}-${cleanName(topic, 15)}-${s.slug}_adobe.jpg`, s.title, s.keywords, s.category, "", "Yes"].map(esc).join(","));
+      [`${s.index}-${cleanName(topic, 15)}-${s.slug}_adobe.jpg`, s.title, normKeywords(s.keywords, ADOBE_MAX_KEYWORDS), s.category, "", "Yes"].map(esc).join(","));
     download(new Blob(["\uFEFF" + [header.map(esc).join(","), ...rows].join("\r\n")], { type: "text/csv;charset=utf-8" }),
       `${cleanName(topic, 20)}-adobe-metadata.csv`);
     /* MiriCanvas XLSX — 자동 연속 (되묻지 않음) */
     const miriRows = ok.map((s) => ({
       fileName: `${s.index}-${cleanName(topic, 15)}-${s.slug}_miri`,
       elementName: [(s.title_kr || "").substring(0, 8), s.title].filter(Boolean).join(" "),
-      keywords: (s.keywords_kr || "").split(",").map((k) => k.trim()).filter(Boolean).slice(0, 25).join(", "),
+      keywords: normKeywords(s.keywords_kr, 25),
       tier: "Premium", contentType: "Photo",
     }));
     const ws = XLSX.utils.json_to_sheet(miriRows, { header: ["fileName", "elementName", "keywords", "tier", "contentType"] });
@@ -712,7 +742,7 @@ Each block content = one short Korean sentence.`,
                               {statusChip(s)}
                             </div>
                             {s.title_kr && <p className="text-xs text-sky-700 truncate">{s.title_kr}</p>}
-                            <p className="text-xs text-slate-400 font-mono truncate">{s.kind} · {s.focal_placement} · cat {s.category}{s.regenCount > 1 ? ` · 재생성 ${s.regenCount - 1}회` : ""}</p>
+                            <p className="text-xs text-slate-400 font-mono truncate" title={`Adobe cat ${s.category} · 키워드 ${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS).split(", ").filter(Boolean).length}개`}>{s.kind} · {s.focal_placement} · {ADOBE_CATEGORIES[s.category] || `cat ${s.category}`}{s.keywords ? ` · kw ${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS).split(", ").filter(Boolean).length}` : ""}{s.regenCount > 1 ? ` · 재생성 ${s.regenCount - 1}회` : ""}</p>
                             {s.autoFlag && (phase === "qc" || phase === "review") && (
                               <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1 leading-relaxed">
                                 자동 검수: {s.autoFlag}
