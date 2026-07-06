@@ -310,6 +310,7 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     toneLine,
     peopleLine,
     `Palette: ${slot.palette || "bright commercial tones"}`,
+    slot.kind !== "illustration" ? "Physically plausible staging: every object rests naturally on a realistic surface — cups and drinks on a table, tray, desk or ledge, never directly on a sofa, bed or fabric; nothing floating or oddly placed" : "",
     slot.kind === "illustration" ? "professional stock illustration" : "8K photorealistic professional stock photograph, crisp detail",
     GUARD,
   ].filter(Boolean).join(". ");
@@ -515,50 +516,90 @@ export default function App() {
     throw lastErr || new Error("모든 두뇌 시도 실패");
   };
 
-  /* ═══ 1단계: 초안 기획 (정확 장수 · 조합 반복 금지) ═══ */
+  /* ═══ 1단계: 초안 기획 — (A) 장면 매트릭스 1콜로 세트 다양성 확정 → (B) 병렬 상세화 ═══
+     유사도 탈락 방지: 장소·행동·앵글·시간대를 세트 단위에서 먼저 서로 다르게 설계한다.
+     우선 키워드는 "메타데이터 우선순위"로만 쓰고 장면 내용을 강제하지 않는다 (전 슬롯 동일 사물 등장 방지). */
   const draftSlots = async () => {
     if (!topic.trim() || phase === "drafting") return;
     cancelRef.current = false;
     setPhase("drafting");
     setSlots([]); setQcRejects({});
-    addLog(`[초안] "${topic}" — 정확히 ${count}행, 모드=${mode}, 두뇌=${brainName}`);
-    const made = [];
-    while (made.length < count && !cancelRef.current) {
-      const n = Math.min(2, count - made.length);
-      setProg({ done: made.length, total: count, stage: `${brainName} 초안 작성` });
+    addLog(`[초안] "${topic}" — ${count}행 · 1단계 장면 설계 → 2단계 병렬 상세화 · 두뇌=${brainName}`);
+
+    /* ── (A) 장면 매트릭스: 한 번의 호출로 세트 전체의 서로 다른 장면을 설계 ── */
+    setProg({ done: 0, total: count, stage: `${brainName} 장면 설계 (다양성 확정)` });
+    let concepts = [];
+    for (let attempt = 0; attempt < 3 && concepts.length < count && !cancelRef.current; attempt++) {
       try {
-        const combos = made.slice(-6).map((s) => `${s.subject}|${s.props || ""}|${s.palette}`).join(" / ") || "none";
-        const r = await askBrain(
-          `You draft professional stock image slots. Respond ONLY compact JSON:
-{"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"EXACTLY 25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경), same SEO ordering as EN","category":11}]}
-RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. SELLABILITY: usable beats pretty — when people interact with objects/devices, prefer hands + device + partial person over posed full faces (higher commercial usability, no model-release burden); keep backgrounds clean enough for ads, blogs and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": medium or wide framing with environmental context and comfortable breathing room — the subject fills about 50-70% of the frame (NEVER edge-to-edge, NOT a tight close-up), keep roughly 25-35% clean uncluttered negative space for versatility, rule-of-thirds/leading-line, subject fully in frame and not cropped. Set "copy_space" to name where that calm area sits (e.g. "upper-left clean area").
-KEYWORDS (Adobe SEO, critical): "keywords" must be EXACTLY 35 English keywords, comma-separated, NO duplicates, ordered by buyer importance (Adobe weights the first ~10 most). Order groups: (1) main subject nouns, (2) specific descriptors/materials/actions, (3) concept/theme/season/emotion, (4) color and lighting, (5) composition/orientation (copy space, background, close-up, minimal), (6) use-case (banner, wallpaper, marketing, web design). Use single words or natural 2-word phrases, all lowercase, only real buyer search terms that literally describe what is visible. No text/number/logo/brand words. "keywords_kr" follows the same SEO ordering in Korean single nouns.
-CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOBE_CAT_LIST}. Choose by the dominant visible subject (e.g. scenery→11, dish/ingredient→7, festival/tradition/ritual→15, person-focused lifestyle→12 or 13, plant/flower→14, drink→4, tech/device→19). If kind is "illustration"/vector/background and nothing fits more strongly, use 8. Return category as the integer id only.
-PROPS & VARIETY (critical for a professional set — avoid templated sameness): every slot's "props" must be SPECIFIC to that exact scene and DIFFERENT from every other slot — never reuse the same generic filler (e.g. do NOT put "plastic water bottle" or "small potted plant" in more than one slot; ideally use each only once in the whole set, if at all). Choose props that genuinely belong to the subject: for FOOD, include the correct culturally-appropriate tableware and utensils that match the dish (Korean meal → spoon + chopsticks; Western plate → fork + knife; noodles/soup → spoon or chopsticks; dessert → small fork or teaspoon) plus fitting garnish, napkin, board, or sauce dish — vary these per dish. For interior/background scenes, rotate a diverse mix of secondary objects across slots (a ceramic vase, dried flowers, stacked books, a woven basket, folded linen, a wooden tray, a candle, seasonal fruit, a framed textile) so no two backgrounds feel like copies. Props must fit the mode's copy space (keep the calm area uncluttered) and the selected people/style/tone. Keep them believable and unbranded.`,
-          `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Avoid repeating any of these already-used subject|props|palette signatures: ${combos}${refinementLine()}${priKw.trim() ? `\nUSER PRIORITY KEYWORDS — the buyer wants these to rank first. Include EVERY one of them near the FRONT of each slot's "keywords" (and Korean equivalents in "keywords_kr"), keeping SEO order, then fill the rest as usual: ${priKw.trim()}` : ""}${handlingTip.trim() ? `\nUSER HANDLING NOTES for composition, props and people — apply to EVERY slot: ${handlingTip.trim()}` : ""}`
+        const m = await askBrain(
+          `You design a maximally DIVERSE professional stock image set — each image must be clearly a SEPARATE asset to a buyer (no near-duplicates; marketplaces reject similar images). Respond ONLY compact JSON:
+{"concepts":[{"scene":"1 short sentence: main subject doing what, where","location":"the place — must be unique in the set","action":"primary action","angle":"camera angle/framing","time":"time of day + light"}]}
+HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.`,
+          `Topic: "${topic}". Mode: ${mode}. Design exactly ${count} distinct scene concepts.${refinementLine()}${handlingTip.trim() ? `\nUser handling notes (apply thoughtfully WITHOUT reducing diversity): ${handlingTip.trim()}` : ""}${priKw.trim() ? `\nBuyer search terms for context (use as inspiration for DIFFERENT scenes — do NOT put every term into every scene): ${priKw.trim()}` : ""}`
         );
-        for (const item of r.items || []) {
-          if (made.length >= count) break;
-          made.push({
-            ...item,
-            index: pad2(made.length + 1),
-            status: "pending", regenCount: 0, dataUrl: "", rejectReason: "", qcNote: "", angle: refAngle, finalPrompt: "",
-            keywords: padKeywordsEN(item, ADOBE_MAX_KEYWORDS),
-            keywords_kr: padKeywordsKR(item, MIRI_MAX_KEYWORDS),
-            slug: cleanName(item.slug, 24) || `slot-${made.length + 1}`,
-          });
-        }
-        setSlots([...made]);
-        addLog(`[초안] ${made.length}/${count}행 완료`);
+        concepts = (m.concepts || []).filter((c) => c && c.scene).slice(0, count);
+        if (concepts.length < count) addLog(`[장면 설계] ${concepts.length}/${count}개 — 부족분 재시도`);
       } catch (err) {
-        addLog(`[오류] 초안 실패: ${err.message} — 3초 후 재시도`);
+        addLog(`[오류] 장면 설계 실패: ${err.message} — 3초 후 재시도`);
         await new Promise((r2) => setTimeout(r2, 3000));
       }
     }
+    if (cancelRef.current) { setPhase("idle"); setProg(null); addLog("[초안] 사용자 중단"); return; }
+    if (concepts.length === 0) { setPhase("idle"); setProg(null); setNotice("장면 설계에 실패했습니다. 두뇌 키를 확인하고 다시 시도하세요."); return; }
+    const setSummary = concepts.map((c, i) => `${i + 1}. ${c.location} — ${c.action}`).join(" / ");
+    addLog(`[장면 설계] ${concepts.length}개 확정: ${setSummary.slice(0, 160)}…`);
+
+    /* ── (B) 병렬 상세화: 확정된 장면을 2개씩 묶어 동시 3콜로 확장 (속도 ↑) ── */
+    const made = new Array(concepts.length).fill(null);
+    let doneCnt = 0;
+    const detailSystem = `You expand assigned scene concepts into professional stock image slots. Respond ONLY compact JSON:
+{"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"EXACTLY 25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경), same SEO ordering as EN","category":11}]}
+RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": medium or wide framing, subject fills about 50-70% of frame (never edge-to-edge), roughly 25-35% clean negative space, rule-of-thirds, subject fully in frame.
+KEYWORDS (Adobe SEO, critical): EXACTLY 35 EN keywords, no duplicates, ordered by buyer importance (first ~10 weigh most): (1) main subject nouns, (2) descriptors/materials/actions, (3) concept/season/emotion, (4) color/lighting, (5) composition (copy space, background), (6) use-case (banner, marketing, web design). All lowercase, only terms literally describing what is visible. "keywords_kr" same ordering in Korean single nouns.
+CATEGORY: pick ONE best Adobe Stock category id: ${ADOBE_CAT_LIST}. Illustration/vector fallback: 8. Integer id only.
+PROPS & VARIETY: props must be SPECIFIC to each scene and DIFFERENT from every other slot in the whole set (set list provided) — never reuse generic filler across slots; tableware must match the dish culture; keep the copy-space area uncluttered; believable and unbranded.`;
+    const expandPair = async (pairIdx) => {
+      const pair = pairIdx.map((i) => concepts[i]);
+      for (let attempt = 0; attempt < 3 && !cancelRef.current; attempt++) {
+        try {
+          const r = await askBrain(
+            detailSystem,
+            `Topic: "${topic}". Mode: ${mode}. Whole-set overview (make THIS pair's props/palette clearly distinct from all): ${setSummary}
+Expand EXACTLY these ${pair.length} assigned concepts, one item each, in order:
+${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | action: ${c.action} | angle: ${c.angle} | time: ${c.time}`).join("\n")}${refinementLine()}${handlingTip.trim() ? `\nUser handling notes — apply to these slots: ${handlingTip.trim()}` : ""}${priKw.trim() ? `\nPRIORITY KEYWORDS (metadata ordering only — for each slot, place the ones that are LITERALLY VISIBLE in that slot near the FRONT of "keywords"; NEVER add ones not visible, NEVER alter the scene to include them): ${priKw.trim()}` : ""}`
+          );
+          (r.items || []).slice(0, pair.length).forEach((item, j) => {
+            made[pairIdx[j]] = {
+              ...item,
+              status: "pending", regenCount: 0, dataUrl: "", rejectReason: "", qcNote: "", angle: refAngle, finalPrompt: "",
+              keywords: padKeywordsEN(item, ADOBE_MAX_KEYWORDS),
+              keywords_kr: padKeywordsKR(item, MIRI_MAX_KEYWORDS),
+              slug: cleanName(item.slug, 24) || `slot-${pairIdx[j] + 1}`,
+            };
+          });
+          doneCnt += pair.length;
+          setProg({ done: Math.min(doneCnt, concepts.length), total: concepts.length, stage: `${brainName} 상세 기획 (병렬)` });
+          setSlots(made.filter(Boolean).map((s, i) => ({ ...s, index: pad2(i + 1) })));
+          return;
+        } catch (err) {
+          addLog(`[오류] 상세화 실패(슬롯 ${pairIdx.map((i) => i + 1).join(",")}): ${err.message} — 재시도 ${attempt + 1}/3`);
+          await new Promise((r2) => setTimeout(r2, 2500));
+        }
+      }
+    };
+    const pairs = [];
+    for (let i = 0; i < concepts.length; i += 2) pairs.push([i, i + 1].filter((x) => x < concepts.length));
+    const queue = [...pairs];
+    await Promise.all(Array.from({ length: Math.min(3, queue.length) }, async () => {
+      while (queue.length > 0 && !cancelRef.current) await expandPair(queue.shift());
+    }));
+
     setProg(null);
     if (cancelRef.current) { setPhase("idle"); addLog("[초안] 사용자 중단"); return; }
+    const ok = made.filter(Boolean);
+    setSlots(ok.map((s, i) => ({ ...s, index: pad2(i + 1) })));
     setPhase("review");
-    addLog(`[멈춤 1] 초안 ${made.length}행 검토 대기 — 승인 시 생성 시작`);
+    addLog(`[멈춤 1] 초안 ${ok.length}행 검토 대기${ok.length < concepts.length ? ` (${concepts.length - ok.length}행 실패 — 필요 시 다시 기획)` : ""} — 승인 시 생성 시작`);
   };
 
   /* ═══ 2단계: 승인 후 missing-only 순차 생성 ═══ */
@@ -1060,7 +1101,7 @@ Each block content = one short Korean sentence.`,
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-neutral-400 mb-1">
-                    우선 키워드 <span className="text-neutral-600 font-normal">(선택 — 앞줄에 우선 배치, 쉼표로 구분)</span>
+                    우선 키워드 <span className="text-neutral-600 font-normal">(선택 — 해당 사물이 보이는 슬롯에만 앞배치 · 장면을 강제하지 않음)</span>
                   </label>
                   <input value={priKw} onChange={(e) => setPriKw(e.target.value.slice(0, 400))}
                     disabled={phase === "drafting" || phase === "generating"}
@@ -1069,7 +1110,7 @@ Each block content = one short Korean sentence.`,
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-neutral-400 mb-1">
-                    구도·소품·인물 팁 <span className="text-neutral-600 font-normal">(선택 — 모든 슬롯에 적용)</span>
+                    구도·소품·인물 팁 <span className="text-neutral-600 font-normal">(선택 — 전 슬롯 적용하되 장면 다양성은 유지)</span>
                   </label>
                   <textarea value={handlingTip} onChange={(e) => setHandlingTip(e.target.value.slice(0, 500))}
                     disabled={phase === "drafting" || phase === "generating"}
