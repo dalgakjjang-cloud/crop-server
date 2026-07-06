@@ -1,11 +1,12 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Sparkles, Download, Trash2, RefreshCw, Copy, Check, Cpu, AlertTriangle,
   FileSpreadsheet, Wand2, X, Play, Square, Image as ImageIcon, ScanSearch,
   Layers, Key, Settings2, CornerDownLeft, FileText, ClipboardCheck,
-  ShieldAlert, CircleDollarSign, ChevronRight, Ban
+  ShieldAlert, CircleDollarSign, ChevronRight, Ban, FolderOpen
 } from "lucide-react";
 import * as XLSX from "xlsx";
+import JSZip from "jszip";
 
 /* ═══════════════════════════════════════════════════════════
    FreeJJang STOCK STUDIO — 최종판 (다크 · 3중 두뇌)
@@ -299,6 +300,53 @@ export default function App() {
   const [refPeople, setRefPeople] = useState("none"); // 기본: 사람 없음 (모델 릴리즈 회피)
   const [refAngle, setRefAngle] = useState("auto");   // 초안 전체 기본 카메라 앵글
   const [refTone, setRefTone] = useState("realism");  // 기본: 판매 리얼 (베스트셀러 미학)
+  const [saveDir, setSaveDir] = useState(null);        // 저장 폴더 핸들 (File System Access API)
+  const settingsLoaded = useRef(false);
+
+  /* ── 설정·키 자동 저장 (이 브라우저 localStorage에만 · 서버 전송 없음) ── */
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("freejjang_settings");
+      if (raw) {
+        const s = JSON.parse(raw);
+        if (s.openaiKey) setOpenaiKey(s.openaiKey);
+        if (s.googleKey) setGoogleKey(s.googleKey);
+        if (s.brain) setBrain(s.brain);
+        if (s.provider) setProvider(s.provider);
+        if (s.quality) setQuality(s.quality);
+        if (s.aspect) setAspect(s.aspect);
+        if (s.gptModel) setGptModel(s.gptModel);
+        if (s.geminiModel) setGeminiModel(s.geminiModel);
+        if (typeof s.autoFallback === "boolean") setAutoFallback(s.autoFallback);
+        if (s.refTone) setRefTone(s.refTone);
+        if (s.refPeople) setRefPeople(s.refPeople);
+      }
+    } catch { /* 손상된 저장값 무시 */ }
+    settingsLoaded.current = true;
+  }, []);
+  useEffect(() => {
+    if (!settingsLoaded.current) return;
+    try {
+      localStorage.setItem("freejjang_settings", JSON.stringify({
+        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople,
+      }));
+    } catch { /* 저장 불가 환경 무시 */ }
+  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople]);
+
+  /* ── Start Fresh: 파이프라인만 초기화 (키·설정은 유지) ── */
+  const startFresh = () => {
+    if (slots.length > 0 && !window.confirm("새로 시작할까요? 현재 슬롯·이미지·로그가 모두 지워집니다. (API 키와 설정은 유지)")) return;
+    cancelRef.current = true;
+    setTopic(""); setSlots([]); setQcRejects({}); setQcReason("");
+    setPhase("idle"); setProg(null); setAutoQcProg(null); setAutoQcBusy(false);
+    setMaxNew(""); setLog([]); setNotice(null);
+    setModeAuto(true); setMode("commercial");
+  };
+  const clearSavedKeys = () => {
+    setOpenaiKey(""); setGoogleKey("");
+    try { localStorage.removeItem("freejjang_settings"); } catch {}
+    setNotice("저장된 API 키를 삭제했습니다.");
+  };
   const [phase, setPhase] = useState("idle"); // idle | drafting | review | generating | qc | done
   const [slots, setSlots] = useState([]);
   const [prog, setProg] = useState(null);
@@ -560,7 +608,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       : "자동 검수: 전량 통과했습니다. 직접 훑어본 뒤 승인하세요.");
   };
 
-  /* ═══ 내보내기 (Adobe CSV → 미캔 XLSX 자동 연속) ═══ */
+  /* ═══ 내보내기 ═══ */
   const download = (blob, name) => {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
@@ -568,11 +616,42 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-  const downloadSlotImage = (s) => {
-    const a = document.createElement("a");
-    a.href = s.dataUrl;
-    a.download = `${s.index}-${cleanName(topic, 15)}-${s.slug}.png`;
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+
+  /* ── 저장 폴더 선택 (Chrome/Edge · File System Access API) ── */
+  const pickSaveDir = async () => {
+    if (!window.showDirectoryPicker) {
+      setNotice("이 브라우저는 폴더 선택을 지원하지 않습니다 (Chrome/Edge 필요). 기본 다운로드 폴더로 저장됩니다.");
+      return;
+    }
+    try {
+      const dir = await window.showDirectoryPicker({ mode: "readwrite" });
+      setSaveDir(dir);
+      addLog(`[저장 폴더] "${dir.name}" 선택됨 — 이후 파일은 이 폴더로 바로 저장`);
+    } catch { /* 사용자 취소 */ }
+  };
+
+  /* 선택 폴더가 있으면 그 폴더에 직접 쓰고, 없으면 기본 다운로드 */
+  const saveBlob = async (blob, name) => {
+    if (saveDir) {
+      try {
+        const fh = await saveDir.getFileHandle(name, { create: true });
+        const w = await fh.createWritable();
+        await w.write(blob);
+        await w.close();
+        addLog(`[저장] ${saveDir.name}/${name}`);
+        return;
+      } catch (err) {
+        addLog(`[저장 오류] 폴더 쓰기 실패(${err.message}) — 기본 다운로드로 대체`);
+      }
+    }
+    download(blob, name);
+  };
+
+  const dataUrlToU8 = (dataUrl) => {
+    const bin = atob(dataUrl.split(",")[1]);
+    const u8 = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+    return u8;
   };
 
   /* ── 프롬프트 TXT 백업 (생성 실패 대비 · 다른 AI 이식용) ── */
@@ -584,16 +663,14 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `# 각 줄의 프롬프트에는 노텍스트 GUARD 규칙이 이미 포함되어 있습니다.\n` +
       `# Midjourney / Firefly / Stable Diffusion 등 다른 AI에 그대로 붙여넣어 쓰세요.\n\n`;
     const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode, refTone)}`).join("\n\n");
-    download(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-min.txt`);
+    saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-min.txt`);
     addLog(`[백업] 프롬프트 TXT(간편) 저장 완료 — ${rows.length}슬롯`);
   };
-  const exportPromptsFull = () => {
-    const rows = slots.filter((s) => s.subject);
-    if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
+  const buildPromptsFullText = (rows) => {
     const head =
       `# FreeJJang 프롬프트 (전체 필드 · 백업) — 주제: ${topic || "(미지정)"} · 모드: ${mode} · 종횡비: ${aspect} · 요청 ${count}장\n` +
       `# 최종 프롬프트 + 구성 필드 + 한/영 키워드 + 카테고리 + 상태. 세션 복원·타 시스템 재생성용.\n\n`;
-    const body = rows.map((s) => [
+    return head + rows.map((s) => [
       `[${s.index}] ${s.title_kr || ""} / ${s.title || ""}`,
       `status: ${s.status}`,
       `final_prompt: ${s.finalPrompt || buildSlotPrompt(s, mode, refTone)}`,
@@ -608,23 +685,32 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `keywords_en: ${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS)}`,
       `keywords_kr: ${normKeywords(s.keywords_kr, 25)}`,
     ].join("\n")).join("\n\n────────────────────────────\n\n");
-    download(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-full.txt`);
+  };
+  const exportPromptsFull = () => {
+    const rows = slots.filter((s) => s.subject);
+    if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
+    saveBlob(new Blob([buildPromptsFullText(rows)], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-full.txt`);
     addLog(`[백업] 프롬프트 TXT(전체) 저장 완료 — ${rows.length}슬롯`);
   };
 
+  /* ═══ 제출 팩 — ZIP 하나로 묶어 저장 (이미지 + Adobe CSV + 미캔 XLSX + 프롬프트 백업) ═══ */
   const exportSubmitPack = async () => {
     const ok = slots.filter((s) => s.status === "success" && s.dataUrl);
     if (ok.length === 0) { setNotice("성공한 이미지가 없습니다."); return; }
-    /* 이미지 전체 */
-    for (const s of ok) { downloadSlotImage(s); await new Promise((r) => setTimeout(r, 350)); }
+    const base = cleanName(topic, 20) || "freejjang";
+    addLog(`[제출 팩] ZIP 생성 중 — 이미지 ${ok.length}장…`);
+    const zip = new JSZip();
+    /* 이미지 전체 → images/ 폴더 */
+    for (const s of ok) {
+      zip.file(`images/${s.index}-${cleanName(topic, 15)}-${s.slug}.png`, dataUrlToU8(s.dataUrl));
+    }
     /* Adobe CSV */
     const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const header = ["Filename", "Title", "Keywords", "Category", "Releases", "is_ai_generated"];
     const rows = ok.map((s) =>
       [`${s.index}-${cleanName(topic, 15)}-${s.slug}_adobe.jpg`, s.title, normKeywords(s.keywords, ADOBE_MAX_KEYWORDS), s.category, "", "Yes"].map(esc).join(","));
-    download(new Blob(["﻿" + [header.map(esc).join(","), ...rows].join("\r\n")], { type: "text/csv;charset=utf-8" }),
-      `${cleanName(topic, 20)}-adobe-metadata.csv`);
-    /* MiriCanvas XLSX — 자동 연속 (되묻지 않음) */
+    zip.file(`${base}-adobe-metadata.csv`, "﻿" + [header.map(esc).join(","), ...rows].join("\r\n"));
+    /* MiriCanvas XLSX */
     const miriRows = ok.map((s) => ({
       fileName: `${s.index}-${cleanName(topic, 15)}-${s.slug}_miri`,
       elementName: [(s.title_kr || "").substring(0, 8), s.title].filter(Boolean).join(" "),
@@ -634,11 +720,14 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const ws = XLSX.utils.json_to_sheet(miriRows, { header: ["fileName", "elementName", "keywords", "tier", "contentType"] });
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-    download(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }),
-      `${cleanName(topic, 20)}-miricanvas.xlsx`);
-    addLog(`[제출 팩] 이미지 ${ok.length}장 + Adobe CSV + 미캔 XLSX 저장 완료 (요청 ${count}장 대비 ${ok.length === count ? "정확 일치 ✓" : "불일치 ⚠"})`);
-    setNotice(`제출 팩 완료: 이미지 ${ok.length}장 · Adobe CSV · 미캔 XLSX${ok.length !== count ? ` — 요청 ${count}장과 다릅니다. 미완료 슬롯을 확인하세요.` : ""}`);
+    zip.file(`${base}-miricanvas.xlsx`, XLSX.write(wb, { bookType: "xlsx", type: "array" }));
+    /* 프롬프트 전체 백업도 동봉 */
+    zip.file(`${base}-prompts-full.txt`, buildPromptsFullText(ok));
+    /* ZIP 저장 (선택 폴더 or 기본 다운로드) */
+    const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+    await saveBlob(blob, `${base}-submit-pack.zip`);
+    addLog(`[제출 팩] ZIP 저장 완료 — 이미지 ${ok.length}장 + Adobe CSV + 미캔 XLSX + 프롬프트 TXT (요청 ${count}장 대비 ${ok.length === count ? "정확 일치 ✓" : "불일치 ⚠"})`);
+    setNotice(`제출 팩 ZIP 저장 완료: 이미지 ${ok.length}장 · Adobe CSV · 미캔 XLSX · 프롬프트 백업${saveDir ? ` → "${saveDir.name}" 폴더` : ""}${ok.length !== count ? ` — 요청 ${count}장과 다릅니다. 미완료 슬롯을 확인하세요.` : ""}`);
   };
 
   const updateSlot = (index, field, value) =>
@@ -760,11 +849,18 @@ Each block content = one short Korean sentence.`,
                 <p className="text-xs text-neutral-500">초안 승인 → 순차 생성 → QC → 제출 팩 · 멈춤은 딱 두 곳</p>
               </div>
             </div>
-            <button onClick={() => setShowSettings(!showSettings)}
-              className={`flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded border transition ${
-                imageKey() ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300" : "bg-amber-500/10 border-amber-500/30 text-amber-300"}`}>
-              <Key className="w-3.5 h-3.5" /> {imageKey() ? "이미지 엔진 연결됨" : "이미지 API 키 필요"} <Settings2 className="w-3.5 h-3.5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={startFresh}
+                title="슬롯·이미지·로그를 비우고 새 프로젝트 시작 (API 키·설정은 유지)"
+                className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded border border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 transition">
+                <RefreshCw className="w-3.5 h-3.5" /> Start Fresh
+              </button>
+              <button onClick={() => setShowSettings(!showSettings)}
+                className={`flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded border transition ${
+                  imageKey() ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300" : "bg-amber-500/10 border-amber-500/30 text-amber-300"}`}>
+                <Key className="w-3.5 h-3.5" /> {imageKey() ? "이미지 엔진 연결됨" : "이미지 API 키 필요"} <Settings2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
 
           {showSettings && (
@@ -836,9 +932,15 @@ Each block content = one short Korean sentence.`,
                 <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AIzaSy…"
                   className={`${fieldCls} font-mono w-full`} />
               </div>
-              <p className="text-xs text-neutral-500 leading-relaxed max-w-xs pb-1">
-                키는 화면 메모리에만 유지되며 어디에도 기록·출력되지 않습니다. 새로고침 시 재입력하세요. 두뇌와 이미지 엔진이 같은 서비스 키를 공유합니다.
-              </p>
+              <div className="max-w-xs pb-1">
+                <p className="text-xs text-neutral-500 leading-relaxed">
+                  키는 <b className="text-neutral-400">이 브라우저에만 자동 저장</b>되어 다음에 재입력이 필요 없습니다 (서버 전송 없음). 공용 PC에서는 사용 후 아래 버튼으로 지우세요.
+                </p>
+                <button onClick={clearSavedKeys}
+                  className="mt-1 text-xs text-rose-300/80 hover:text-rose-300 underline underline-offset-2">
+                  저장된 키 삭제
+                </button>
+              </div>
             </div>
           )}
 
@@ -1080,9 +1182,15 @@ Each block content = one short Korean sentence.`,
                   <section className="bg-neutral-800 border border-neutral-700 rounded-lg p-3 flex flex-wrap items-center gap-3">
                     <div className="flex items-center gap-1.5 text-xs text-neutral-400">
                       <FileText className="w-4 h-4 text-violet-400" />
-                      <span>프롬프트 백업 <span className="text-neutral-500">— 생성이 실패해도 프롬프트는 안전하게 확보</span></span>
+                      <span>백업·저장 <span className="text-neutral-500">— 제출 팩은 ZIP 하나로 묶여 저장됩니다</span></span>
                     </div>
                     <div className="flex flex-wrap gap-2 ml-auto">
+                      <button onClick={pickSaveDir}
+                        title="Chrome/Edge에서 컴퓨터 저장 폴더를 직접 지정 (미지정 시 기본 다운로드 폴더)"
+                        className={`font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition border ${
+                          saveDir ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300" : "bg-neutral-950 hover:bg-neutral-700 border-neutral-700 text-neutral-200"}`}>
+                        <FolderOpen className="w-3.5 h-3.5" /> {saveDir ? `저장 폴더: ${saveDir.name}` : "저장 폴더 선택"}
+                      </button>
                       <button onClick={exportPromptsMin}
                         className="bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
                         <Download className="w-3.5 h-3.5" /> 프롬프트만 TXT
