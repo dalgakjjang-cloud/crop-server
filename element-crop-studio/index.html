@@ -198,7 +198,9 @@
           <div class="range">
             <input type="range" id="thr" min="8" max="140" value="42">
             <span class="rv" id="thrV">42</span>
+            <button class="btn ghost sm" id="thrAuto" style="width:auto;padding:5px 9px" title="가장자리 색 분산으로 적정값 추천">🎯 자동</button>
           </div>
+          <div class="hint" id="thrRec"></div>
         </div>
 
         <div class="mb">
@@ -505,6 +507,56 @@ function detectKey(data,w,h){
   if(!R.length) return [255,255,255];
   return [median(R),median(G),median(B)];
 }
+
+/* 가장자리 색 분산으로 적정 threshold 추천.
+   배경 픽셀들이 키 색에서 얼마나 퍼져 있는지(92 백분위 거리)를 재고,
+   상한 hi(=thr*1.4)가 그 분산을 막 덮도록 thr 을 역산 → 배경은 다 잡고
+   오브젝트(키에서 더 먼 색)는 안 건드리는 값. */
+function edgeStats(img){
+  const max=420;
+  const s=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+  const w=Math.max(2,Math.round(img.naturalWidth*s)), h=Math.max(2,Math.round(img.naturalHeight*s));
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const x=c.getContext('2d',{willReadFrequently:true});
+  x.drawImage(img,0,0,w,h);
+  const {data}=x.getImageData(0,0,w,h);
+  const corners=[[0,0],[w-1,0],[0,h-1],[w-1,h-1]].map(([px,py])=>data[(py*w+px)*4+3]);
+  if(corners.every(a=>a<=6)) return {transparent:true};
+  const key=detectKey(data,w,h);
+  const band=Math.max(2,Math.round(Math.min(w,h)*0.06)); // 가장자리 6% 두께
+  const dists=[];
+  for(let y=0;y<h;y++) for(let px=0;px<w;px++){
+    if(px>=band&&px<w-band&&y>=band&&y<h-band) continue;
+    const i=(y*w+px)*4; if(data[i+3]<8) continue;
+    const dr=data[i]-key[0],dg=data[i+1]-key[1],db=data[i+2]-key[2];
+    dists.push(Math.sqrt(dr*dr+dg*dg+db*db));
+  }
+  if(dists.length<20) return {transparent:false, thr:42, spread:0};
+  dists.sort((a,b)=>a-b);
+  const p92=dists[Math.floor(dists.length*0.92)];
+  const thr=Math.max(24,Math.min(100,Math.round((p92+10)/1.4)));
+  return {transparent:false, thr, spread:Math.round(p92)};
+}
+function recommendThr(){
+  const vals=[]; let anyTransparent=false;
+  for(const it of state.items.slice(0,8)){
+    const st=edgeStats(it.img);
+    if(st.transparent){ anyTransparent=true; continue; }
+    if(st.thr) vals.push(st.thr);
+  }
+  if(!vals.length) return {thr:null, transparent:anyTransparent};
+  vals.sort((a,b)=>a-b);
+  return {thr:vals[Math.floor(vals.length/2)], transparent:anyTransparent}; // 여러 장이면 중앙값
+}
+function setThr(v){ $('#thr').value=v; $('#thrV').textContent=v; }
+function maybeAutoThreshold(){ // 첫 로드 시, 사용자가 슬라이더를 만진 적 없으면 자동 적용
+  if(state.thrTouched) return;
+  if($('#bgSeg .on').dataset.v==='none'){ $('#thrRec').textContent=''; return; }
+  const r=recommendThr();
+  if(r.thr!=null){ setThr(r.thr); $('#thrRec').innerHTML=`권장 감도 <b class="k">${r.thr}</b> 자동 적용 · 슬라이더로 조절 가능`; saveSettings(); }
+  else if(r.transparent){ $('#thrRec').textContent='이미 투명한 이미지 — 감도 불필요.'; }
+}
+
 /* 배경 제거 v2 — 캔바 스타일 2단 구조의 자동 단계
    1) 엣지-스톱 하이스테리시스 flood: 배경은 매끈하므로 픽셀 간 급격한
       색 변화(오브젝트 경계)에서 확산을 멈춤 → 밝은 오브젝트 내부로 누수 방지
@@ -887,9 +939,9 @@ function loadFiles(fileList){
     const img=new Image();
     img.onload=()=>{
       state.items.push({ id:++uid, name:f.name, img, title:'', keywords:'', manualCrop:null, retouch:null, retouchHas:false, out:null });
-      if(--pending===0){ render(); processAll(); }
+      if(--pending===0){ maybeAutoThreshold(); render(); processAll(); }
     };
-    img.onerror=()=>{ if(--pending===0){ render(); processAll(); } };
+    img.onerror=()=>{ if(--pending===0){ maybeAutoThreshold(); render(); processAll(); } };
     img.src=URL.createObjectURL(f);
   });
 }
@@ -1299,7 +1351,15 @@ $('#bgSeg').addEventListener('click',e=>{
     none:'이미 투명한 PNG. 배경 제거 없이 크롭·리사이즈만 수행합니다.'};
   $('#bgHint').textContent=hints[v];
 });
-$('#thr').oninput=e=>$('#thrV').textContent=e.target.value;
+$('#thr').oninput=e=>{ $('#thrV').textContent=e.target.value; state.thrTouched=true; $('#thrRec').textContent='수동 설정됨'; };
+$('#thrAuto').onclick=()=>{
+  if(!state.items.length){ $('#thrRec').textContent='먼저 이미지를 올려주세요.'; return; }
+  if($('#bgSeg .on').dataset.v==='none'){ $('#thrRec').textContent='투명유지 모드에서는 감도가 사용되지 않습니다.'; return; }
+  const r=recommendThr();
+  if(r.thr==null){ $('#thrRec').textContent = r.transparent ? '이미 투명한 이미지 — 감도 불필요.' : '추천값을 계산할 수 없습니다.'; return; }
+  setThr(r.thr); $('#thrRec').innerHTML=`권장 감도 <b class="k">${r.thr}</b> 적용 · 가장자리 색분산 기준`; saveSettings();
+  processAll();
+};
 $('#feather').oninput=e=>$('#featherV').textContent=e.target.value+' px';
 $('#aiProvider').onchange=e=>{ $('#aiModel').value=AI_MODELS[e.target.value]||''; };
 $('#aiFill').onclick=aiFill;
