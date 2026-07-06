@@ -37,6 +37,31 @@ const ADOBE_CATEGORIES = {
 const ADOBE_CAT_LIST = Object.entries(ADOBE_CATEGORIES).map(([id, name]) => `${id} ${name}`).join(", ");
 const ADOBE_MAX_KEYWORDS = 35; // Adobe SEO 키워드 상한
 
+/* 정밀 카메라 구도 프리셋 — 선택 시 하이퍼리얼 카메라 묘사 문장으로 변환되어 프롬프트에 주입 */
+const CAMERA_ANGLES = {
+  auto: { label: "자동 (초안 카메라 그대로)", phrase: "" },
+  eye_level: { label: "Eye Level (정면)", phrase: "eye-level straight-on shot, balanced calm perspective, 50mm lens, orderly composition" },
+  low_angle: { label: "Low Angle (올려다보기)", phrase: "dynamic low-angle shot, looking slightly upward, powerful perspective, majestic presence" },
+  high_angle: { label: "High Angle (내려다보기)", phrase: "clean high-angle shot looking down, comprehensive organized top-down view" },
+  wide: { label: "Wide (와이드)", phrase: "wide establishing shot, 24mm lens, generous environmental context and abundant negative space" },
+  angle_45: { label: "Angle 45 (사선 45도)", phrase: "45-degree three-quarter angle shot, natural depth and dimensionality" },
+  over_shoulder: { label: "Over Shoulder (어깨 너머)", phrase: "over-the-shoulder shot, natural candid framing looking past the subject" },
+  closeup: { label: "Closeup (클로즈업)", phrase: "close-up shot, sharp focus on key details, elegant shallow depth of field, f/2.8" },
+  macro: { label: "Macro (초근접 접사)", phrase: "ultra-close extreme macro lens photography, f/1.8 shallow depth of field, hyper-detailed texture close-up" },
+};
+
+/* 지능형 분위기 필터 — 실내/사무 주제 감지 시 중립 화이트밸런스(노란끼 배제) 적용 */
+const INDOOR_RE = /office|desk|workspace|indoor|meeting|remote\s*work|home\s*office|studio|사무실|재택|실내|회의|책상|워크스페이스|홈\s*오피스|스튜디오|작업실/i;
+const NIGHT_RE = /night|evening|dusk|midnight|sunset|밤|저녁|야간|새벽|노을|야경|일몰/i;
+/* 생성 시점마다 Math.random()으로 진짜 무작위 선택되는 밝은 실내 광원 풀 */
+const BRIGHT_NEUTRAL_STYLES = [
+  "bright professional workspace, color-accurate neutral white balance, no excessive warm or yellow filters",
+  "clean daylight-balanced lighting, airy natural window light, true-to-life neutral colors, transparent atmosphere",
+  "crisp bright interior, neutral 5500K daylight white balance, clean white office lighting, no heavy color cast",
+  "fresh luminous workspace, soft diffused daylight, accurate whites and neutral grays, modern clean look",
+];
+const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
+
 /* 두뇌(에이전트) 라벨 · 기본 모델 */
 const BRAIN_LABELS = { claude: "Claude(Fable)", gpt: "GPT(Codex 계열)", gemini: "Gemini" };
 const GPT_MODEL_DEFAULT = "gpt-5-mini";
@@ -158,17 +183,28 @@ async function genOpenAI(key, prompt, aspect, quality) {
 
 /* 슬롯 필드 → 최종 이미지 프롬프트 (전문 판매 프롬프트 규칙) */
 function buildSlotPrompt(slot, mode) {
+  const anglePick = CAMERA_ANGLES[slot.angle]?.phrase || "";
+  const isTight = slot.angle === "closeup" || slot.angle === "macro";
+  /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
   const comp = mode === "wallpaper"
     ? `40-60% low-density clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
-    : `well-composed commercial framing with breathing room: medium or wide shot showing environmental context, main subject occupies about 50-70% of the frame with clean uncluttered negative space around it (${slot.copy_space || "~25-35% calm area suitable for text overlay"}), subject fully within frame and never cropped at the edges, eye-level, rule-of-thirds — NOT a tight edge-to-edge close-up`;
+    : isTight
+      ? `intentional detail composition, subject sharply focused with soft fall-off background (${slot.copy_space || "soft blurred margin"})`
+      : `spacious commercial framing with generous breathing room: the main subject occupies AT MOST 60% of the frame, surrounded by clean uncluttered negative space (${slot.copy_space || "~30-40% calm low-detail area suitable for text overlay"}), visible environmental context around the subject, subject fully within frame and never touching or cropped by the edges, rule-of-thirds — strictly NOT a tight edge-to-edge close-up, NOT filling the whole frame`;
   const camera = slot.kind === "illustration"
     ? `Rendering: ${slot.camera || "clean vector-like edges, consistent medium"}`
-    : `Camera: ${slot.camera || "one coherent lens, natural depth of field"}`;
+    : `Camera: ${[anglePick, slot.camera].filter(Boolean).join(", ") || "one coherent lens, natural depth of field"}`;
+  /* 지능형 분위기: 실내/사무 주제 + 밤 아님 → 중립 화이트밸런스 (매 생성마다 무작위 풀에서 선택) */
+  const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""}`;
+  const atmosphere = slot.kind !== "illustration" && INDOOR_RE.test(themeText) && !NIGHT_RE.test(themeText)
+    ? pickRandom(BRIGHT_NEUTRAL_STYLES)
+    : "";
   return [
     slot.subject,
     `Focal placement: ${slot.focal_placement || "center"}`,
     comp, camera,
     `Lighting: ${slot.lighting || "soft natural light with realistic shadows"}`,
+    atmosphere,
     `Palette: ${slot.palette || "bright commercial tones"}`,
     slot.kind === "illustration" ? "professional stock illustration" : "8K photorealistic professional stock photograph, crisp detail",
     GUARD,
@@ -312,7 +348,7 @@ CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOB
           made.push({
             ...item,
             index: pad2(made.length + 1),
-            status: "pending", regenCount: 0, dataUrl: "", rejectReason: "",
+            status: "pending", regenCount: 0, dataUrl: "", rejectReason: "", angle: "auto", finalPrompt: "",
             slug: cleanName(item.slug, 24) || `slot-${made.length + 1}`,
           });
         }
@@ -345,10 +381,11 @@ CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOB
       setProg({ done: newMade, total: Math.min(targets.length, cap), stage: `슬롯 ${t.index} 생성 중` });
       setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
       try {
-        const dataUrl = await generateImage(buildSlotPrompt(t, mode));
+        const fp = buildSlotPrompt(t, mode);
+        const dataUrl = await generateImage(fp);
         newMade += 1;
         setSlots((p) => p.map((s) => (s.index === t.index
-          ? { ...s, status: "success", dataUrl, rejectReason: "", regenCount: s.regenCount + 1 } : s)));
+          ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", regenCount: s.regenCount + 1 } : s)));
         addLog(`[성공 ${t.index}] ${t.title_kr || t.title}`);
       } catch (err) {
         setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "failed", rejectReason: err.message } : s)));
@@ -471,7 +508,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `# FreeJJang 프롬프트 (간편) — 주제: ${topic || "(미지정)"} · 모드: ${mode} · 종횡비: ${aspect}\n` +
       `# 각 줄의 프롬프트에는 노텍스트 GUARD 규칙이 이미 포함되어 있습니다.\n` +
       `# Midjourney / Firefly / Stable Diffusion 등 다른 AI에 그대로 붙여넣어 쓰세요.\n\n`;
-    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${buildSlotPrompt(s, mode)}`).join("\n\n");
+    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode)}`).join("\n\n");
     download(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-min.txt`);
     addLog(`[백업] 프롬프트 TXT(간편) 저장 완료 — ${rows.length}슬롯`);
   };
@@ -484,7 +521,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const body = rows.map((s) => [
       `[${s.index}] ${s.title_kr || ""} / ${s.title || ""}`,
       `status: ${s.status}`,
-      `final_prompt: ${buildSlotPrompt(s, mode)}`,
+      `final_prompt: ${s.finalPrompt || buildSlotPrompt(s, mode)}`,
       `subject: ${s.subject || ""}`,
       `kind: ${s.kind || ""}`,
       `focal_placement: ${s.focal_placement || ""}`,
@@ -531,6 +568,32 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
 
   const updateSlot = (index, field, value) =>
     setSlots((p) => p.map((s) => (s.index === index ? { ...s, [field]: value } : s)));
+
+  /* ── 슬롯 단건 재생성 (편집한 구도/앵글 즉시 반영) ── */
+  const regenSlot = async (t) => {
+    if (!imageKey()) { setNotice("이미지 API 키가 필요합니다."); return; }
+    if (phase === "generating") return;
+    setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
+    addLog(`[재생성 ${t.index}] ${CAMERA_ANGLES[t.angle]?.label || "자동"} · 시작`);
+    try {
+      const fp = buildSlotPrompt(t, mode);
+      const dataUrl = await generateImage(fp);
+      setSlots((p) => p.map((s) => (s.index === t.index
+        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", autoFlag: "", regenCount: s.regenCount + 1 } : s)));
+      setQcRejects((p) => { const n = { ...p }; delete n[t.index]; return n; });
+      addLog(`[재생성 ${t.index}] 완료`);
+    } catch (err) {
+      setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "failed", rejectReason: err.message } : s)));
+      addLog(`[재생성 실패 ${t.index}] ${err.message}`);
+    }
+  };
+
+  /* ── 슬롯 삭제 (번호 재정렬) ── */
+  const deleteSlot = (index) => {
+    setSlots((p) => p.filter((s) => s.index !== index).map((s, i) => ({ ...s, index: pad2(i + 1) })));
+    setQcRejects({});
+    addLog(`[삭제] 슬롯 ${index} 제거 — 번호 재정렬됨`);
+  };
 
   /* ═══ 기본 생성 (자유 프롬프트) ═══ */
   const handleFreeGen = async (base) => {
@@ -947,18 +1010,53 @@ Each block content = one short Korean sentence.`,
                               </p>
                             )}
 
-                            {/* 초안 단계 편집 */}
-                            {phase === "review" && (
+                            {/* 구도/앵글 미세조정 — 초안·QC 단계 모두 편집 가능 */}
+                            {(phase === "review" || phase === "qc") && (
                               <div className="pt-1.5 border-t border-neutral-700 space-y-1.5">
                                 <textarea value={s.subject} rows={2}
                                   onChange={(e) => updateSlot(s.index, "subject", e.target.value)}
                                   className="w-full text-xs px-2 py-1.5 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none focus:border-violet-500 resize-none"
                                   placeholder="피사체/장면" />
+                                <div>
+                                  <label className="block text-[10px] font-mono text-neutral-500 mb-0.5">CAMERA ANGLE (카메라 앵글)</label>
+                                  <select value={s.angle || "auto"} onChange={(e) => updateSlot(s.index, "angle", e.target.value)}
+                                    className="w-full text-xs px-2 py-1 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none focus:border-violet-500">
+                                    {Object.entries(CAMERA_ANGLES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                                  </select>
+                                </div>
                                 <div className="grid grid-cols-2 gap-1.5">
-                                  <input value={s.camera} onChange={(e) => updateSlot(s.index, "camera", e.target.value)}
-                                    className="text-xs px-2 py-1 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none" placeholder="camera" />
-                                  <input value={s.palette} onChange={(e) => updateSlot(s.index, "palette", e.target.value)}
+                                  <div>
+                                    <label className="block text-[10px] font-mono text-neutral-500 mb-0.5">FOCAL PLACEMENT</label>
+                                    <input value={s.focal_placement || ""} onChange={(e) => updateSlot(s.index, "focal_placement", e.target.value)}
+                                      className="w-full text-xs px-2 py-1 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none" placeholder="예: center-right" />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] font-mono text-neutral-500 mb-0.5">COPY SPACE 영역</label>
+                                    <input value={s.copy_space || ""} onChange={(e) => updateSlot(s.index, "copy_space", e.target.value)}
+                                      className="w-full text-xs px-2 py-1 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none" placeholder="예: top left soft blur" />
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-1.5">
+                                  <input value={s.camera || ""} onChange={(e) => updateSlot(s.index, "camera", e.target.value)}
+                                    className="text-xs px-2 py-1 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none" placeholder="camera 추가 묘사" />
+                                  <input value={s.palette || ""} onChange={(e) => updateSlot(s.index, "palette", e.target.value)}
                                     className="text-xs px-2 py-1 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none" placeholder="palette" />
+                                </div>
+                                {/* 슬롯 액션: 재생성 · 삭제 */}
+                                <div className="flex gap-1.5 pt-0.5">
+                                  <button onClick={() => regenSlot(s)}
+                                    disabled={s.status === "generating" || !imageKey()}
+                                    title={!imageKey() ? "이미지 API 키가 필요합니다" : "편집한 구도로 이 슬롯만 다시 생성"}
+                                    className="flex-1 bg-violet-600/20 hover:bg-violet-600/40 border border-violet-500/40 disabled:opacity-40 text-violet-300 font-bold text-xs py-1.5 rounded flex items-center justify-center gap-1 transition">
+                                    <RefreshCw className={`w-3 h-3 ${s.status === "generating" ? "animate-spin" : ""}`} />
+                                    {s.status === "generating" ? "생성 중…" : "이 슬롯 재생성"}
+                                  </button>
+                                  <button onClick={() => deleteSlot(s.index)}
+                                    disabled={s.status === "generating"}
+                                    title="이 슬롯을 목록에서 제거"
+                                    className="bg-red-500/10 hover:bg-red-500/25 border border-red-500/30 disabled:opacity-40 text-red-300 font-bold text-xs py-1.5 px-2.5 rounded flex items-center justify-center gap-1 transition">
+                                    <Trash2 className="w-3 h-3" /> 삭제
+                                  </button>
                                 </div>
                               </div>
                             )}
