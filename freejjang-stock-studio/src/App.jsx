@@ -336,6 +336,7 @@ export default function App() {
 
   /* ── 파이프라인 상태 ── */
   const [topic, setTopic] = useState("");
+  const [topicNote, setTopicNote] = useState(""); // 보충 설명·키워드 전략 (선택 — 초안 두뇌에 그대로 전달)
   const [count, setCount] = useState(6);
   const [maxNew, setMaxNew] = useState(""); // 생성 상한 (하드캡, 선택)
   const [mode, setMode] = useState("commercial"); // commercial | wallpaper
@@ -385,7 +386,7 @@ export default function App() {
   const startFresh = () => {
     if (slots.length > 0 && !window.confirm("새로 시작할까요? 현재 슬롯·이미지·로그가 모두 지워집니다. (API 키와 설정은 유지)")) return;
     cancelRef.current = true;
-    setTopic(""); setSlots([]); setQcRejects({}); setQcReason("");
+    setTopic(""); setTopicNote(""); setSlots([]); setQcRejects({}); setQcReason("");
     setPhase("idle"); setProg(null); setAutoQcProg(null); setAutoQcBusy(false);
     setMaxNew(""); setLog([]); setNotice(null);
     setModeAuto(true); setMode("commercial");
@@ -527,11 +528,11 @@ export default function App() {
         const r = await askBrain(
           `You draft professional stock image slots. Respond ONLY compact JSON:
 {"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"EXACTLY 25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경), same SEO ordering as EN","category":11}]}
-RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": medium or wide framing with environmental context and comfortable breathing room — the subject fills about 50-70% of the frame (NEVER edge-to-edge, NOT a tight close-up), keep roughly 25-35% clean uncluttered negative space for versatility, rule-of-thirds/leading-line, subject fully in frame and not cropped. Set "copy_space" to name where that calm area sits (e.g. "upper-left clean area").
+RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. SELLABILITY: usable beats pretty — when people interact with objects/devices, prefer hands + device + partial person over posed full faces (higher commercial usability, no model-release burden); keep backgrounds clean enough for ads, blogs and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": medium or wide framing with environmental context and comfortable breathing room — the subject fills about 50-70% of the frame (NEVER edge-to-edge, NOT a tight close-up), keep roughly 25-35% clean uncluttered negative space for versatility, rule-of-thirds/leading-line, subject fully in frame and not cropped. Set "copy_space" to name where that calm area sits (e.g. "upper-left clean area").
 KEYWORDS (Adobe SEO, critical): "keywords" must be EXACTLY 35 English keywords, comma-separated, NO duplicates, ordered by buyer importance (Adobe weights the first ~10 most). Order groups: (1) main subject nouns, (2) specific descriptors/materials/actions, (3) concept/theme/season/emotion, (4) color and lighting, (5) composition/orientation (copy space, background, close-up, minimal), (6) use-case (banner, wallpaper, marketing, web design). Use single words or natural 2-word phrases, all lowercase, only real buyer search terms that literally describe what is visible. No text/number/logo/brand words. "keywords_kr" follows the same SEO ordering in Korean single nouns.
 CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOBE_CAT_LIST}. Choose by the dominant visible subject (e.g. scenery→11, dish/ingredient→7, festival/tradition/ritual→15, person-focused lifestyle→12 or 13, plant/flower→14, drink→4, tech/device→19). If kind is "illustration"/vector/background and nothing fits more strongly, use 8. Return category as the integer id only.
 PROPS & VARIETY (critical for a professional set — avoid templated sameness): every slot's "props" must be SPECIFIC to that exact scene and DIFFERENT from every other slot — never reuse the same generic filler (e.g. do NOT put "plastic water bottle" or "small potted plant" in more than one slot; ideally use each only once in the whole set, if at all). Choose props that genuinely belong to the subject: for FOOD, include the correct culturally-appropriate tableware and utensils that match the dish (Korean meal → spoon + chopsticks; Western plate → fork + knife; noodles/soup → spoon or chopsticks; dessert → small fork or teaspoon) plus fitting garnish, napkin, board, or sauce dish — vary these per dish. For interior/background scenes, rotate a diverse mix of secondary objects across slots (a ceramic vase, dried flowers, stacked books, a woven basket, folded linen, a wooden tray, a candle, seasonal fruit, a framed textile) so no two backgrounds feel like copies. Props must fit the mode's copy space (keep the calm area uncluttered) and the selected people/style/tone. Keep them believable and unbranded.`,
-          `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Avoid repeating any of these already-used subject|props|palette signatures: ${combos}${refinementLine()}`
+          `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Avoid repeating any of these already-used subject|props|palette signatures: ${combos}${refinementLine()}${topicNote.trim() ? `\nUSER'S MARKET RESEARCH / STRATEGY NOTES (high priority — use these to pick scene variations AND to choose/order the keywords; they reflect current buyer demand. JSON format and all rules above stay unchanged): """${topicNote.trim()}"""` : ""}`
         );
         for (const item of r.items || []) {
           if (made.length >= count) break;
@@ -1053,6 +1054,16 @@ Each block content = one short Korean sentence.`,
                     disabled={phase === "drafting" || phase === "generating"}
                     placeholder="예: 9월 가을 신학기 계절 배경화면"
                     className={`${fieldCls} w-full disabled:opacity-60`} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-400 mb-1">
+                    보충 설명 · 전략 메모 <span className="text-neutral-600 font-normal">(선택 — 키워드·장면 기획에 반영)</span>
+                  </label>
+                  <textarea value={topicNote} onChange={(e) => setTopicNote(e.target.value)}
+                    disabled={phase === "drafting" || phase === "generating"}
+                    rows={4}
+                    placeholder={"판매 리서치·키워드 전략·장면 아이디어를 자유롭게 붙여넣으세요.\n예: 손+기기 컷이 잘 팔림 / 카페·소파·출퇴근 장면별로 / smartphone, scrolling, copy space 우선"}
+                    className={`${fieldCls} w-full disabled:opacity-60 resize-y leading-relaxed`} />
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
