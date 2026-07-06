@@ -276,7 +276,7 @@
           </select>
           <input type="text" id="aiModel" value="gemini-2.5-flash" placeholder="모델">
         </div>
-        <input type="password" id="aiKey" class="mb" placeholder="API 키 (브라우저 메모리에만 보관)" autocomplete="off">
+        <input type="password" id="aiKey" class="mb" placeholder="API 키 (이 브라우저에만 저장, 전송 안 됨)" autocomplete="off">
         <button class="btn ghost" id="aiFill">🪄 제목·키워드 AI 자동생성</button>
         <div id="aiMsg"></div>
         <div class="hint">이미지가 무엇인지 AI가 보고 SEO 키워드(≤25개)와 제목(≤100자)을 채웁니다.
@@ -802,15 +802,21 @@ function koSlug(text, fallback){
 function validDate(){
   const d=$('#date').value.trim();
   if(!/^\d{6}$/.test(d)) return {ok:false,msg:'등록일을 YYMMDD 6자리로 입력하세요.'};
+  const mm=+d.slice(2,4), dd=+d.slice(4,6);
+  if(mm<1||mm>12||dd<1||dd>31) return {ok:false,msg:'등록일의 월/일이 올바르지 않습니다.'};
   return {ok:true,date:d};
 }
-function baseName(i){
+/* 전체 파일명(중복 슬러그는 숫자 접미사로 해소) — 카드 표시와 ZIP 이 동일한 결과 사용 */
+function allBaseNames(){
   const v=validDate();
-  const n=String(i+1).padStart(2,'0');
-  const it=state.items[i];
-  const slug=koSlug(it&&it.title, $('#slug').value);
-  if(!v.ok) return `______${slug}_${n}`;
-  return `${v.date}_${slug}_${n}`;
+  const date=v.ok?v.date:'______';
+  const seen=new Map();
+  return state.items.map((it,i)=>{
+    let slug=koSlug(it.title, $('#slug').value);
+    const cnt=(seen.get(slug)||0)+1; seen.set(slug,cnt);
+    if(cnt>1){ const sfx=String(cnt); slug=slug.slice(0,Math.max(1,8-sfx.length))+sfx; }
+    return `${date}_${slug}_${String(i+1).padStart(2,'0')}`;
+  });
 }
 
 /* ---------- 렌더 ---------- */
@@ -827,6 +833,7 @@ function render(){
   const vm=state.viewMode||'thumb';
   if(vm==='thumb') wrap.classList.add('compact');
   else wrap.style.setProperty('--cardw', vm==='large' ? '300px' : '210px');
+  const names=allBaseNames();
   state.items.forEach((item,i)=>{
     const o=item.out;
     const gv = o? gatesOf(item,S):{g:[],warn:[]};
@@ -840,7 +847,7 @@ function render(){
         ${o?`<img src="${o.url}" alt="">`:`<div class="spin">처리 대기…</div>`}
       </div>
       <div class="meta">
-        <div class="fn">${baseName(i)}.png</div>
+        <div class="fn">${names[i]}.png</div>
         ${o?`<div class="dims"><span>${o.w}×${o.h}px</span><span>${o.sizeMB.toFixed(2)}MB</span><span>${S.dpi}DPI</span>${item.manualCrop?'<span style="color:var(--acc)">수동크롭</span>':''}</div>`:''}
         <div class="gates">${gatesHtml}</div>
         <input type="text" class="ttl" placeholder="한글 제목 (≤100자)" value="${(item.title||'').replace(/"/g,'&quot;')}">
@@ -854,10 +861,11 @@ function render(){
     // events
     el.querySelector('.del').onclick=()=>{ if(o)URL.revokeObjectURL(o.url); state.items.splice(i,1); render(); };
     el.querySelector('.ttl').oninput=e=>item.title=e.target.value;
+    el.querySelector('.ttl').onchange=()=>render(); // 입력 확정 시 파일명 갱신
     el.querySelector('.kw').oninput=e=>item.keywords=e.target.value;
     el.querySelector('.crop').onclick=()=>openCrop(item);
     el.querySelector('.rt').onclick=()=>openRetouch(item);
-    el.querySelector('.dl').onclick=()=>{ if(o) downloadBlob(o.blob, baseName(i)+'.png'); };
+    el.querySelector('.dl').onclick=()=>{ if(o) downloadBlob(o.blob, allBaseNames()[i]+'.png'); };
     wrap.appendChild(el);
   });
   stage.innerHTML=''; stage.appendChild(wrap);
@@ -919,13 +927,9 @@ async function downloadZip(){
   const rows=[['fileName','uniqueId','elementName','keywords','status','licenseType']];
   const map=[['sourceFile','fileName']];
   const problems=[];
-  const seen=new Map(); // 슬러그 중복 방지
+  const names=allBaseNames(); // 카드 표시와 동일한 파일명(중복 자동 해소)
   state.items.forEach((it,i)=>{
-    let slug=koSlug(it.title, $('#slug').value);
-    const key=slug;
-    const cnt=(seen.get(key)||0)+1; seen.set(key,cnt);
-    if(cnt>1) slug = (slug+cnt).slice(0,8);
-    const base=`${v.date}_${slug}_${String(i+1).padStart(2,'0')}`;
+    const base=names[i];
     files.push({name:`PNG/${base}.png`, data:it.out.bytes});
     const title=(it.title||'').trim();
     let kw=(it.keywords||'').split(',').map(x=>x.trim()).filter(Boolean);
@@ -933,6 +937,7 @@ async function downloadZip(){
     if(!title) problems.push(`#${i+1} 제목 없음`);
     if(title.length>100) problems.push(`#${i+1} 제목 100자 초과`);
     if(kw.length>25) problems.push(`#${i+1} 키워드 25개 초과`);
+    if(it.out.sizeMB>50) problems.push(`#${i+1} 50MB 초과`);
     rows.push([base,'',title,kw.join(','),'ACTIVE','STANDARD']);
     map.push([it.name,base]);
   });
@@ -1033,16 +1038,25 @@ async function aiFill(){
   const S=readSettings();
   for(const it of state.items){ if(!it.out) await processItem(it,S); }
   let done=0; const errs=[];
+  const friendly=(e)=>/failed to fetch|networkerror|load failed/i.test(e.message||'')
+    ? '외부 API 연결 차단/실패 — 아티팩트 미리보기에서는 API가 차단됩니다. index.html 파일을 내려받아 직접 여세요.'
+    : e.message;
   for(let i=0;i<state.items.length;i++){
     const it=state.items[i];
     aiMsg(`AI 생성 중… ${i+1}/${state.items.length}`,'warn');
-    try{
-      const b64=await makeThumb(it.out.blob, 512);
-      const text=await callAI(provider,key,model,AI_PROMPT,b64);
-      const m=parseMeta(text);
-      if(!m.title) throw new Error('빈 응답');
-      it.title=m.title; it.keywords=m.keywords; done++; render();
-    }catch(e){ errs.push(`#${i+1}: ${e.message}`); }
+    let ok=false;
+    for(let attempt=1;attempt<=2 && !ok;attempt++){ // 일시 오류 1회 재시도
+      try{
+        const b64=await makeThumb(it.out.blob, 512);
+        const text=await callAI(provider,key,model,AI_PROMPT,b64);
+        const m=parseMeta(text);
+        if(!m.title) throw new Error('빈 응답');
+        it.title=m.title; it.keywords=m.keywords; done++; ok=true; render();
+      }catch(e){
+        if(attempt===2) errs.push(`#${i+1}: ${friendly(e)}`);
+        else await new Promise(r=>setTimeout(r,700));
+      }
+    }
     await new Promise(r=>setTimeout(r,120));
   }
   aiRunning=false; $('#aiFill').disabled=false;
@@ -1305,12 +1319,62 @@ $('#date').oninput=()=>{
   else $('#acctMsg').innerHTML='';
 };
 
-// 등록일 기본값 = 오늘(YYMMDD)
+/* ---------- 설정 저장/복원 (localStorage, 이 브라우저에만 보관) ---------- */
+const LS_KEY='element_crop_studio_v1';
+function saveSettings(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      bgMode:$('#bgSeg .on').dataset.v,
+      thr:$('#thr').value, feather:$('#feather').value,
+      longAxis:$('#longAxis').value, maxAxis:$('#maxAxis').value,
+      dpi:$('#dpi').value, margin:$('#margin').value,
+      sanitize:$('#sanitize').checked, pockets:$('#pockets').checked, shadows:$('#shadows').checked,
+      slug:$('#slug').value,
+      aiProvider:$('#aiProvider').value, aiModel:$('#aiModel').value, aiKey:$('#aiKey').value,
+      viewMode:state.viewMode||'thumb',
+    }));
+  }catch(_){}
+}
+function loadSettings(){
+  let s=null;
+  try{ s=JSON.parse(localStorage.getItem(LS_KEY)||'null'); }catch(_){}
+  if(!s) return;
+  if(s.bgMode && $(`#bgSeg button[data-v="${s.bgMode}"]`)){
+    $('#bgSeg .on').classList.remove('on');
+    $(`#bgSeg button[data-v="${s.bgMode}"]`).classList.add('on');
+  }
+  if(s.thr){$('#thr').value=s.thr;$('#thrV').textContent=s.thr;}
+  if(s.feather!=null){$('#feather').value=s.feather;$('#featherV').textContent=s.feather+' px';}
+  if(s.longAxis)$('#longAxis').value=s.longAxis;
+  if(s.maxAxis)$('#maxAxis').value=s.maxAxis;
+  if(s.dpi)$('#dpi').value=s.dpi;
+  if(s.margin!=null)$('#margin').value=s.margin;
+  if(typeof s.sanitize==='boolean')$('#sanitize').checked=s.sanitize;
+  if(typeof s.pockets==='boolean')$('#pockets').checked=s.pockets;
+  if(typeof s.shadows==='boolean')$('#shadows').checked=s.shadows;
+  if(s.slug)$('#slug').value=s.slug;
+  if(s.aiProvider)$('#aiProvider').value=s.aiProvider;
+  if(s.aiModel)$('#aiModel').value=s.aiModel;
+  if(s.aiKey)$('#aiKey').value=s.aiKey;
+  if(s.viewMode && $(`#sizeSeg button[data-v="${s.viewMode}"]`)){
+    state.viewMode=s.viewMode;
+    $('#sizeSeg .on').classList.remove('on');
+    $(`#sizeSeg button[data-v="${s.viewMode}"]`).classList.add('on');
+  }
+}
+// 설정 변경 시 자동 저장
+['#thr','#feather','#longAxis','#maxAxis','#dpi','#margin','#sanitize','#pockets','#shadows','#slug','#aiProvider','#aiModel','#aiKey']
+  .forEach(sel=>{ const el=$(sel); if(el) el.addEventListener('change',saveSettings); });
+$('#bgSeg').addEventListener('click',saveSettings);
+$('#sizeSeg').addEventListener('click',saveSettings);
+
+// 등록일 기본값 = 오늘(YYMMDD) — 항상 오늘 날짜로 시작
 (function(){
   const d=new Date();
   $('#date').value = String(d.getFullYear()).slice(-2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
 })();
 
+loadSettings();
 render();
 </script>
 </body>
