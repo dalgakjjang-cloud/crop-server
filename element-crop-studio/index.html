@@ -78,6 +78,7 @@
   .drop .ic{font-size:30px;margin-bottom:8px}
   .drop b{font-size:13.5px}
   .drop span{display:block;color:var(--dim);font-size:11.5px;margin-top:5px}
+  .dropbtns{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
 
   .empty{padding:70px 20px;text-align:center;color:var(--dim)}
   .empty .ic{font-size:46px;margin-bottom:12px;opacity:.6}
@@ -255,10 +256,15 @@
         <div class="bd">
           <div class="drop" id="drop">
             <div class="ic">🖼️</div>
-            <b>이미지를 끌어다 놓거나 클릭해서 선택</b>
+            <b>이미지를 여기로 끌어다 놓으세요</b>
             <span>PNG · JPG · WEBP · 여러 장 동시 · 붙여넣기(Ctrl+V)도 가능</span>
+            <div class="dropbtns">
+              <button class="btn primary sm" id="pickFiles">📁 파일 선택</button>
+              <button class="btn ghost sm" id="pickFolder">🗂 폴더 전체 가져오기</button>
+            </div>
           </div>
           <input type="file" id="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+          <input type="file" id="folder" accept="image/png,image/jpeg,image/webp" webkitdirectory multiple hidden>
         </div>
       </div>
 
@@ -834,9 +840,12 @@ $('#cropX').onclick=()=>$('#cropModal').classList.remove('on');
 $('#cropModal').addEventListener('pointerdown',e=>{ if(e.target===$('#cropModal')) $('#cropModal').classList.remove('on'); });
 
 /* ══════════════════════ 이벤트 바인딩 ══════════════════════ */
-const drop=$('#drop'), file=$('#file');
+const drop=$('#drop'), file=$('#file'), folder=$('#folder');
 drop.onclick=()=>file.click();
+$('#pickFiles').onclick=e=>{ e.stopPropagation(); file.click(); };
+$('#pickFolder').onclick=e=>{ e.stopPropagation(); folder.click(); };
 file.onchange=e=>{ loadFiles(e.target.files); file.value=''; };
+folder.onchange=e=>{ loadFiles(e.target.files); folder.value=''; };
 ['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
 ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
 drop.addEventListener('drop',e=>loadFiles(e.dataTransfer.files));
