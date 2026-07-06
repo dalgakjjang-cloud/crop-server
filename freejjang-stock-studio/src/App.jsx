@@ -160,16 +160,33 @@ const normKeywords = (raw, max) => {
     .join(", ");
 };
 
-/* 두뇌가 35개 미만을 돌려주면 제목·주제·소품 등 실제 보이는 단어로 자동 보충 (Adobe SEO 손해 방지) */
-const KW_STOP = new Set(["the","a","an","of","and","with","in","on","for","at","to","by","is","are","its","from","into","over"]);
-const padKeywords = (item, max) => {
+/* 키워드 미달 시 제목·주제·소품에서 자동 보충 — Adobe(EN 35개)·미캔(KR 25개) 공용 */
+const KW_STOP_EN = new Set(["the","a","an","of","and","with","in","on","for","at","to","by","is","are","its","from","into","over"]);
+const KW_STOP_KR = new Set(["그","이","저","것","수","등","및","의","에","를","을","은","는","로","와","과","도","가"]);
+const MIRI_MAX_KEYWORDS = 25;
+
+const padKeywordsEN = (item, max) => {
   const base = normKeywords(item.keywords, max);
   const list = base ? base.split(", ") : [];
   if (list.length >= max) return base;
   const seen = new Set(list.map((k) => k.toLowerCase()));
   const pool = `${item.title || ""} ${item.subject || ""} ${item.props || ""} ${item.lighting || ""} ${item.palette || ""}`
     .toLowerCase().replace(/[^a-z\s-]/g, " ").split(/\s+/)
-    .filter((w) => w.length >= 3 && !KW_STOP.has(w) && !seen.has(w));
+    .filter((w) => w.length >= 3 && !KW_STOP_EN.has(w) && !seen.has(w));
+  for (const w of pool) {
+    if (list.length >= max) break;
+    list.push(w); seen.add(w);
+  }
+  return list.join(", ");
+};
+const padKeywordsKR = (item, max) => {
+  const base = normKeywords(item.keywords_kr, max);
+  const list = base ? base.split(", ") : [];
+  if (list.length >= max) return base;
+  const seen = new Set(list);
+  const pool = `${item.title_kr || ""} ${item.subject || ""} ${item.props || ""}`
+    .replace(/[^가-힣\s]/g, " ").split(/\s+/)
+    .filter((w) => w.length >= 2 && !KW_STOP_KR.has(w) && !seen.has(w));
   for (const w of pool) {
     if (list.length >= max) break;
     list.push(w); seen.add(w);
@@ -509,7 +526,7 @@ export default function App() {
         const combos = made.slice(-6).map((s) => `${s.subject}|${s.props || ""}|${s.palette}`).join(" / ") || "none";
         const r = await askBrain(
           `You draft professional stock image slots. Respond ONLY compact JSON:
-{"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경)","category":11}]}
+{"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"EXACTLY 25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경), same SEO ordering as EN","category":11}]}
 RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": medium or wide framing with environmental context and comfortable breathing room — the subject fills about 50-70% of the frame (NEVER edge-to-edge, NOT a tight close-up), keep roughly 25-35% clean uncluttered negative space for versatility, rule-of-thirds/leading-line, subject fully in frame and not cropped. Set "copy_space" to name where that calm area sits (e.g. "upper-left clean area").
 KEYWORDS (Adobe SEO, critical): "keywords" must be EXACTLY 35 English keywords, comma-separated, NO duplicates, ordered by buyer importance (Adobe weights the first ~10 most). Order groups: (1) main subject nouns, (2) specific descriptors/materials/actions, (3) concept/theme/season/emotion, (4) color and lighting, (5) composition/orientation (copy space, background, close-up, minimal), (6) use-case (banner, wallpaper, marketing, web design). Use single words or natural 2-word phrases, all lowercase, only real buyer search terms that literally describe what is visible. No text/number/logo/brand words. "keywords_kr" follows the same SEO ordering in Korean single nouns.
 CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOBE_CAT_LIST}. Choose by the dominant visible subject (e.g. scenery→11, dish/ingredient→7, festival/tradition/ritual→15, person-focused lifestyle→12 or 13, plant/flower→14, drink→4, tech/device→19). If kind is "illustration"/vector/background and nothing fits more strongly, use 8. Return category as the integer id only.
@@ -522,7 +539,8 @@ PROPS & VARIETY (critical for a professional set — avoid templated sameness): 
             ...item,
             index: pad2(made.length + 1),
             status: "pending", regenCount: 0, dataUrl: "", rejectReason: "", qcNote: "", angle: refAngle, finalPrompt: "",
-            keywords: padKeywords(item, ADOBE_MAX_KEYWORDS),
+            keywords: padKeywordsEN(item, ADOBE_MAX_KEYWORDS),
+            keywords_kr: padKeywordsKR(item, MIRI_MAX_KEYWORDS),
             slug: cleanName(item.slug, 24) || `slot-${made.length + 1}`,
           });
         }
@@ -736,7 +754,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `palette: ${s.palette || ""}`,
       `category: ${s.category} (${ADOBE_CATEGORIES[s.category] || "?"})`,
       `keywords_en: ${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS)}`,
-      `keywords_kr: ${normKeywords(s.keywords_kr, 25)}`,
+      `keywords_kr: ${normKeywords(s.keywords_kr, MIRI_MAX_KEYWORDS)}`,
     ].join("\n")).join("\n\n────────────────────────────\n\n");
   };
   const exportPromptsFull = () => {
@@ -767,7 +785,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const miriRows = ok.map((s) => ({
       fileName: `${s.index}-${cleanName(topic, 15)}-${s.slug}_miri`,
       elementName: [(s.title_kr || "").substring(0, 8), s.title].filter(Boolean).join(" "),
-      keywords: normKeywords(s.keywords_kr, 25),
+      keywords: normKeywords(s.keywords_kr, MIRI_MAX_KEYWORDS),
       tier: "Premium", contentType: "Photo",
     }));
     const ws = XLSX.utils.json_to_sheet(miriRows, { header: ["fileName", "elementName", "keywords", "tier", "contentType"] });
@@ -1299,7 +1317,7 @@ Each block content = one short Korean sentence.`,
                               {statusChip(s)}
                             </div>
                             {s.title_kr && <p className="text-xs text-sky-300 truncate">{s.title_kr}</p>}
-                            <p className="text-xs text-neutral-500 font-mono truncate" title={`Adobe cat ${s.category} · 키워드 ${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS).split(", ").filter(Boolean).length}개`}>{s.kind} · {s.focal_placement} · {ADOBE_CATEGORIES[s.category] || `cat ${s.category}`}{s.keywords ? ` · kw ${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS).split(", ").filter(Boolean).length}` : ""}{s.regenCount > 1 ? ` · 재생성 ${s.regenCount - 1}회` : ""}</p>
+                            <p className="text-xs text-neutral-500 font-mono truncate" title={`Adobe cat ${s.category} · EN ${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS).split(", ").filter(Boolean).length}/35 · KR ${normKeywords(s.keywords_kr, MIRI_MAX_KEYWORDS).split(", ").filter(Boolean).length}/25`}>{s.kind} · {s.focal_placement} · {ADOBE_CATEGORIES[s.category] || `cat ${s.category}`}{s.keywords ? ` · EN${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS).split(", ").filter(Boolean).length}` : ""}{s.keywords_kr ? `/KR${normKeywords(s.keywords_kr, MIRI_MAX_KEYWORDS).split(", ").filter(Boolean).length}` : ""}{s.regenCount > 1 ? ` · 재생성 ${s.regenCount - 1}회` : ""}</p>
                             {s.autoFlag && (phase === "qc" || phase === "review") && (
                               <p className="text-xs text-red-300 bg-red-500/10 border border-red-500/30 rounded px-2 py-1 leading-relaxed">
                                 자동 검수: {s.autoFlag}
