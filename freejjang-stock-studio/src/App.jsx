@@ -160,7 +160,7 @@ async function genOpenAI(key, prompt, aspect, quality) {
 function buildSlotPrompt(slot, mode) {
   const comp = mode === "wallpaper"
     ? `40-60% low-density clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
-    : `natural full commercial composition, ${slot.copy_space || "spacing only where needed (10-30%)"}, subject not pushed to the edge`;
+    : `well-composed commercial framing with breathing room: medium or wide shot showing environmental context, main subject occupies about 50-70% of the frame with clean uncluttered negative space around it (${slot.copy_space || "~25-35% calm area suitable for text overlay"}), subject fully within frame and never cropped at the edges, eye-level, rule-of-thirds — NOT a tight edge-to-edge close-up`;
   const camera = slot.kind === "illustration"
     ? `Rendering: ${slot.camera || "clean vector-like edges, consistent medium"}`
     : `Camera: ${slot.camera || "one coherent lens, natural depth of field"}`;
@@ -302,7 +302,7 @@ export default function App() {
         const r = await askBrain(
           `You draft professional stock image slots. Respond ONLY compact JSON:
 {"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경)","category":11}]}
-RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": natural rule-of-thirds/leading-line/central composition, copy_space only 10-30% if needed.
+RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": medium or wide framing with environmental context and comfortable breathing room — the subject fills about 50-70% of the frame (NEVER edge-to-edge, NOT a tight close-up), keep roughly 25-35% clean uncluttered negative space for versatility, rule-of-thirds/leading-line, subject fully in frame and not cropped. Set "copy_space" to name where that calm area sits (e.g. "upper-left clean area").
 KEYWORDS (Adobe SEO, critical): "keywords" must be EXACTLY 35 English keywords, comma-separated, NO duplicates, ordered by buyer importance (Adobe weights the first ~10 most). Order groups: (1) main subject nouns, (2) specific descriptors/materials/actions, (3) concept/theme/season/emotion, (4) color and lighting, (5) composition/orientation (copy space, background, close-up, minimal), (6) use-case (banner, wallpaper, marketing, web design). Use single words or natural 2-word phrases, all lowercase, only real buyer search terms that literally describe what is visible. No text/number/logo/brand words. "keywords_kr" follows the same SEO ordering in Korean single nouns.
 CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOBE_CAT_LIST}. Choose by the dominant visible subject (e.g. scenery→11, dish/ingredient→7, festival/tradition/ritual→15, person-focused lifestyle→12 or 13, plant/flower→14, drink→4, tech/device→19). If kind is "illustration"/vector/background and nothing fits more strongly, use 8. Return category as the integer id only.`,
           `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Combos already used (avoid): ${combos}`
@@ -916,10 +916,10 @@ Each block content = one short Korean sentence.`,
                               if (phase === "qc" && s.status === "success") setQcRejects((p) => ({ ...p, [s.index]: !p[s.index] }));
                               else if (s.dataUrl) setPreviewSlot(s);
                             }}
-                            className="w-full bg-neutral-950 relative flex items-center justify-center" style={{ height: "140px" }}>
+                            className="w-full bg-neutral-950 relative flex items-center justify-center" style={{ height: "170px" }}>
                             {s.dataUrl ? (
                               <>
-                                <img src={s.dataUrl} alt={s.title} className="w-full h-full object-cover" />
+                                <img src={s.dataUrl} alt={s.title} className="w-full h-full object-contain" title="실제 구도 그대로 표시 (잘라내지 않음)" />
                                 {rejected && (
                                   <div className="absolute inset-0 bg-red-600/50 flex flex-col items-center justify-center text-white text-xs font-bold">
                                     <Ban className="w-6 h-6 mb-1" /> 거절 표시됨
