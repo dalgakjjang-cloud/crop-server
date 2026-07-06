@@ -84,7 +84,7 @@
   .empty .ic{font-size:46px;margin-bottom:12px;opacity:.6}
 
   /* item list */
-  .items{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
+  .items{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cardw,190px),1fr));gap:14px}
   .item{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
   .item .pv{position:relative;aspect-ratio:1/1;
     background-image:
@@ -112,6 +112,15 @@
   .g.warn{color:var(--warn);border-color:rgba(242,178,58,.4);background:rgba(242,178,58,.08)}
   .item .acts{display:flex;gap:7px}
   .item .acts .btn{flex:1}
+  /* 썸네일(compact) 모드: 편집 UI 접고 이미지 위주로 */
+  .items.compact{--cardw:150px;gap:10px}
+  .items.compact .meta .ttl,
+  .items.compact .meta .kw,
+  .items.compact .acts,
+  .items.compact .gates{display:none}
+  .items.compact .meta{padding:7px 9px;gap:4px}
+  .items.compact .fn{font-size:10px}
+  .items.compact .dims{font-size:10px}
 
   .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
   .toolbar .count{font-size:12.5px;color:var(--mut)}
@@ -282,6 +291,11 @@
 
       <div class="toolbar" id="toolbar" style="display:none">
         <span class="count" id="count">0개</span>
+        <div class="seg" id="sizeSeg" style="flex:0 0 auto;width:auto">
+          <button data-v="thumb" class="on" title="썸네일 — 여러 장 한눈에">▦ 썸네일</button>
+          <button data-v="normal" title="보통">▧ 보통</button>
+          <button data-v="large" title="크게 — 디테일 확인">▢ 크게</button>
+        </div>
         <span class="sp"></span>
         <button class="btn ghost sm" id="clearAll">전체 삭제</button>
         <button class="btn ghost sm" id="dlZip">📦 업로드 패키지 ZIP</button>
@@ -790,6 +804,9 @@ function render(){
     return;
   }
   const wrap=document.createElement('div'); wrap.className='items';
+  const vm=state.viewMode||'thumb';
+  if(vm==='thumb') wrap.classList.add('compact');
+  else wrap.style.setProperty('--cardw', vm==='large' ? '300px' : '210px');
   state.items.forEach((item,i)=>{
     const o=item.out;
     const gv = o? gatesOf(item,S):{g:[],warn:[]};
@@ -1149,6 +1166,11 @@ $('#bgSeg').addEventListener('click',e=>{
 $('#thr').oninput=e=>$('#thrV').textContent=e.target.value;
 $('#feather').oninput=e=>$('#featherV').textContent=e.target.value+' px';
 $('#processAll').onclick=processAll;
+$('#sizeSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  $('#sizeSeg .on').classList.remove('on'); b.classList.add('on');
+  state.viewMode=b.dataset.v; render();
+});
 $('#clearAll').onclick=()=>{ state.items.forEach(it=>it.out&&URL.revokeObjectURL(it.out.url)); state.items=[]; render(); };
 $('#dlZip').onclick=downloadZip;
 $('#acct').oninput=()=>{ render(); const a=validAccount(); if(a.ok) showAcct('계정·등록일 확인 ✓ → '+`uni_${a.date}_${a.id}_01`, true); else $('#acctMsg').innerHTML=''; };
