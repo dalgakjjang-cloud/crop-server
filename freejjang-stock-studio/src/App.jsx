@@ -121,7 +121,7 @@ const REEDO_TONE = {
 };
 const TONE_PHRASE = {
   realism:
-    "believable present-day commercial photograph that could genuinely be shot in a real 2026 facility: real plausible equipment with realistic subtle screen UI (absolutely NO floating holograms, NO laser grids, NO sci-fi projections), natural daylight or realistic practical lighting, true-to-life materials and accurate colors, a few gentle lived-in details that make it credible (a folded towel, an unbranded water bottle, a plant, natural floor wear), slight natural asymmetry and imperfection — strictly NOT neon-drenched, NOT cyberpunk, NOT a sterile empty showroom, NOT over-polished CGI perfection",
+    "believable present-day commercial photograph that could genuinely be shot in a real 2026 setting: plausible real objects with realistic materials and true-to-life accurate color, natural daylight or realistic practical lighting, natural depth of field, slight organic asymmetry and gentle lived-in imperfection so it never looks templated — absolutely NO floating holograms, NO laser grids, NO sci-fi projections, NOT neon-drenched, NOT cyberpunk, NOT a sterile empty showroom, NOT over-polished CGI perfection. Render exactly the specific supporting props described for THIS scene and nothing generic — do NOT default to a water bottle or a potted plant unless this scene explicitly calls for it",
   bright: "bright airy minimal commercial look, abundant soft natural daylight, clean neutral palette, realistic true-to-life materials, believable real-world scene",
   lifestyle: "warm inviting lifestyle photography, golden natural light, cozy human warmth in a believable real space, editorial magazine quality",
   cinematic: "cinematic moody lighting with dramatic shadows and rich atmosphere, but still a believable real-world scene with plausible equipment — no sci-fi fantasy elements",
@@ -270,8 +270,10 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     : "";
   const toneLine = slot.kind !== "illustration" ? TONE_PHRASE[tone] || TONE_PHRASE.realism : "";
   const peopleLine = PEOPLE_FINAL[people] || "";
+  const propsLine = slot.props ? `Scene-specific supporting props (render exactly these, no generic filler): ${slot.props}` : "";
   return [
     slot.subject,
+    propsLine,
     `Focal placement: ${slot.focal_placement || "center"}`,
     comp, camera,
     `Lighting: ${slot.lighting || "soft natural light with realistic shadows"}`,
@@ -473,14 +475,15 @@ export default function App() {
       const n = Math.min(2, count - made.length);
       setProg({ done: made.length, total: count, stage: `${brainName} 초안 작성` });
       try {
-        const combos = made.slice(-4).map((s) => `${s.subject}|${s.camera}|${s.palette}`).join(" / ") || "none";
+        const combos = made.slice(-6).map((s) => `${s.subject}|${s.props || ""}|${s.palette}`).join(" / ") || "none";
         const r = await askBrain(
           `You draft professional stock image slots. Respond ONLY compact JSON:
-{"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경)","category":11}]}
+{"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경)","category":11}]}
 RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": medium or wide framing with environmental context and comfortable breathing room — the subject fills about 50-70% of the frame (NEVER edge-to-edge, NOT a tight close-up), keep roughly 25-35% clean uncluttered negative space for versatility, rule-of-thirds/leading-line, subject fully in frame and not cropped. Set "copy_space" to name where that calm area sits (e.g. "upper-left clean area").
 KEYWORDS (Adobe SEO, critical): "keywords" must be EXACTLY 35 English keywords, comma-separated, NO duplicates, ordered by buyer importance (Adobe weights the first ~10 most). Order groups: (1) main subject nouns, (2) specific descriptors/materials/actions, (3) concept/theme/season/emotion, (4) color and lighting, (5) composition/orientation (copy space, background, close-up, minimal), (6) use-case (banner, wallpaper, marketing, web design). Use single words or natural 2-word phrases, all lowercase, only real buyer search terms that literally describe what is visible. No text/number/logo/brand words. "keywords_kr" follows the same SEO ordering in Korean single nouns.
-CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOBE_CAT_LIST}. Choose by the dominant visible subject (e.g. scenery→11, dish/ingredient→7, festival/tradition/ritual→15, person-focused lifestyle→12 or 13, plant/flower→14, drink→4, tech/device→19). If kind is "illustration"/vector/background and nothing fits more strongly, use 8. Return category as the integer id only.`,
-          `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Combos already used (avoid): ${combos}${refinementLine()}`
+CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOBE_CAT_LIST}. Choose by the dominant visible subject (e.g. scenery→11, dish/ingredient→7, festival/tradition/ritual→15, person-focused lifestyle→12 or 13, plant/flower→14, drink→4, tech/device→19). If kind is "illustration"/vector/background and nothing fits more strongly, use 8. Return category as the integer id only.
+PROPS & VARIETY (critical for a professional set — avoid templated sameness): every slot's "props" must be SPECIFIC to that exact scene and DIFFERENT from every other slot — never reuse the same generic filler (e.g. do NOT put "plastic water bottle" or "small potted plant" in more than one slot; ideally use each only once in the whole set, if at all). Choose props that genuinely belong to the subject: for FOOD, include the correct culturally-appropriate tableware and utensils that match the dish (Korean meal → spoon + chopsticks; Western plate → fork + knife; noodles/soup → spoon or chopsticks; dessert → small fork or teaspoon) plus fitting garnish, napkin, board, or sauce dish — vary these per dish. For interior/background scenes, rotate a diverse mix of secondary objects across slots (a ceramic vase, dried flowers, stacked books, a woven basket, folded linen, a wooden tray, a candle, seasonal fruit, a framed textile) so no two backgrounds feel like copies. Props must fit the mode's copy space (keep the calm area uncluttered) and the selected people/style/tone. Keep them believable and unbranded.`,
+          `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Avoid repeating any of these already-used subject|props|palette signatures: ${combos}${refinementLine()}`
         );
         for (const item of r.items || []) {
           if (made.length >= count) break;
@@ -691,6 +694,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `status: ${s.status}`,
       `final_prompt: ${s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople)}`,
       `subject: ${s.subject || ""}`,
+      `props: ${s.props || ""}`,
       `kind: ${s.kind || ""}`,
       `focal_placement: ${s.focal_placement || ""}`,
       `copy_space: ${s.copy_space || ""}`,
@@ -1274,6 +1278,11 @@ Each block content = one short Korean sentence.`,
                                   onChange={(e) => updateSlot(s.index, "subject", e.target.value)}
                                   className="w-full text-xs px-2 py-1.5 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none focus:border-violet-500 resize-none"
                                   placeholder="피사체/장면" />
+                                <div>
+                                  <label className="block text-[10px] font-mono text-neutral-500 mb-0.5">PROPS (소품 · 슬롯마다 다르게)</label>
+                                  <input value={s.props || ""} onChange={(e) => updateSlot(s.index, "props", e.target.value)}
+                                    className="w-full text-xs px-2 py-1 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none focus:border-violet-500" placeholder="예: 청자 꽃병, 마른 유칼립투스, 원목 트레이" />
+                                </div>
                                 <div>
                                   <label className="block text-[10px] font-mono text-neutral-500 mb-0.5">CAMERA ANGLE (카메라 앵글)</label>
                                   <select value={s.angle || "auto"} onChange={(e) => updateSlot(s.index, "angle", e.target.value)}
