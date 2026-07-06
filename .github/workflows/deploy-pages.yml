@@ -13,9 +13,11 @@ permissions:
   pages: write
   id-token: write
 
+# 배포는 취소하지 않고 큐잉한다 — 진행 중 배포를 중간에 취소하면
+# Pages 백엔드가 다음 배포를 "try again later"로 거부하는 문제가 있음 (GitHub 공식 권장값)
 concurrency:
   group: pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
