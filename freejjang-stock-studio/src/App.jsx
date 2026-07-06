@@ -98,6 +98,24 @@ const REEDO_PEOPLE_PHRASE = {
   with: "people may appear naturally",
 };
 
+/* 톤(판매 미학) — 2026 베스트셀러 조사 기반: 믿을 수 있는 실사가 팔린다.
+   네온 SF 판타지(AI티)도, 무균실 미니멀(AI티)도 아닌 "진짜 찍은 듯한" 상업 사진이 기본값 */
+const REEDO_TONE = {
+  realism: "판매 리얼 (베스트셀러·기본)",
+  bright: "밝은 미니멀",
+  lifestyle: "라이프스타일 온기",
+  cinematic: "시네마틱 무드",
+  concept: "미래 컨셉 (네온)",
+};
+const TONE_PHRASE = {
+  realism:
+    "believable present-day commercial photograph that could genuinely be shot in a real 2026 facility: real plausible equipment with realistic subtle screen UI (absolutely NO floating holograms, NO laser grids, NO sci-fi projections), natural daylight or realistic practical lighting, true-to-life materials and accurate colors, a few gentle lived-in details that make it credible (a folded towel, an unbranded water bottle, a plant, natural floor wear), slight natural asymmetry and imperfection — strictly NOT neon-drenched, NOT cyberpunk, NOT a sterile empty showroom, NOT over-polished CGI perfection",
+  bright: "bright airy minimal commercial look, abundant soft natural daylight, clean neutral palette, realistic true-to-life materials, believable real-world scene",
+  lifestyle: "warm inviting lifestyle photography, golden natural light, cozy human warmth in a believable real space, editorial magazine quality",
+  cinematic: "cinematic moody lighting with dramatic shadows and rich atmosphere, but still a believable real-world scene with plausible equipment — no sci-fi fantasy elements",
+  concept: "futuristic concept aesthetic, neon accent lighting, high-tech atmosphere, stylized commercial render",
+};
+
 /* 두뇌(에이전트) 라벨 · 기본 모델 */
 const BRAIN_LABELS = { claude: "Claude(Fable)", gpt: "GPT(Codex 계열)", gemini: "Gemini" };
 const GPT_MODEL_DEFAULT = "gpt-5-mini";
@@ -218,7 +236,7 @@ async function genOpenAI(key, prompt, aspect, quality) {
 }
 
 /* 슬롯 필드 → 최종 이미지 프롬프트 (전문 판매 프롬프트 규칙) */
-function buildSlotPrompt(slot, mode) {
+function buildSlotPrompt(slot, mode, tone = "realism") {
   const anglePick = CAMERA_ANGLES[slot.angle]?.phrase || "";
   const isTight = slot.angle === "closeup" || slot.angle === "macro";
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
@@ -235,12 +253,14 @@ function buildSlotPrompt(slot, mode) {
   const atmosphere = slot.kind !== "illustration" && INDOOR_RE.test(themeText) && !NIGHT_RE.test(themeText)
     ? pickRandom(BRIGHT_NEUTRAL_STYLES)
     : "";
+  const toneLine = slot.kind !== "illustration" ? TONE_PHRASE[tone] || TONE_PHRASE.realism : "";
   return [
     slot.subject,
     `Focal placement: ${slot.focal_placement || "center"}`,
     comp, camera,
     `Lighting: ${slot.lighting || "soft natural light with realistic shadows"}`,
     atmosphere,
+    toneLine,
     `Palette: ${slot.palette || "bright commercial tones"}`,
     slot.kind === "illustration" ? "professional stock illustration" : "8K photorealistic professional stock photograph, crisp detail",
     GUARD,
@@ -278,6 +298,7 @@ export default function App() {
   const [refBg, setRefBg] = useState("");
   const [refPeople, setRefPeople] = useState("none"); // 기본: 사람 없음 (모델 릴리즈 회피)
   const [refAngle, setRefAngle] = useState("auto");   // 초안 전체 기본 카메라 앵글
+  const [refTone, setRefTone] = useState("realism");  // 기본: 판매 리얼 (베스트셀러 미학)
   const [phase, setPhase] = useState("idle"); // idle | drafting | review | generating | qc | done
   const [slots, setSlots] = useState([]);
   const [prog, setProg] = useState(null);
@@ -314,6 +335,7 @@ export default function App() {
   /* REEDO식 구조화 구성 → 초안 브레인에 주입할 제약 문장 (선택된 것만) */
   const refinementLine = () => {
     const parts = [];
+    if (TONE_PHRASE[refTone]) parts.push(`Selling aesthetic (CRITICAL, every subject/lighting/palette must follow this): ${TONE_PHRASE[refTone]}`);
     if (REEDO_STYLE_PHRASE[refStyle]) parts.push(`Style: ${REEDO_STYLE_PHRASE[refStyle]}`);
     if (REEDO_REGION_PHRASE[refRegion]) parts.push(`Market: ${REEDO_REGION_PHRASE[refRegion]}`);
     if (REEDO_BG_PHRASE[refBg]) parts.push(`Background: ${REEDO_BG_PHRASE[refBg]}`);
@@ -434,7 +456,7 @@ CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOB
       setProg({ done: newMade, total: Math.min(targets.length, cap), stage: `슬롯 ${t.index} 생성 중` });
       setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
       try {
-        const fp = buildSlotPrompt(t, mode);
+        const fp = buildSlotPrompt(t, mode, refTone);
         const dataUrl = await generateImage(fp);
         newMade += 1;
         setSlots((p) => p.map((s) => (s.index === t.index
@@ -561,7 +583,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `# FreeJJang 프롬프트 (간편) — 주제: ${topic || "(미지정)"} · 모드: ${mode} · 종횡비: ${aspect}\n` +
       `# 각 줄의 프롬프트에는 노텍스트 GUARD 규칙이 이미 포함되어 있습니다.\n` +
       `# Midjourney / Firefly / Stable Diffusion 등 다른 AI에 그대로 붙여넣어 쓰세요.\n\n`;
-    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode)}`).join("\n\n");
+    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode, refTone)}`).join("\n\n");
     download(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-min.txt`);
     addLog(`[백업] 프롬프트 TXT(간편) 저장 완료 — ${rows.length}슬롯`);
   };
@@ -574,7 +596,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const body = rows.map((s) => [
       `[${s.index}] ${s.title_kr || ""} / ${s.title || ""}`,
       `status: ${s.status}`,
-      `final_prompt: ${s.finalPrompt || buildSlotPrompt(s, mode)}`,
+      `final_prompt: ${s.finalPrompt || buildSlotPrompt(s, mode, refTone)}`,
       `subject: ${s.subject || ""}`,
       `kind: ${s.kind || ""}`,
       `focal_placement: ${s.focal_placement || ""}`,
@@ -629,7 +651,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
     addLog(`[재생성 ${t.index}] ${CAMERA_ANGLES[t.angle]?.label || "자동"} · 시작`);
     try {
-      const fp = buildSlotPrompt(t, mode);
+      const fp = buildSlotPrompt(t, mode, refTone);
       const dataUrl = await generateImage(fp);
       setSlots((p) => p.map((s) => (s.index === t.index
         ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", autoFlag: "", regenCount: s.regenCount + 1 } : s)));
@@ -883,6 +905,10 @@ Each block content = one short Korean sentence.`,
                       const opts = (o) => Object.entries(o).map(([k, v]) => <option key={k} value={k}>{v}</option>);
                       return (
                         <>
+                          <div className="col-span-2">
+                            <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">톤 (판매 미학)</span>
+                            <select value={refTone} onChange={(e) => setRefTone(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_TONE)}</select>
+                          </div>
                           <div>
                             <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">인물</span>
                             <select value={refPeople} onChange={(e) => setRefPeople(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_PEOPLE)}</select>
