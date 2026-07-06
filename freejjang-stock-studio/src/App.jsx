@@ -22,6 +22,9 @@ const ASPECTS = ["1:1", "16:9", "4:3", "3:4", "9:16"];
 const OPENAI_SIZE = { "1:1": "1024x1024", "16:9": "1536x1024", "4:3": "1536x1024", "3:4": "1024x1536", "9:16": "1024x1536" };
 /* gpt-image 1536×1024 기준 근사 단가 (실제 청구액은 상이할 수 있음) */
 const OPENAI_COST = { low: 0.005, medium: 0.041, high: 0.165 };
+const GEMINI_IMG_COST = 0.039; // gemini-2.5-flash-image 1장 근사 단가
+/* 일시적(재시도 가능) 오류 패턴 — 요금/키 오류는 제외 */
+const TRANSIENT_RE = /429|rate.?limit|overloaded|timeout|temporarily|unavailable|failed to fetch|network|internal|50[023]/i;
 
 const WALLPAPER_RE = /배경화면|월페이퍼|wallpaper|배너|banner|카피\s*스페이스|copy\s*space/i;
 
@@ -157,6 +160,23 @@ const normKeywords = (raw, max) => {
     .join(", ");
 };
 
+/* 두뇌가 35개 미만을 돌려주면 제목·주제·소품 등 실제 보이는 단어로 자동 보충 (Adobe SEO 손해 방지) */
+const KW_STOP = new Set(["the","a","an","of","and","with","in","on","for","at","to","by","is","are","its","from","into","over"]);
+const padKeywords = (item, max) => {
+  const base = normKeywords(item.keywords, max);
+  const list = base ? base.split(", ") : [];
+  if (list.length >= max) return base;
+  const seen = new Set(list.map((k) => k.toLowerCase()));
+  const pool = `${item.title || ""} ${item.subject || ""} ${item.props || ""} ${item.lighting || ""} ${item.palette || ""}`
+    .toLowerCase().replace(/[^a-z\s-]/g, " ").split(/\s+/)
+    .filter((w) => w.length >= 3 && !KW_STOP.has(w) && !seen.has(w));
+  for (const w of pool) {
+    if (list.length >= max) break;
+    list.push(w); seen.add(w);
+  }
+  return list.join(", ");
+};
+
 /* 응답 텍스트 → JSON 파싱 (세 두뇌 공용) */
 function extractJSON(text, who) {
   const clean = String(text || "").replace(/```json|```/g, "").trim();
@@ -256,8 +276,15 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   const toneLine = slot.kind !== "illustration" ? TONE_PHRASE[tone] || TONE_PHRASE.realism : "";
   const peopleLine = PEOPLE_FINAL[people] || "";
   const propsLine = slot.props ? `Scene-specific supporting props (render exactly these, no generic filler): ${slot.props}` : "";
+  /* 재생성 피드백 루프: 직전 거절 사유를 교정 지시로 주입 → 같은 실수 반복 차단 */
+  const fixLine = slot.qcNote
+    ? `CRITICAL CORRECTION — the previous render of this exact slot was REJECTED for this reason: "${slot.qcNote}". Fix that specific problem this time; do NOT repeat it`
+    : slot.regenCount > 0
+      ? "This is a re-render requested by the user: produce a NOTICEABLY different composition, styling and prop arrangement from the previous attempt — do not repeat the same look"
+      : "";
   return [
     slot.subject,
+    fixLine,
     propsLine,
     `Focal placement: ${slot.focal_placement || "center"}`,
     comp, camera,
@@ -372,6 +399,7 @@ export default function App() {
   const [previewSlot, setPreviewSlot] = useState(null);
   const [log, setLog] = useState([]);
   const [notice, setNotice] = useState(null);
+  const [spent, setSpent] = useState({ img: 0, cost: 0 }); // 세션 누적 (실제 생성 성공만 집계)
   const [copied, setCopied] = useState(false);
   const anaFileRef = useRef(null);
 
@@ -404,12 +432,31 @@ export default function App() {
 
   /* ── 이미지 엔진 키 (provider별) ── */
   const imageKey = () => (provider === "gemini" ? googleKey : openaiKey).trim();
+  /* 일시 오류(429/네트워크/서버 혼잡)는 3초→6초 대기 후 자동 재시도, 성공 시 세션 비용 집계 */
   const generateImage = async (finalPrompt) => {
     const key = imageKey();
     if (!key) throw new Error(`${provider === "gemini" ? "Google" : "OpenAI"} 이미지 API 키를 먼저 연결하세요 (상단 설정).`);
-    return provider === "gemini"
-      ? await genGemini(key, finalPrompt, aspect)
-      : await genOpenAI(key, finalPrompt, aspect, quality);
+    let lastErr;
+    for (let attempt = 0; attempt <= 2; attempt++) {
+      try {
+        const out = provider === "gemini"
+          ? await genGemini(key, finalPrompt, aspect)
+          : await genOpenAI(key, finalPrompt, aspect, quality);
+        const unit = provider === "gemini" ? GEMINI_IMG_COST : (OPENAI_COST[quality] || 0.041);
+        setSpent((p) => ({ img: p.img + 1, cost: p.cost + unit }));
+        return out;
+      } catch (err) {
+        lastErr = err;
+        if (attempt < 2 && TRANSIENT_RE.test(err.message)) {
+          const wait = 3000 * (attempt + 1);
+          addLog(`[재시도 ${attempt + 1}/2] 일시 오류 감지 — ${wait / 1000}초 후 자동 재시도: ${err.message}`);
+          await new Promise((r) => setTimeout(r, wait));
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw lastErr;
   };
 
   /* ═══ 두뇌 라우터 — 선택 두뇌 먼저 → 키 등록된 다른 두뇌로 폴백 ═══ */
@@ -474,7 +521,8 @@ PROPS & VARIETY (critical for a professional set — avoid templated sameness): 
           made.push({
             ...item,
             index: pad2(made.length + 1),
-            status: "pending", regenCount: 0, dataUrl: "", rejectReason: "", angle: refAngle, finalPrompt: "",
+            status: "pending", regenCount: 0, dataUrl: "", rejectReason: "", qcNote: "", angle: refAngle, finalPrompt: "",
+            keywords: padKeywords(item, ADOBE_MAX_KEYWORDS),
             slug: cleanName(item.slug, 24) || `slot-${made.length + 1}`,
           });
         }
@@ -507,11 +555,12 @@ PROPS & VARIETY (critical for a professional set — avoid templated sameness): 
       setProg({ done: newMade, total: Math.min(targets.length, cap), stage: `슬롯 ${t.index} 생성 중` });
       setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
       try {
+        if (t.qcNote) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${t.qcNote}`);
         const fp = buildSlotPrompt(t, mode, refTone, refPeople);
         const dataUrl = await generateImage(fp);
         newMade += 1;
         setSlots((p) => p.map((s) => (s.index === t.index
-          ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", regenCount: s.regenCount + 1 } : s)));
+          ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", regenCount: s.regenCount + 1 } : s)));
         addLog(`[성공 ${t.index}] ${t.title_kr || t.title}`);
       } catch (err) {
         setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "failed", rejectReason: err.message } : s)));
@@ -543,7 +592,7 @@ PROPS & VARIETY (critical for a professional set — avoid templated sameness): 
       return;
     }
     setSlots((p) => p.map((s) => rejected.includes(s.index)
-      ? { ...s, status: "rejected", dataUrl: "", rejectReason: s.autoFlag || qcReason || "visual defect" } : s));
+      ? { ...s, status: "rejected", dataUrl: "", rejectReason: s.autoFlag || qcReason || "visual defect", qcNote: s.autoFlag || qcReason || "" } : s));
     setQcRejects({}); setQcReason("");
     addLog(`[격리] 슬롯 ${rejected.join(", ")} — 해당 슬롯만 재생성 (사유는 슬롯별 기록)`);
     setPhase("review");
@@ -752,10 +801,13 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
     addLog(`[재생성 ${t.index}] ${CAMERA_ANGLES[t.angle]?.label || "자동"} · 시작`);
     try {
-      const fp = buildSlotPrompt(t, mode, refTone, refPeople);
+      /* 거절/플래그 사유가 있으면 교정 지시로 주입 (같은 실수 반복 차단) */
+      const note = t.qcNote || t.autoFlag || "";
+      if (note) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${note}`);
+      const fp = buildSlotPrompt({ ...t, qcNote: note }, mode, refTone, refPeople);
       const dataUrl = await generateImage(fp);
       setSlots((p) => p.map((s) => (s.index === t.index
-        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", autoFlag: "", regenCount: s.regenCount + 1 } : s)));
+        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", autoFlag: "", regenCount: s.regenCount + 1 } : s)));
       setQcRejects((p) => { const n = { ...p }; delete n[t.index]; return n; });
       addLog(`[재생성 ${t.index}] 완료`);
     } catch (err) {
@@ -1399,6 +1451,14 @@ Each block content = one short Korean sentence.`,
                         <Wand2 className="w-3.5 h-3.5" /> 수정 (Fix)
                       </button>
                     </>
+                  )}
+
+                  {/* 세션 누적 비용 (재생성 포함 실제 생성 성공 건만) */}
+                  {spent.img > 0 && (
+                    <div className="pt-2 border-t border-neutral-700 text-xs text-neutral-400 flex items-center gap-1.5">
+                      <CircleDollarSign className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+                      <span>세션 누적: 이미지 <b className="text-neutral-200">{spent.img}장</b> ≈ <b className="text-amber-300">${spent.cost.toFixed(2)}</b> <span className="text-neutral-600">(근사치)</span></span>
+                    </div>
                   )}
                 </section>
 
