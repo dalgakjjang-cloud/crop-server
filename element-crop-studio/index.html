@@ -267,6 +267,22 @@
         <div id="acctMsg"></div>
 
         <div class="divider"></div>
+        <label class="f">🪄 AI 제목·키워드 (SEO 자동)</label>
+        <div class="row mb">
+          <select id="aiProvider" style="flex:0 0 42%">
+            <option value="gemini">Gemini</option>
+            <option value="openai">OpenAI</option>
+            <option value="claude">Claude</option>
+          </select>
+          <input type="text" id="aiModel" value="gemini-2.5-flash" placeholder="모델">
+        </div>
+        <input type="password" id="aiKey" class="mb" placeholder="API 키 (브라우저 메모리에만 보관)" autocomplete="off">
+        <button class="btn ghost" id="aiFill">🪄 제목·키워드 AI 자동생성</button>
+        <div id="aiMsg"></div>
+        <div class="hint">이미지가 무엇인지 AI가 보고 SEO 키워드(≤25개)와 제목(≤100자)을 채웁니다.
+          이 단계에서만 썸네일이 선택한 AI 제공사로 전송됩니다.</div>
+
+        <div class="divider"></div>
         <button class="btn primary" id="processAll">✨ 전체 처리 / 재처리</button>
         <div class="progress" id="prog"><i></i></div>
       </div>
@@ -312,7 +328,7 @@
       <div class="foot">
         미리캔버스 규격: 최소 단축 700px · 최대 축 9800px · 최대 50MB · 투명 PNG · 타이트 크롭 ·
         불필요한 그림자 없음. 이 도구는 프린트 대응을 위해 긴 축 4096px / 300 DPI 로 출력합니다.<br>
-        모든 처리는 브라우저 안에서만 일어나며 이미지는 어디에도 업로드되지 않습니다.
+        이미지 처리는 모두 브라우저 안에서만 일어납니다. (AI 제목·키워드 자동생성을 쓸 때만 해당 썸네일이 선택한 AI 제공사로 전송됩니다.)
       </div>
     </main>
   </div>
@@ -930,6 +946,104 @@ function showAcct(msg,ok){
   el.innerHTML=`<div class="${cls}">${msg}</div>`;
 }
 
+/* ══════════════════════ AI 제목·키워드 (SEO) ══════════════════════ */
+const AI_PROMPT =
+`당신은 미리캔버스(디자인 요소 스톡) SEO 전문가입니다. 첨부 이미지는 배경이 투명한 PNG 그래픽 요소 하나입니다(흰색은 확인용 배경).
+이 요소를 미리캔버스에 등록할 메타데이터를 한국어로 작성하세요.
+규칙:
+- title: 요소가 무엇인지 자연스럽고 구체적으로. 20~40자 권장, 최대 100자. 과장·특수문자·따옴표 금지.
+- keywords: SEO 최적화 한국어 검색어 배열. 최대 25개, 중복 없음.
+  · 핵심 사물/주제 + 상위 개념 + 스타일(예: 3D, 캐릭터, 일러스트, 아이콘) + 용도/감정/계절 + 동의어를 고루 포함.
+  · 실제 검색량이 있을 일반 단어 우선, 한 단어~두 단어 위주. 문장·해시태그(#)·영어 금지(고유명사 제외).
+반드시 JSON만 출력: {"title":"...","keywords":["...", "..."]}`;
+
+const AI_MODELS = { gemini:'gemini-2.5-flash', openai:'gpt-4o-mini', claude:'claude-3-5-sonnet-latest' };
+
+async function makeThumb(blob, max){
+  const bmp = await createImageBitmap(blob);
+  const s = Math.min(1, max/Math.max(bmp.width,bmp.height));
+  const w = Math.max(1,Math.round(bmp.width*s)), h = Math.max(1,Math.round(bmp.height*s));
+  const c = document.createElement('canvas'); c.width=w; c.height=h;
+  const x = c.getContext('2d');
+  x.fillStyle='#ffffff'; x.fillRect(0,0,w,h);   // 투명 요소를 흰 배경에 합성(인식 도움)
+  x.drawImage(bmp,0,0,w,h);
+  bmp.close && bmp.close();
+  return c.toDataURL('image/jpeg',0.85).split(',')[1];
+}
+
+async function callAI(provider, key, model, prompt, b64){
+  if(provider==='gemini'){
+    const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+    const body={contents:[{parts:[{text:prompt},{inline_data:{mime_type:'image/jpeg',data:b64}}]}],
+      generationConfig:{temperature:0.45,responseMimeType:'application/json'}};
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json();
+    if(!r.ok) throw new Error(j.error?.message||('HTTP '+r.status));
+    return (j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+  }
+  if(provider==='openai'){
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model,temperature:0.45,response_format:{type:'json_object'},
+        messages:[{role:'user',content:[{type:'text',text:prompt},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+b64}}]}]})});
+    const j=await r.json();
+    if(!r.ok) throw new Error(j.error?.message||('HTTP '+r.status));
+    return j.choices?.[0]?.message?.content||'';
+  }
+  // claude
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model,max_tokens:500,
+      messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
+        {type:'text',text:prompt}]}]})});
+  const j=await r.json();
+  if(!r.ok) throw new Error(j.error?.message||('HTTP '+r.status));
+  return (j.content||[]).map(c=>c.text||'').join('');
+}
+
+function parseMeta(text){
+  let t=String(text||'').trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+  const s=t.indexOf('{'), e=t.lastIndexOf('}');
+  if(s>=0&&e>=0) t=t.slice(s,e+1);
+  const obj=JSON.parse(t);
+  const title=String(obj.title||'').replace(/["\r\n]/g,' ').trim().slice(0,100);
+  let kw=Array.isArray(obj.keywords)?obj.keywords:String(obj.keywords||'').split(',');
+  kw=kw.map(x=>String(x).trim().replace(/^#/,'')).filter(Boolean);
+  kw=[...new Set(kw)].slice(0,25);
+  return {title, keywords:kw.join(', ')};
+}
+
+function aiMsg(msg,kind){ $('#aiMsg').innerHTML=`<div class="${kind==='ok'?'okbox':'warnbox'}">${msg}</div>`; }
+
+let aiRunning=false;
+async function aiFill(){
+  if(aiRunning) return;
+  const provider=$('#aiProvider').value, key=$('#aiKey').value.trim(), model=$('#aiModel').value.trim()||AI_MODELS[provider];
+  if(!key){ aiMsg('API 키를 입력하세요.','warn'); $('#aiKey').focus(); return; }
+  if(!state.items.length){ aiMsg('먼저 이미지를 올려주세요.','warn'); return; }
+  aiRunning=true; $('#aiFill').disabled=true;
+  const S=readSettings();
+  for(const it of state.items){ if(!it.out) await processItem(it,S); }
+  let done=0; const errs=[];
+  for(let i=0;i<state.items.length;i++){
+    const it=state.items[i];
+    aiMsg(`AI 생성 중… ${i+1}/${state.items.length}`,'warn');
+    try{
+      const b64=await makeThumb(it.out.blob, 512);
+      const text=await callAI(provider,key,model,AI_PROMPT,b64);
+      const m=parseMeta(text);
+      if(!m.title) throw new Error('빈 응답');
+      it.title=m.title; it.keywords=m.keywords; done++; render();
+    }catch(e){ errs.push(`#${i+1}: ${e.message}`); }
+    await new Promise(r=>setTimeout(r,120));
+  }
+  aiRunning=false; $('#aiFill').disabled=false;
+  if(done && !errs.length) aiMsg(`제목·키워드 자동생성 완료 (${done}개) — 이제 📦 업로드 패키지 ZIP 을 누르세요.`,'ok');
+  else if(done) aiMsg(`완료 ${done}개 · 오류 ${errs.length}개: ${errs.slice(0,2).join(' / ')}${errs.length>2?' …':''}`,'warn');
+  else aiMsg(`실패: ${errs.slice(0,2).join(' / ')} · 키/모델을 확인하세요. (아티팩트 미리보기는 외부 API가 차단되니 파일을 직접 열어 사용)`,'warn');
+}
+
 /* ══════════════════════ 수동 크롭 모달 ══════════════════════ */
 let cropCtx=null; // {item, scale, natW, natH, box:{x,y,w,h}(natural)}
 function openCrop(item){
@@ -1166,6 +1280,8 @@ $('#bgSeg').addEventListener('click',e=>{
 });
 $('#thr').oninput=e=>$('#thrV').textContent=e.target.value;
 $('#feather').oninput=e=>$('#featherV').textContent=e.target.value+' px';
+$('#aiProvider').onchange=e=>{ $('#aiModel').value=AI_MODELS[e.target.value]||''; };
+$('#aiFill').onclick=aiFill;
 $('#processAll').onclick=processAll;
 $('#sizeSeg').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return;
