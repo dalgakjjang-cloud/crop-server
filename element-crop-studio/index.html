@@ -254,16 +254,16 @@
         <div class="divider"></div>
 
         <div class="row mb">
-          <div>
-            <label class="f">미리캔버스 계정 ID</label>
-            <input type="text" id="acct" placeholder="이메일 @앞부분" autocomplete="off">
-          </div>
-          <div style="max-width:110px;flex:0 0 110px">
+          <div style="max-width:140px;flex:0 0 140px">
             <label class="f">등록일 YYMMDD</label>
             <input type="text" id="date" maxlength="6" placeholder="260706">
           </div>
+          <div>
+            <label class="f">폴백 슬러그 (제목 없을 때)</label>
+            <input type="text" id="slug" placeholder="요소" maxlength="20" autocomplete="off">
+          </div>
         </div>
-        <div class="hint">최종 파일명: <span class="k">uni_등록일_계정ID_번호</span> · <code class="kbd">@</code> 포함/placeholder 는 거부됩니다.</div>
+        <div class="hint">최종 파일명: <span class="k">등록일_한글슬러그(≤8자)_번호</span> · 슬러그는 각 항목의 한글 제목에서 자동 추출됩니다.</div>
         <div id="acctMsg"></div>
 
         <div class="divider"></div>
@@ -793,21 +793,24 @@ function readSettings(){
     shadows: $('#shadows').checked,
   };
 }
-function validAccount(){
-  const id=$('#acct').value.trim();
-  const blocked=['account_id','accountid','sample','test','tester','placeholder','real_id'];
-  if(!id) return {ok:false,msg:'계정 ID를 입력하세요.'};
-  if(id.includes('@')) return {ok:false,msg:'@도메인을 제외한 ID만 입력하세요.'};
-  if(blocked.includes(id.toLowerCase())||!/^[A-Za-z0-9._-]+$/.test(id)) return {ok:false,msg:'placeholder·특수문자는 사용할 수 없습니다.'};
+/* 파일명용 한글 슬러그: 한글/영숫자만 남기고 8자로 자름 */
+function koSlug(text, fallback){
+  const s = String(text||'').replace(/[^가-힣A-Za-z0-9]/g,'');
+  const fb = String(fallback||'요소').replace(/[^가-힣A-Za-z0-9]/g,'') || '요소';
+  return (s || fb).slice(0,8);
+}
+function validDate(){
   const d=$('#date').value.trim();
   if(!/^\d{6}$/.test(d)) return {ok:false,msg:'등록일을 YYMMDD 6자리로 입력하세요.'};
-  return {ok:true,id,date:d};
+  return {ok:true,date:d};
 }
 function baseName(i){
-  const a=validAccount();
+  const v=validDate();
   const n=String(i+1).padStart(2,'0');
-  if(!a.ok) return `uni________________${n}`;
-  return `uni_${a.date}_${a.id}_${n}`;
+  const it=state.items[i];
+  const slug=koSlug(it&&it.title, $('#slug').value);
+  if(!v.ok) return `______${slug}_${n}`;
+  return `${v.date}_${slug}_${n}`;
 }
 
 /* ---------- 렌더 ---------- */
@@ -906,19 +909,23 @@ async function processAll(){
 
 /* ---------- ZIP 패키지 ---------- */
 async function downloadZip(){
-  const a=validAccount();
-  if(!a.ok){ showAcct(a.msg,false); $('#acct').focus(); return; }
+  const v=validDate();
+  if(!v.ok){ showAcct(v.msg,false); $('#date').focus(); return; }
   if(!state.items.length) return;
   const S=readSettings();
-  // 미처리 항목 처리
   for(const it of state.items){ if(!it.out) await processItem(it,S); }
 
   const files=[];
   const rows=[['fileName','uniqueId','elementName','keywords','status','licenseType']];
   const map=[['sourceFile','fileName']];
   const problems=[];
+  const seen=new Map(); // 슬러그 중복 방지
   state.items.forEach((it,i)=>{
-    const base=`uni_${a.date}_${a.id}_${String(i+1).padStart(2,'0')}`;
+    let slug=koSlug(it.title, $('#slug').value);
+    const key=slug;
+    const cnt=(seen.get(key)||0)+1; seen.set(key,cnt);
+    if(cnt>1) slug = (slug+cnt).slice(0,8);
+    const base=`${v.date}_${slug}_${String(i+1).padStart(2,'0')}`;
     files.push({name:`PNG/${base}.png`, data:it.out.bytes});
     const title=(it.title||'').trim();
     let kw=(it.keywords||'').split(',').map(x=>x.trim()).filter(Boolean);
@@ -935,7 +942,7 @@ async function downloadZip(){
   files.push({name:'CSV/filename_mapping.csv', data:strBytes(toCsv(map))});
 
   const blob=buildZip(files);
-  downloadBlob(blob, `miricanvas_upload_${a.date}_${a.id}.zip`);
+  downloadBlob(blob, `miricanvas_upload_${v.date}.zip`);
   if(problems.length) showAcct('패키지 생성 완료 (경고: '+problems.join(' · ')+')', 'warn');
   else showAcct('업로드 패키지 ZIP 생성 완료 ✓', true);
 }
@@ -1290,8 +1297,13 @@ $('#sizeSeg').addEventListener('click',e=>{
 });
 $('#clearAll').onclick=()=>{ state.items.forEach(it=>it.out&&URL.revokeObjectURL(it.out.url)); state.items=[]; render(); };
 $('#dlZip').onclick=downloadZip;
-$('#acct').oninput=()=>{ render(); const a=validAccount(); if(a.ok) showAcct('계정·등록일 확인 ✓ → '+`uni_${a.date}_${a.id}_01`, true); else $('#acctMsg').innerHTML=''; };
-$('#date').oninput=()=>{ render(); };
+$('#slug').oninput=render;
+$('#date').oninput=()=>{
+  render();
+  const v=validDate();
+  if(v.ok){ const it=state.items[0]; const slug=koSlug(it&&it.title, $('#slug').value); showAcct(`등록일 확인 ✓ → ${v.date}_${slug}_01`, true); }
+  else $('#acctMsg').innerHTML='';
+};
 
 // 등록일 기본값 = 오늘(YYMMDD)
 (function(){
