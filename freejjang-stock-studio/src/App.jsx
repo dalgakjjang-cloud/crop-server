@@ -749,6 +749,14 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
   const updateSlot = (index, field, value) =>
     setSlots((p) => p.map((s) => (s.index === index ? { ...s, [field]: value } : s)));
 
+  /* ── 수정(Fix) 모드: 완료/QC 후에도 다시 편집 단계로 되돌리기 ── */
+  const backToEdit = () => {
+    setQcRejects({}); setQcReason("");
+    setPhase("review");
+    addLog(`[수정 모드] 편집 단계로 복귀 — 슬롯별 재생성·삭제 가능`);
+    setNotice("수정 모드로 돌아왔습니다. 슬롯을 편집한 뒤 '이 슬롯 재생성'으로 다시 만들거나, 상단 '승인'을 눌러 이어서 진행하세요.");
+  };
+
   /* ── 슬롯 단건 재생성 (편집한 구도/앵글 즉시 반영) ── */
   const regenSlot = async (t) => {
     if (!imageKey()) { setNotice("이미지 API 키가 필요합니다."); return; }
@@ -1174,12 +1182,19 @@ Each block content = one short Korean sentence.`,
                         <h3 className="text-sm font-bold text-emerald-200 flex items-center gap-1.5">
                           <Check className="w-4 h-4" /> 제작 완료 — 요청 {count}장 / 유효 {successCount}장 {successCount === count ? "정확 일치" : "(불일치 확인 필요)"}
                         </h3>
-                        <p className="text-xs text-emerald-300/80 mt-0.5">제출 팩이 저장되었습니다. 필요 시 다시 내려받을 수 있어요.</p>
+                        <p className="text-xs text-emerald-300/80 mt-0.5">제출 팩이 저장되었습니다. 아래에서 다시 저장하거나, 수정 모드로 돌아가 슬롯을 편집·재생성할 수 있습니다.</p>
                       </div>
-                      <button onClick={exportSubmitPack}
-                        className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
-                        <Download className="w-4 h-4" /> 제출 팩 다시 저장
-                      </button>
+                      <div className="flex gap-2">
+                        <button onClick={backToEdit}
+                          title="수정 모드로 전환: 슬롯 편집·개별 재생성·삭제 가능"
+                          className="bg-neutral-950 hover:bg-neutral-800 border border-neutral-600 text-neutral-100 font-bold text-sm py-2.5 px-4 rounded flex items-center gap-2 transition">
+                          <Wand2 className="w-4 h-4" /> 수정 (Fix)
+                        </button>
+                        <button onClick={exportSubmitPack}
+                          className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
+                          <Download className="w-4 h-4" /> 저장 및 다운로드
+                        </button>
+                      </div>
                     </section>
                   )}
 
@@ -1381,10 +1396,15 @@ Each block content = one short Korean sentence.`,
 
                   {phase === "done" && (
                     <>
-                      <p className="text-xs text-emerald-300 leading-relaxed">제작 완료 — 유효 {successCount}장. 제출 팩이 저장되었습니다.</p>
+                      <p className="text-xs text-emerald-300 leading-relaxed">제작 완료 — 유효 {successCount}장.</p>
                       <button onClick={exportSubmitPack}
                         className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
-                        <Download className="w-4 h-4" /> 제출 팩 ZIP 다시 저장
+                        <Download className="w-4 h-4" /> 저장 및 다운로드 (ZIP)
+                      </button>
+                      <button onClick={backToEdit}
+                        title="수정 모드로 전환: 슬롯 편집·개별 재생성·삭제 가능"
+                        className="w-full bg-neutral-950 hover:bg-neutral-800 border border-neutral-700 text-neutral-100 font-bold text-xs py-2 rounded flex items-center justify-center gap-1.5 transition">
+                        <Wand2 className="w-3.5 h-3.5" /> 수정 (Fix)
                       </button>
                     </>
                   )}
