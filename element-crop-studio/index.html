@@ -94,7 +94,7 @@
       linear-gradient(-45deg,transparent 75%,var(--chk1) 75%);
     background-size:18px 18px;background-position:0 0,0 9px,9px -9px,-9px 0;
     background-color:var(--chk2);display:grid;place-items:center;overflow:hidden}
-  .item .pv img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+  .item .pv img{position:absolute;inset:6px;width:calc(100% - 12px);height:calc(100% - 12px);object-fit:contain;display:block}
   .item .pv .num{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;
     padding:2px 8px;border-radius:99px;font-variant-numeric:tabular-nums;backdrop-filter:blur(4px)}
   .item .pv .del{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;border:0;width:26px;height:26px;
@@ -112,8 +112,9 @@
   .g.warn{color:var(--warn);border-color:rgba(242,178,58,.4);background:rgba(242,178,58,.08)}
   .item .acts{display:flex;gap:7px}
   .item .acts .btn{flex:1}
-  /* 썸네일(compact) 모드: 편집 UI 접고 이미지 위주로 */
-  .items.compact{--cardw:150px;gap:10px}
+  /* 썸네일(compact) 모드: 정확히 3열 그리드, 편집 UI 접고 이미지 위주로 */
+  .items.compact{grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:560px){.items.compact{grid-template-columns:repeat(2,1fr)}}
   .items.compact .meta .ttl,
   .items.compact .meta .kw,
   .items.compact .acts,
