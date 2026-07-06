@@ -843,9 +843,12 @@ Each block content = one short Korean sentence.`,
 
   /* 공용 다크 입력/셀렉트 클래스 */
   const fieldCls = "text-sm px-3 py-2 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none focus:border-violet-500";
+  /* 승인 대기 시 주의를 끄는 글로우 펄스 (buildSlotPrompt 무관, UI 전용) */
+  const attnPulse = { animation: "attnGlow 1.4s ease-in-out infinite" };
 
   return (
     <div className="min-h-screen bg-neutral-900 text-neutral-200" style={{ fontFamily: "'Pretendard','Apple SD Gothic Neo',-apple-system,sans-serif" }}>
+      <style>{`@keyframes attnGlow{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,.6)}50%{box-shadow:0 0 0 9px rgba(139,92,246,0)}}`}</style>
 
       {/* ═══ 헤더 ═══ */}
       <header className="bg-neutral-800 border-b border-neutral-700 px-5 pt-4">
@@ -1077,26 +1080,10 @@ Each block content = one short Korean sentence.`,
                 </div>
               </section>
 
-              {/* 실행 로그 */}
-              <section className="bg-neutral-950 border border-neutral-800 rounded-lg p-4">
-                <div className="text-xs font-mono text-neutral-500 uppercase mb-2 flex justify-between">
-                  <span>실행 로그</span>
-                  <span className={phase === "drafting" || phase === "generating" ? "text-violet-400" : "text-neutral-600"}>
-                    {phase === "idle" ? "대기" : phase === "review" ? "멈춤 1 · 검토" : phase === "qc" ? "멈춤 2 · QC" : phase === "done" ? "완료" : "가동 중"}
-                  </span>
-                </div>
-                <div className="h-48 overflow-y-auto font-mono text-xs space-y-1">
-                  {log.length === 0
-                    ? <div className="text-neutral-600 italic">로그 없음</div>
-                    : log.map((l, i) => (
-                        <div key={i} className={l.includes("[오류]") || l.includes("[실패") ? "text-red-400" : l.includes("[성공") || l.includes("완료") ? "text-emerald-400" : l.includes("[멈춤") ? "text-violet-300" : l.includes("[두뇌 폴백]") ? "text-amber-300" : "text-neutral-400"}>{l}</div>
-                      ))}
-                </div>
-              </section>
             </aside>
 
             {/* 메인 워크스페이스 */}
-            <main className="xl:col-span-3 space-y-4">
+            <main className="xl:col-span-2 space-y-4">
 
               {/* 진행 바 */}
               {prog && (
@@ -1221,7 +1208,7 @@ Each block content = one short Korean sentence.`,
                   </section>
 
                   {/* 슬롯 그리드 (초안 테이블 겸 콘택트시트) */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     {slots.map((s) => {
                       const rejected = !!qcRejects[s.index];
                       return (
@@ -1323,6 +1310,99 @@ Each block content = one short Korean sentence.`,
                 </>
               )}
             </main>
+
+            {/* ── 오른쪽 고정 레일: 지금 할 일(승인) + 실행 로그 ── */}
+            <aside className="xl:col-span-1">
+              <div className="xl:sticky xl:top-4 space-y-3">
+                {/* 지금 할 일 위젯 */}
+                <section className="bg-neutral-800 border border-neutral-700 rounded-lg p-4 space-y-2.5">
+                  <div className="text-xs font-mono text-neutral-500 uppercase flex items-center justify-between">
+                    <span>지금 할 일</span>
+                    <span className={phase === "drafting" || phase === "generating" ? "text-violet-400" : phase === "review" || phase === "qc" ? "text-amber-300" : phase === "done" ? "text-emerald-300" : "text-neutral-600"}>
+                      {phase === "idle" ? "대기" : phase === "review" ? "멈춤 1 · 검토" : phase === "qc" ? "멈춤 2 · QC" : phase === "done" ? "완료" : phase === "drafting" ? "초안 작성" : "가동 중"}
+                    </span>
+                  </div>
+
+                  {!imageKey() && (
+                    <div className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded px-2 py-1.5 flex items-center gap-1.5">
+                      <Key className="w-3.5 h-3.5 shrink-0" /> 이미지 API 키를 입력하세요 (상단 설정)
+                    </div>
+                  )}
+
+                  {phase === "idle" && <p className="text-xs text-neutral-500 leading-relaxed">주제·구성을 설정하고 <b className="text-neutral-300">초안 기획</b>을 시작하세요.</p>}
+                  {phase === "drafting" && (
+                    <div className="text-xs text-violet-300 flex items-center gap-1.5"><RefreshCw className="w-3.5 h-3.5 animate-spin" /> {brainName} 초안 작성 중…</div>
+                  )}
+
+                  {phase === "review" && (
+                    <>
+                      <p className="text-xs text-neutral-400 leading-relaxed">초안 <b className="text-neutral-200">{slots.length}행</b> 준비됨. 검토 후 승인하면 생성이 시작됩니다.{successCount > 0 && ` (유효 ${successCount}장 유지)`}</p>
+                      <button onClick={runGeneration} disabled={!imageKey()}
+                        style={imageKey() ? attnPulse : undefined}
+                        className="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
+                        <Play className="w-4 h-4" /> 승인 · 순차 생성 시작
+                      </button>
+                    </>
+                  )}
+
+                  {phase === "generating" && (
+                    <>
+                      {prog && (
+                        <div>
+                          <div className="flex justify-between text-xs font-mono text-neutral-400 mb-1"><span className="truncate">{prog.stage}</span><span>{prog.done}/{prog.total}</span></div>
+                          <div className="w-full bg-neutral-950 h-1.5 rounded-full overflow-hidden"><div className="bg-violet-500 h-full transition-all" style={{ width: `${(prog.done / prog.total) * 100}%` }} /></div>
+                        </div>
+                      )}
+                      <button onClick={() => { cancelRef.current = true; }}
+                        className="w-full bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-300 hover:text-red-300 font-bold text-xs py-2 rounded flex items-center justify-center gap-1.5">
+                        <Square className="w-3 h-3" /> 중지 요청
+                      </button>
+                    </>
+                  )}
+
+                  {phase === "qc" && (
+                    <>
+                      <p className="text-xs text-neutral-400 leading-relaxed">생성 완료. <b className="text-neutral-200">자동 검수</b> 후 이상 없으면 승인·제출하세요.</p>
+                      <button onClick={runAutoQC} disabled={autoQcBusy}
+                        className="w-full bg-neutral-950 hover:bg-neutral-800 border border-neutral-700 disabled:opacity-50 text-violet-300 font-bold text-sm py-2 rounded flex items-center justify-center gap-2 transition">
+                        {autoQcBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ScanSearch className="w-4 h-4" />}
+                        {autoQcBusy ? `검수 중 ${autoQcProg ? `${autoQcProg.done + 1}/${autoQcProg.total}` : ""}` : `${brainName} 자동 검수`}
+                      </button>
+                      <button onClick={submitQC} disabled={autoQcBusy}
+                        style={!autoQcBusy ? attnPulse : undefined}
+                        className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-neutral-950 font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
+                        <Check className="w-4 h-4" />
+                        {Object.values(qcRejects).some(Boolean)
+                          ? `거절 ${Object.values(qcRejects).filter(Boolean).length}건 격리·재생성`
+                          : "전량 승인 · 제출 팩 저장"}
+                      </button>
+                    </>
+                  )}
+
+                  {phase === "done" && (
+                    <>
+                      <p className="text-xs text-emerald-300 leading-relaxed">제작 완료 — 유효 {successCount}장. 제출 팩이 저장되었습니다.</p>
+                      <button onClick={exportSubmitPack}
+                        className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
+                        <Download className="w-4 h-4" /> 제출 팩 ZIP 다시 저장
+                      </button>
+                    </>
+                  )}
+                </section>
+
+                {/* 실행 로그 (오른쪽 고정) */}
+                <section className="bg-neutral-950 border border-neutral-800 rounded-lg p-4">
+                  <div className="text-xs font-mono text-neutral-500 uppercase mb-2 flex justify-between"><span>실행 로그</span><span className="text-neutral-600 normal-case">최신순 ↑</span></div>
+                  <div className="h-64 overflow-y-auto font-mono text-xs space-y-1">
+                    {log.length === 0
+                      ? <div className="text-neutral-600 italic">로그 없음</div>
+                      : [...log].reverse().map((l, i) => (
+                          <div key={i} className={l.includes("[오류]") || l.includes("[실패") ? "text-red-400" : l.includes("[성공") || l.includes("완료") ? "text-emerald-400" : l.includes("[멈춤") ? "text-violet-300" : l.includes("[두뇌 폴백]") ? "text-amber-300" : "text-neutral-400"}>{l}</div>
+                        ))}
+                  </div>
+                </section>
+              </div>
+            </aside>
           </div>
         )}
 
