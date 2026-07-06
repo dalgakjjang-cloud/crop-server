@@ -255,17 +255,31 @@
 
         <div class="divider"></div>
 
+        <label class="f">파일명 형식 (원하는 조합)</label>
+        <input type="text" id="fnPattern" class="mb" placeholder="{날짜}_{제목}_{번호}" value="{날짜}_{제목}_{번호}" autocomplete="off">
+        <div class="hint" style="margin-top:-8px;margin-bottom:10px">
+          토큰: <code class="kbd">{날짜}</code> <code class="kbd">{제목}</code> <code class="kbd">{번호}</code> <code class="kbd">{원본}</code> · 자유롭게 배치·구분자 사용
+        </div>
+        <div class="seg mb" id="fnPreset" style="flex-wrap:wrap">
+          <button data-v="{날짜}_{제목}_{번호}">날짜_제목_번호</button>
+          <button data-v="{제목}_{날짜}_{번호}">제목_날짜_번호</button>
+          <button data-v="{제목}_{번호}">제목_번호</button>
+        </div>
         <div class="row mb">
           <div style="max-width:140px;flex:0 0 140px">
             <label class="f">등록일 YYMMDD</label>
             <input type="text" id="date" maxlength="6" placeholder="260706">
           </div>
+          <div style="max-width:120px;flex:0 0 120px">
+            <label class="f">제목 글자수</label>
+            <input type="number" id="slugLen" value="8" min="2" max="20">
+          </div>
           <div>
-            <label class="f">폴백 슬러그 (제목 없을 때)</label>
+            <label class="f">폴백(제목 없을 때)</label>
             <input type="text" id="slug" placeholder="요소" maxlength="20" autocomplete="off">
           </div>
         </div>
-        <div class="hint">최종 파일명: <span class="k">등록일_한글슬러그(≤8자)_번호</span> · 슬러그는 각 항목의 한글 제목에서 자동 추출됩니다.</div>
+        <div class="hint" id="fnPreview">최종 파일명 미리보기: —</div>
         <div id="acctMsg"></div>
 
         <div class="divider"></div>
@@ -845,11 +859,13 @@ function readSettings(){
     shadows: $('#shadows').checked,
   };
 }
-/* 파일명용 한글 슬러그: 한글/영숫자만 남기고 8자로 자름 */
-function koSlug(text, fallback){
+/* 파일명용 한글 슬러그: 한글/영숫자만 남기고 지정 글자수로 자름 */
+function slugLen(){ return Math.max(2,Math.min(20,+$('#slugLen').value||8)); }
+function koSlug(text, fallback, len){
+  len = len || slugLen();
   const s = String(text||'').replace(/[^가-힣A-Za-z0-9]/g,'');
   const fb = String(fallback||'요소').replace(/[^가-힣A-Za-z0-9]/g,'') || '요소';
-  return (s || fb).slice(0,8);
+  return (s || fb).slice(0,len);
 }
 function validDate(){
   const d=$('#date').value.trim();
@@ -858,16 +874,27 @@ function validDate(){
   if(mm<1||mm>12||dd<1||dd>31) return {ok:false,msg:'등록일의 월/일이 올바르지 않습니다.'};
   return {ok:true,date:d};
 }
-/* 전체 파일명(중복 슬러그는 숫자 접미사로 해소) — 카드 표시와 ZIP 이 동일한 결과 사용 */
+/* 파일명에 못 쓰는 문자 정리 */
+function safeName(s){ return String(s).replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,''); }
+/* 전체 파일명 — 사용자 지정 패턴({날짜}{제목}{번호}{원본}) 적용, 중복은 숫자 접미사로 해소.
+   카드 표시·개별 다운로드·ZIP 이 모두 이 결과를 공유. */
 function allBaseNames(){
   const v=validDate();
   const date=v.ok?v.date:'______';
+  const pattern=($('#fnPattern').value.trim())||'{날짜}_{제목}_{번호}';
+  const L=slugLen();
   const seen=new Map();
   return state.items.map((it,i)=>{
-    let slug=koSlug(it.title, $('#slug').value);
+    let slug=koSlug(it.title, $('#slug').value, L);
     const cnt=(seen.get(slug)||0)+1; seen.set(slug,cnt);
-    if(cnt>1){ const sfx=String(cnt); slug=slug.slice(0,Math.max(1,8-sfx.length))+sfx; }
-    return `${date}_${slug}_${String(i+1).padStart(2,'0')}`;
+    if(cnt>1){ const sfx=String(cnt); slug=slug.slice(0,Math.max(1,L-sfx.length))+sfx; }
+    const origBase=(it.name||'').replace(/\.[^.]+$/,'');
+    const name=pattern
+      .replace(/\{날짜\}/g,date)
+      .replace(/\{제목\}/g,slug)
+      .replace(/\{번호\}/g,String(i+1).padStart(2,'0'))
+      .replace(/\{원본\}/g,koSlug(origBase,'원본',20));
+    return safeName(name)||`요소_${String(i+1).padStart(2,'0')}`;
   });
 }
 
@@ -879,6 +906,7 @@ function render(){
   $('#count').textContent = state.items.length+'개';
   if(!state.items.length){
     stage.innerHTML=`<div class="card"><div class="empty"><div class="ic">📥</div><div>아직 이미지가 없습니다. 위에 이미지를 올려 시작하세요.</div></div></div>`;
+    updateFnPreview();
     return;
   }
   const wrap=document.createElement('div'); wrap.className='items';
@@ -921,6 +949,7 @@ function render(){
     wrap.appendChild(el);
   });
   stage.innerHTML=''; stage.appendChild(wrap);
+  updateFnPreview();
 }
 
 function downloadBlob(blob,name){
@@ -1371,11 +1400,24 @@ $('#sizeSeg').addEventListener('click',e=>{
 });
 $('#clearAll').onclick=()=>{ state.items.forEach(it=>it.out&&URL.revokeObjectURL(it.out.url)); state.items=[]; render(); };
 $('#dlZip').onclick=downloadZip;
-$('#slug').oninput=render;
+function updateFnPreview(){
+  const names=state.items.length ? allBaseNames() : (()=>{ // 이미지 없을 때 샘플
+    const v=validDate(); const date=v.ok?v.date:'______';
+    const pattern=($('#fnPattern').value.trim())||'{날짜}_{제목}_{번호}';
+    const s=pattern.replace(/\{날짜\}/g,date).replace(/\{제목\}/g,koSlug('','예시제목',slugLen())).replace(/\{번호\}/g,'01').replace(/\{원본\}/g,'원본');
+    return [safeName(s)];
+  })();
+  $('#fnPreview').innerHTML=`최종 파일명 미리보기: <span class="k">${(names[0]||'—')}.png</span>`;
+}
+['#fnPattern','#slug','#slugLen'].forEach(sel=>$(sel).oninput=()=>{ render(); updateFnPreview(); });
+$('#fnPreset').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  $('#fnPattern').value=b.dataset.v; render(); updateFnPreview(); saveSettings();
+});
 $('#date').oninput=()=>{
-  render();
+  render(); updateFnPreview();
   const v=validDate();
-  if(v.ok){ const it=state.items[0]; const slug=koSlug(it&&it.title, $('#slug').value); showAcct(`등록일 확인 ✓ → ${v.date}_${slug}_01`, true); }
+  if(v.ok) showAcct(`등록일 확인 ✓`, true);
   else $('#acctMsg').innerHTML='';
 };
 
@@ -1389,7 +1431,7 @@ function saveSettings(){
       longAxis:$('#longAxis').value, maxAxis:$('#maxAxis').value,
       dpi:$('#dpi').value, margin:$('#margin').value,
       sanitize:$('#sanitize').checked, pockets:$('#pockets').checked, shadows:$('#shadows').checked,
-      slug:$('#slug').value,
+      slug:$('#slug').value, fnPattern:$('#fnPattern').value, slugLen:$('#slugLen').value,
       aiProvider:$('#aiProvider').value, aiModel:$('#aiModel').value, aiKey:$('#aiKey').value,
       viewMode:state.viewMode||'thumb',
     }));
@@ -1413,6 +1455,8 @@ function loadSettings(){
   if(typeof s.pockets==='boolean')$('#pockets').checked=s.pockets;
   if(typeof s.shadows==='boolean')$('#shadows').checked=s.shadows;
   if(s.slug)$('#slug').value=s.slug;
+  if(s.fnPattern)$('#fnPattern').value=s.fnPattern;
+  if(s.slugLen)$('#slugLen').value=s.slugLen;
   if(s.aiProvider)$('#aiProvider').value=s.aiProvider;
   if(s.aiModel)$('#aiModel').value=s.aiModel;
   if(s.aiKey)$('#aiKey').value=s.aiKey;
@@ -1423,7 +1467,7 @@ function loadSettings(){
   }
 }
 // 설정 변경 시 자동 저장
-['#thr','#feather','#longAxis','#maxAxis','#dpi','#margin','#sanitize','#pockets','#shadows','#slug','#aiProvider','#aiModel','#aiKey']
+['#thr','#feather','#longAxis','#maxAxis','#dpi','#margin','#sanitize','#pockets','#shadows','#slug','#fnPattern','#slugLen','#aiProvider','#aiModel','#aiKey']
   .forEach(sel=>{ const el=$(sel); if(el) el.addEventListener('change',saveSettings); });
 $('#bgSeg').addEventListener('click',saveSettings);
 $('#sizeSeg').addEventListener('click',saveSettings);
