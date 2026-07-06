@@ -597,18 +597,27 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
     setProg(null);
     if (cancelRef.current) { setPhase("idle"); addLog("[초안] 사용자 중단"); return; }
     const ok = made.filter(Boolean);
-    setSlots(ok.map((s, i) => ({ ...s, index: pad2(i + 1) })));
-    setPhase("review");
-    addLog(`[멈춤 1] 초안 ${ok.length}행 검토 대기${ok.length < concepts.length ? ` (${concepts.length - ok.length}행 실패 — 필요 시 다시 기획)` : ""} — 승인 시 생성 시작`);
+    const indexed = ok.map((s, i) => ({ ...s, index: pad2(i + 1) }));
+    setSlots(indexed);
+    addLog(`[초안 완료] ${ok.length}행${ok.length < concepts.length ? ` (${concepts.length - ok.length}행 실패)` : ""}`);
+    /* 검토 멈춤 없이 곧바로 순차 생성 (생성 후 수정) — 키 없으면 검토 단계에서 대기 */
+    if (imageKey()) {
+      runGeneration(indexed);
+    } else {
+      setPhase("review");
+      setNotice("이미지 API 키가 없어 초안에서 멈췄습니다. 상단 설정에서 키를 입력한 뒤 승인하세요.");
+      addLog(`[멈춤 1] 이미지 키 없음 — 키 입력 후 승인 시 생성`);
+    }
   };
 
-  /* ═══ 2단계: 승인 후 missing-only 순차 생성 ═══ */
-  const runGeneration = async () => {
+  /* ═══ 2단계: 순차 생성 (초안 직후 자동 · 또는 재생성 시 수동) ═══ */
+  const runGeneration = async (slotList) => {
     if (phase === "generating") return;
     if (!imageKey()) { setNotice("이미지 API 키가 필요합니다."); return; }
     cancelRef.current = false;
     setPhase("generating");
-    const targets = slots.filter((s) => s.status === "pending" || s.status === "failed" || s.status === "rejected");
+    const source = Array.isArray(slotList) ? slotList : slots;
+    const targets = source.filter((s) => s.status === "pending" || s.status === "failed" || s.status === "rejected");
     const cap = parseInt(maxNew) > 0 ? parseInt(maxNew) : Infinity;
     addLog(`[생성] 미완료 ${targets.length}슬롯 (상한 ${cap === Infinity ? "없음" : cap + "장"}) · ${provider === "openai" ? `GPT ${quality}` : "Gemini"}`);
     let newMade = 0;
@@ -1243,7 +1252,7 @@ Each block content = one short Korean sentence.`,
                     <section className="bg-violet-500/10 border border-violet-500/30 rounded-lg p-4 flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <h3 className="text-sm font-bold text-violet-200 flex items-center gap-1.5">
-                          <ClipboardCheck className="w-4 h-4" /> 멈춤 1 · 초안 검토
+                          <ClipboardCheck className="w-4 h-4" /> 미완료·수정 슬롯 검토
                         </h3>
                         <p className="text-xs text-violet-300/80 mt-0.5">
                           {slots.length}행 · 모드 {mode === "wallpaper" ? "배경화면(여백 40-60%)" : "상업 사진"} · 엔진 {provider === "openai" ? `GPT ${quality}` : "Gemini"} · 종횡비 {aspect}
@@ -1257,7 +1266,7 @@ Each block content = one short Korean sentence.`,
                       </div>
                       <button onClick={runGeneration} disabled={!imageKey()}
                         className="bg-violet-600 hover:bg-violet-500 disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
-                        <Play className="w-4 h-4" /> 승인 · 순차 생성 시작
+                        <Play className="w-4 h-4" /> 미완료·수정 슬롯 생성
                       </button>
                     </section>
                   )}
@@ -1460,7 +1469,7 @@ Each block content = one short Korean sentence.`,
                   <div className="text-xs font-mono text-neutral-500 uppercase flex items-center justify-between">
                     <span>지금 할 일</span>
                     <span className={phase === "drafting" || phase === "generating" ? "text-violet-400" : phase === "review" || phase === "qc" ? "text-amber-300" : phase === "done" ? "text-emerald-300" : "text-neutral-600"}>
-                      {phase === "idle" ? "대기" : phase === "review" ? "멈춤 1 · 검토" : phase === "qc" ? "멈춤 2 · QC" : phase === "done" ? "완료" : phase === "drafting" ? "초안 작성" : "가동 중"}
+                      {phase === "idle" ? "대기" : phase === "review" ? "수정 대기" : phase === "qc" ? "멈춤 2 · QC" : phase === "done" ? "완료" : phase === "drafting" ? "초안 작성" : "가동 중"}
                     </span>
                   </div>
 
@@ -1472,16 +1481,20 @@ Each block content = one short Korean sentence.`,
 
                   {phase === "idle" && <p className="text-xs text-neutral-500 leading-relaxed">주제·구성을 설정하고 <b className="text-neutral-300">초안 기획</b>을 시작하세요.</p>}
                   {phase === "drafting" && (
-                    <div className="text-xs text-violet-300 flex items-center gap-1.5"><RefreshCw className="w-3.5 h-3.5 animate-spin" /> {brainName} 초안 작성 중…</div>
+                    <div className="text-xs text-violet-300 flex items-center gap-1.5"><RefreshCw className="w-3.5 h-3.5 animate-spin" /> {brainName} 초안 작성 중… <span className="text-neutral-500">(완료 즉시 자동 생성)</span></div>
                   )}
 
                   {phase === "review" && (
                     <>
-                      <p className="text-xs text-neutral-400 leading-relaxed">초안 <b className="text-neutral-200">{slots.length}행</b> 준비됨. 검토 후 승인하면 생성이 시작됩니다.{successCount > 0 && ` (유효 ${successCount}장 유지)`}</p>
+                      <p className="text-xs text-neutral-400 leading-relaxed">
+                        {slots.some((s) => s.status === "pending") && !slots.some((s) => s.status === "success")
+                          ? <>초안 <b className="text-neutral-200">{slots.length}행</b> 준비됨. 이미지 키를 입력하고 생성을 시작하세요.</>
+                          : <>미완료·수정 슬롯이 있습니다. 편집 후 아래 버튼으로 이어서 생성하세요.{successCount > 0 && ` (유효 ${successCount}장 유지)`}</>}
+                      </p>
                       <button onClick={runGeneration} disabled={!imageKey()}
                         style={imageKey() ? attnPulse : undefined}
                         className="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
-                        <Play className="w-4 h-4" /> 승인 · 순차 생성 시작
+                        <Play className="w-4 h-4" /> 미완료·수정 슬롯 생성
                       </button>
                     </>
                   )}
