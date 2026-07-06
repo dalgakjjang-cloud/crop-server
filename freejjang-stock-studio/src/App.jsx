@@ -62,6 +62,42 @@ const BRIGHT_NEUTRAL_STYLES = [
 ];
 const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
+/* REEDO식 구조화 구성 — 드롭다운 선택이 초안 프롬프트 제약으로 조립됨 (선택 안함이면 무시) */
+const REEDO_STYLE = {
+  "": "선택 안함", photo: "실사 사진", "3d": "3D 렌더", watercolor: "수채화",
+  vector: "벡터/일러스트", minimal: "미니멀", flatlay: "플랫레이", isometric: "아이소메트릭",
+};
+const REEDO_STYLE_PHRASE = {
+  photo: "photorealistic photography", "3d": "clean 3D render", watercolor: "soft watercolor illustration",
+  vector: "flat vector illustration", minimal: "minimal clean aesthetic", flatlay: "top-down flat lay composition",
+  isometric: "isometric illustration",
+};
+const REEDO_REGION = {
+  "": "선택 안함", us: "미국", kr: "한국", eu: "유럽", jp: "일본", global: "글로벌",
+};
+const REEDO_REGION_PHRASE = {
+  us: "styled for the US market, American aesthetic", kr: "styled for the Korean market, Korean aesthetic",
+  eu: "European aesthetic", jp: "Japanese aesthetic", global: "universal global-market aesthetic",
+};
+const REEDO_BG = {
+  "": "선택 안함", white: "흰 배경", daylight: "자연광 실내", office: "사무실",
+  outdoor: "야외/자연", studio: "스튜디오", solid: "단색 배경", bokeh: "보케 흐림",
+};
+const REEDO_BG_PHRASE = {
+  white: "clean seamless white background", daylight: "bright naturally-lit interior",
+  office: "modern office setting", outdoor: "natural outdoor environment",
+  studio: "professional studio setting", solid: "clean solid color backdrop", bokeh: "soft bokeh blurred background",
+};
+const REEDO_PEOPLE = {
+  none: "사람 없음 (권장)", hands: "손만", silhouette: "뒷모습/실루엣", with: "인물 포함",
+};
+const REEDO_PEOPLE_PHRASE = {
+  none: "absolutely NO people, no faces, no hands, no body parts — no model release needed",
+  hands: "only hands visible, no faces",
+  silhouette: "people only as back-view or silhouette, no identifiable faces",
+  with: "people may appear naturally",
+};
+
 /* 두뇌(에이전트) 라벨 · 기본 모델 */
 const BRAIN_LABELS = { claude: "Claude(Fable)", gpt: "GPT(Codex 계열)", gemini: "Gemini" };
 const GPT_MODEL_DEFAULT = "gpt-5-mini";
@@ -236,6 +272,12 @@ export default function App() {
   const [maxNew, setMaxNew] = useState(""); // 생성 상한 (하드캡, 선택)
   const [mode, setMode] = useState("commercial"); // commercial | wallpaper
   const [modeAuto, setModeAuto] = useState(true);
+  /* ── REEDO식 구조화 구성 (선택 안함이면 무시) ── */
+  const [refStyle, setRefStyle] = useState("");
+  const [refRegion, setRefRegion] = useState("");
+  const [refBg, setRefBg] = useState("");
+  const [refPeople, setRefPeople] = useState("none"); // 기본: 사람 없음 (모델 릴리즈 회피)
+  const [refAngle, setRefAngle] = useState("auto");   // 초안 전체 기본 카메라 앵글
   const [phase, setPhase] = useState("idle"); // idle | drafting | review | generating | qc | done
   const [slots, setSlots] = useState([]);
   const [prog, setProg] = useState(null);
@@ -267,6 +309,17 @@ export default function App() {
   const onTopicChange = (v) => {
     setTopic(v);
     if (modeAuto) setMode(WALLPAPER_RE.test(v) ? "wallpaper" : "commercial");
+  };
+
+  /* REEDO식 구조화 구성 → 초안 브레인에 주입할 제약 문장 (선택된 것만) */
+  const refinementLine = () => {
+    const parts = [];
+    if (REEDO_STYLE_PHRASE[refStyle]) parts.push(`Style: ${REEDO_STYLE_PHRASE[refStyle]}`);
+    if (REEDO_REGION_PHRASE[refRegion]) parts.push(`Market: ${REEDO_REGION_PHRASE[refRegion]}`);
+    if (REEDO_BG_PHRASE[refBg]) parts.push(`Background: ${REEDO_BG_PHRASE[refBg]}`);
+    if (REEDO_PEOPLE_PHRASE[refPeople]) parts.push(`People: ${REEDO_PEOPLE_PHRASE[refPeople]}`);
+    if (CAMERA_ANGLES[refAngle]?.phrase) parts.push(`Camera baseline: ${CAMERA_ANGLES[refAngle].phrase}`);
+    return parts.length ? `\nApply these refinements to EVERY slot: ${parts.join("; ")}.` : "";
   };
 
   const estCost = () => {
@@ -341,14 +394,14 @@ export default function App() {
 RULES: kind is "photo" or "illustration" by topic. Never repeat a subject+camera+lighting+palette combo within the set. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items (flags, food, rituals, object counts) must be factually correct. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": medium or wide framing with environmental context and comfortable breathing room — the subject fills about 50-70% of the frame (NEVER edge-to-edge, NOT a tight close-up), keep roughly 25-35% clean uncluttered negative space for versatility, rule-of-thirds/leading-line, subject fully in frame and not cropped. Set "copy_space" to name where that calm area sits (e.g. "upper-left clean area").
 KEYWORDS (Adobe SEO, critical): "keywords" must be EXACTLY 35 English keywords, comma-separated, NO duplicates, ordered by buyer importance (Adobe weights the first ~10 most). Order groups: (1) main subject nouns, (2) specific descriptors/materials/actions, (3) concept/theme/season/emotion, (4) color and lighting, (5) composition/orientation (copy space, background, close-up, minimal), (6) use-case (banner, wallpaper, marketing, web design). Use single words or natural 2-word phrases, all lowercase, only real buyer search terms that literally describe what is visible. No text/number/logo/brand words. "keywords_kr" follows the same SEO ordering in Korean single nouns.
 CATEGORY: pick the ONE best Adobe Stock category id from this exact list: ${ADOBE_CAT_LIST}. Choose by the dominant visible subject (e.g. scenery→11, dish/ingredient→7, festival/tradition/ritual→15, person-focused lifestyle→12 or 13, plant/flower→14, drink→4, tech/device→19). If kind is "illustration"/vector/background and nothing fits more strongly, use 8. Return category as the integer id only.`,
-          `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Combos already used (avoid): ${combos}`
+          `Topic: "${topic}". Mode: ${mode}. Generate exactly ${n} slots. Combos already used (avoid): ${combos}${refinementLine()}`
         );
         for (const item of r.items || []) {
           if (made.length >= count) break;
           made.push({
             ...item,
             index: pad2(made.length + 1),
-            status: "pending", regenCount: 0, dataUrl: "", rejectReason: "", angle: "auto", finalPrompt: "",
+            status: "pending", regenCount: 0, dataUrl: "", rejectReason: "", angle: refAngle, finalPrompt: "",
             slug: cleanName(item.slug, 24) || `slot-${made.length + 1}`,
           });
         }
@@ -820,12 +873,62 @@ Each block content = one short Korean sentence.`,
                     </button>
                   </div>
                 </div>
+                {/* REEDO식 구조화 구성 — 선택 항목이 모든 슬롯 초안에 주입됨 */}
+                <div className="pt-1 border-t border-neutral-700">
+                  <label className="block text-xs font-semibold text-neutral-400 mb-1.5">구조화 구성 <span className="text-neutral-600">(선택 항목만 반영)</span></label>
+                  <div className="grid grid-cols-2 gap-1.5">
+                    {(() => {
+                      const dis = phase === "drafting" || phase === "generating";
+                      const sel = `${fieldCls} w-full !px-2 !py-1.5 text-xs disabled:opacity-60`;
+                      const opts = (o) => Object.entries(o).map(([k, v]) => <option key={k} value={k}>{v}</option>);
+                      return (
+                        <>
+                          <div>
+                            <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">인물</span>
+                            <select value={refPeople} onChange={(e) => setRefPeople(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_PEOPLE)}</select>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">스타일</span>
+                            <select value={refStyle} onChange={(e) => setRefStyle(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_STYLE)}</select>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">배경</span>
+                            <select value={refBg} onChange={(e) => setRefBg(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_BG)}</select>
+                          </div>
+                          <div>
+                            <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">나라/지역</span>
+                            <select value={refRegion} onChange={(e) => setRefRegion(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_REGION)}</select>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">카메라/구도 (전체 기본)</span>
+                            <select value={refAngle} onChange={(e) => setRefAngle(e.target.value)} disabled={dis} className={sel}>
+                              {Object.entries(CAMERA_ANGLES).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                            </select>
+                          </div>
+                        </>
+                      );
+                    })()}
+                  </div>
+                </div>
+
                 <button onClick={draftSlots}
                   disabled={!topic.trim() || phase === "drafting" || phase === "generating"}
                   className="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
                   {phase === "drafting" ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Wand2 className="w-4 h-4" />}
                   {phase === "drafting" ? `${brainName} 초안 작성 중…` : slots.length > 0 ? "초안 다시 만들기" : `${brainName} 초안 기획`}
                 </button>
+
+                {/* 플랫폼 바로가기 */}
+                <div className="flex gap-1.5 pt-0.5">
+                  <a href="https://contributor.stock.adobe.com/" target="_blank" rel="noopener noreferrer"
+                    className="flex-1 text-center bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-300 font-bold text-xs py-2 rounded transition">
+                    Adobe Stock 열기
+                  </a>
+                  <a href="https://www.miricanvas.com/" target="_blank" rel="noopener noreferrer"
+                    className="flex-1 text-center bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-300 font-bold text-xs py-2 rounded transition">
+                    미리캔버스
+                  </a>
+                </div>
               </section>
 
               {/* 실행 로그 */}
