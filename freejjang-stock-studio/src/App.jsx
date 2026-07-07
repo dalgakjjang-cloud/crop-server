@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import JSZip from "jszip";
+import Pica from "pica";
 
 /* ═══════════════════════════════════════════════════════════
    FreeJJang STOCK STUDIO — 최종판 (다크 · 2중 두뇌)
@@ -271,6 +272,40 @@ async function genOpenAI(key, prompt, aspect, quality) {
   if (!b64) throw new Error("OpenAI가 이미지 데이터를 반환하지 않았습니다.");
   return `data:image/png;base64,${b64}`;
 }
+/* ── 해상도 유틸: 어도비 최소 4MP — 저해상도 감지 + ZIP 저장 시 자동 업스케일(Lanczos+샤픈) ── */
+const ADOBE_MIN_MP = 4e6;
+const picaInst = new Pica();
+const loadImgEl = (dataUrl) => new Promise((resolve, reject) => {
+  const i = new Image();
+  i.onload = () => resolve(i);
+  i.onerror = () => reject(new Error("이미지 로드 실패"));
+  i.src = dataUrl;
+});
+const getDims = async (dataUrl) => {
+  const i = await loadImgEl(dataUrl);
+  return { w: i.width, h: i.height };
+};
+/* 4MP 미만이면 Lanczos 리샘플 + 언샤프 마스크로 4MP 이상 JPEG 생성 (어도비 바로 업로드용) */
+async function upscaleForAdobe(dataUrl) {
+  const img = await loadImgEl(dataUrl);
+  const mp = img.width * img.height;
+  if (mp >= ADOBE_MIN_MP) {
+    const c0 = document.createElement("canvas");
+    c0.width = img.width; c0.height = img.height;
+    c0.getContext("2d").drawImage(img, 0, 0);
+    return { jpeg: c0.toDataURL("image/jpeg", 0.92), w: img.width, h: img.height, factor: 1 };
+  }
+  const factor = Math.min(3, Math.ceil(Math.sqrt((ADOBE_MIN_MP * 1.08) / mp) * 100) / 100);
+  const src = document.createElement("canvas");
+  src.width = img.width; src.height = img.height;
+  src.getContext("2d").drawImage(img, 0, 0);
+  const dst = document.createElement("canvas");
+  dst.width = Math.round(img.width * factor);
+  dst.height = Math.round(img.height * factor);
+  await picaInst.resize(src, dst, { unsharpAmount: 55, unsharpRadius: 0.6, unsharpThreshold: 2 });
+  return { jpeg: dst.toDataURL("image/jpeg", 0.92), w: dst.width, h: dst.height, factor };
+}
+
 /* ── 무료 엔진 C: Pollinations (Flux · 가입/키 불필요 · 과금 없음) ──
    무료(익명) 티어는 긴 변을 ~1024px로 제한한다. 이보다 큰 값을 요청하면 작게 생성한 뒤
    요청 크기로 강제로 늘려(가로 stretch) 채우므로, 긴 변=1024로 맞춘 정확 비율만 사용한다. */
@@ -499,6 +534,7 @@ export default function App() {
   /* ── 이미지 엔진 키 (provider별 · Pollinations는 키 불필요) ── */
   const imageKey = () => (provider === "pollinations" ? "free" : (provider === "gemini" ? googleKey : openaiKey).trim());
   const IMG_LABEL = { openai: "GPT", gemini: "Gemini", pollinations: "Pollinations(무료)" };
+  const engineUsedRef = useRef(""); // 마지막 생성에 실제 사용된 엔진 (폴백 추적)
   /* 엔진 1개 호출 (재시도 없음) */
   const genWithEngine = (eng, prompt, q) => {
     if (eng === "pollinations") return genPollinations(prompt, aspect);
@@ -523,6 +559,7 @@ export default function App() {
           const out = await genWithEngine(eng, finalPrompt, q);
           const unit = eng === "pollinations" ? 0 : eng === "gemini" ? GEMINI_IMG_COST : (OPENAI_COST[q] || 0.041);
           setSpent((p) => ({ img: p.img + 1, cost: p.cost + unit }));
+          engineUsedRef.current = eng;
           if (e > 0) addLog(`[엔진 폴백] ${IMG_LABEL[order[0]]} 실패 → ${IMG_LABEL[eng]}로 생성 완료`);
           return out;
         } catch (err) {
@@ -704,10 +741,12 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
     const draftQ = ecoOn ? "low" : undefined;
     addLog(`[생성] 미완료 ${targets.length}슬롯${force ? " · 강제 실행 (시간 무시)" : hasDeadline ? ` · 최대 ${Math.ceil((deadlineRef.current - Date.now()) / 60000)}분 남음` : ""} · ${provider === "openai" ? (ecoOn ? `GPT low 초안 (승인 후 ${finalQuality} 마감)` : `GPT ${quality}`) : provider === "pollinations" ? "Pollinations 무료 (Flux)" : "Gemini"}`);
     let newMade = 0;
-    const markSuccess = (idx, dataUrl, fp) => {
+    const markSuccess = async (idx, dataUrl, fp) => {
       newMade += 1;
+      const eng = engineUsedRef.current;
+      const px = await getDims(dataUrl).catch(() => null);
       setSlots((p) => p.map((s) => (s.index === idx
-        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", finalized: false, regenCount: s.regenCount + 1 } : s)));
+        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", finalized: false, engine: eng, px, regenCount: s.regenCount + 1 } : s)));
     };
     for (const t of targets) {
       if (cancelRef.current) break;
@@ -718,7 +757,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
         if (t.qcNote) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${t.qcNote}`);
         const fp = buildSlotPrompt(t, mode, refTone, refPeople);
         const dataUrl = await generateImage(fp, draftQ);
-        markSuccess(t.index, dataUrl, fp);
+        await markSuccess(t.index, dataUrl, fp);
         addLog(`[성공 ${t.index}] ${t.title_kr || t.title}`);
       } catch (err) {
         /* 자동 복구: 일시 오류가 아닌 실패(콘텐츠 충돌 등)는 두뇌가 장면을 규정에 맞게 고쳐 쓴 뒤 즉시 1회 재시도 */
@@ -730,7 +769,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
             setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, ...fix, repaired: true } : s)));
             const fp2 = buildSlotPrompt(t2, mode, refTone, refPeople);
             const dataUrl2 = await generateImage(fp2, draftQ);
-            markSuccess(t.index, dataUrl2, fp2);
+            await markSuccess(t.index, dataUrl2, fp2);
             addLog(`[복구 성공 ${t.index}] 장면 수정 후 생성 완료`);
             await new Promise((r) => setTimeout(r, 1200));
             continue;
@@ -969,10 +1008,26 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const base = cleanName(topic, 20) || "freejjang";
     addLog(`[제출 팩] ZIP 생성 중 — 이미지 ${ok.length}장…`);
     const zip = new JSZip();
-    /* 이미지 전체 → images/ 폴더 */
-    for (const s of ok) {
-      zip.file(`images/${s.index}-${cleanName(topic, 15)}-${s.slug}.png`, dataUrlToU8(s.dataUrl));
+    /* 이미지: adobe/ = 4MP+ 자동 업스케일 JPEG (CSV 파일명과 일치 → 바로 업로드), miri/ = 원본 PNG */
+    addLog(`[제출 팩] 어도비 규격(4MP+) 자동 업스케일 중…`);
+    for (let i = 0; i < ok.length; i++) {
+      const s = ok[i];
+      const name = `${s.index}-${cleanName(topic, 15)}-${s.slug}`;
+      setProg({ done: i, total: ok.length, stage: `슬롯 ${s.index} 업스케일·압축` });
+      try {
+        const up = await upscaleForAdobe(s.dataUrl);
+        zip.file(`images/adobe/${name}_adobe.jpg`, dataUrlToU8(up.jpeg));
+        if (up.factor > 1) {
+          addLog(`[업스케일 ${s.index}] ${s.px ? `${s.px.w}×${s.px.h}` : "원본"} → ${up.w}×${up.h} (${up.factor}배)`);
+          if (s.px && s.px.w * s.px.h < 1e6) addLog(`[주의 ${s.index}] 저해상도 원본의 고배율 업스케일 — 어도비 심사 탈락 위험, GPT 엔진 재생성 권장`);
+        }
+      } catch (e) {
+        zip.file(`images/adobe/${name}_adobe.png`, dataUrlToU8(s.dataUrl));
+        addLog(`[업스케일 실패 ${s.index}] 원본 그대로 동봉 — ${e.message}`);
+      }
+      zip.file(`images/miri/${name}_miri.png`, dataUrlToU8(s.dataUrl));
     }
+    setProg(null);
     /* Adobe CSV */
     const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const header = ["Filename", "Title", "Keywords", "Category", "Releases", "is_ai_generated"];
@@ -996,7 +1051,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
     await saveBlob(blob, `${base}-submit-pack.zip`);
     addLog(`[제출 팩] ZIP 저장 완료 — 이미지 ${ok.length}장 + Adobe CSV + 미캔 XLSX + 프롬프트 TXT (요청 ${count}장 대비 ${ok.length === count ? "정확 일치 ✓" : "불일치 ⚠"})`);
-    setNotice(`제출 팩 ZIP 저장 완료: 이미지 ${ok.length}장 · Adobe CSV · 미캔 XLSX · 프롬프트 백업${saveDir ? ` → "${saveDir.name}" 폴더` : ""}${ok.length !== count ? ` — 요청 ${count}장과 다릅니다. 미완료 슬롯을 확인하세요.` : ""} ⚠ 어도비 제출 전 필수: ① Ps 슈퍼 해상도 2배(4MP 기준 충족) ② 100% 확대로 노이즈·아티팩트·소프트포커스 육안 확인 — 발견 시 해당 슬롯만 재생성하세요.`);
+    setNotice(`제출 팩 ZIP 저장 완료: 이미지 ${ok.length}장 · Adobe CSV · 미캔 XLSX · 프롬프트 백업${saveDir ? ` → "${saveDir.name}" 폴더` : ""}${ok.length !== count ? ` — 요청 ${count}장과 다릅니다. 미완료 슬롯을 확인하세요.` : ""} ✅ adobe 폴더의 JPG는 4MP+ 자동 업스케일 완료 — CSV와 파일명이 일치해 바로 업로드 가능합니다. 제출 전 100% 확대로 아티팩트만 한번 훑어보세요.`);
   };
 
   const updateSlot = (index, field, value) =>
@@ -1022,8 +1077,10 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       if (note) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${note}`);
       const fp = buildSlotPrompt({ ...t, qcNote: note }, mode, refTone, refPeople);
       const dataUrl = await generateImage(fp, ecoTwoPass && provider === "openai" ? "low" : undefined);
+      const eng = engineUsedRef.current;
+      const px = await getDims(dataUrl).catch(() => null);
       setSlots((p) => p.map((s) => (s.index === t.index
-        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", autoFlag: "", finalized: false, regenCount: s.regenCount + 1 } : s)));
+        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", autoFlag: "", finalized: false, engine: eng, px, regenCount: s.regenCount + 1 } : s)));
       setQcRejects((p) => { const n = { ...p }; delete n[t.index]; return n; });
       addLog(`[재생성 ${t.index}] 완료`);
     } catch (err) {
@@ -1188,6 +1245,9 @@ Each block content = one short Korean sentence.`,
                   <option value="gemini">Gemini (2.5-flash-image)</option>
                   <option value="pollinations">Pollinations (Flux · 완전 무료 · 키 불필요)</option>
                 </select>
+                {provider === "pollinations" && (
+                  <p className="text-[10px] text-amber-300/90 mt-1 leading-snug max-w-56">⚠ 무료 엔진은 원본 해상도가 낮아 어도비 판매용으론 비권장 — 기획·구도 확인용으로 쓰세요</p>
+                )}
               </div>
               {provider === "openai" && (
                 <div>
@@ -1539,6 +1599,17 @@ Each block content = one short Korean sentence.`,
                             {s.dataUrl ? (
                               <>
                                 <img src={s.dataUrl} alt={s.title} className="w-full h-full object-contain" title="실제 구도 그대로 표시 (잘라내지 않음)" />
+                                {/* 해상도 경고: 어도비 4MP 기준 대비 원본 픽셀 상태 표시 */}
+                                {s.px && s.px.w * s.px.h < 1e6 && (
+                                  <div className="absolute bottom-0 inset-x-0 bg-red-600/85 text-white text-[10px] font-bold text-center py-0.5">
+                                    ⚠ 저해상도 {s.px.w}×{s.px.h} — 판매 비권장 (기획 확인용)
+                                  </div>
+                                )}
+                                {s.px && s.px.w * s.px.h >= 1e6 && s.px.w * s.px.h < ADOBE_MIN_MP && (
+                                  <div className="absolute bottom-0 inset-x-0 bg-neutral-950/75 text-emerald-300 text-[10px] font-semibold text-center py-0.5">
+                                    {s.px.w}×{s.px.h} · 저장 시 자동 업스케일 → 판매 규격(4MP+)
+                                  </div>
+                                )}
                                 {rejected && (
                                   <div className="absolute inset-0 bg-red-600/50 flex flex-col items-center justify-center text-white text-xs font-bold">
                                     <Ban className="w-6 h-6 mb-1" /> 거절 표시됨
