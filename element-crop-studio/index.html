@@ -331,6 +331,7 @@
         </div>
         <span class="sp"></span>
         <button class="btn ghost sm" id="clearAll">전체 삭제</button>
+        <button class="btn ghost sm" id="dlSimple" title="제목·키워드·CSV 없이 처리된 PNG만 ZIP으로">🖼 그림만 ZIP</button>
         <button class="btn ghost sm" id="dlZip">📦 업로드 패키지 ZIP</button>
       </div>
 
@@ -996,6 +997,25 @@ async function processAll(){
   processing=false;
 }
 
+/* ---------- 심플 패키지: 처리된 PNG만 (제목·키워드·CSV·API 불필요) ---------- */
+let simpleBusy=false;
+async function downloadSimpleZip(){
+  if(simpleBusy) return;
+  if(!state.items.length){ showAcct('먼저 이미지를 올려주세요.','warn'); return; }
+  simpleBusy=true; const btn=$('#dlSimple'); btn.disabled=true;
+  try{
+    const S=readSettings();
+    for(const it of state.items){ if(!it.out) await processItem(it,S); }
+    const names=allBaseNames(); // 제목 없으면 폴백 슬러그로 자동 파일명
+    const files=state.items.map((it,i)=>({name:`${names[i]}.png`, data:it.out.bytes}));
+    const v=validDate();
+    const blob=buildZip(files);
+    downloadBlob(blob, `elements_${v.ok?v.date:'save'}.zip`);
+    showAcct(`그림만 ZIP 생성 완료 ✓ (${files.length}장 · 제목/CSV 없이 저장)`, true);
+  }catch(e){ showAcct('그림만 ZIP 실패: '+(e.message||e),'warn'); }
+  finally{ simpleBusy=false; btn.disabled=false; }
+}
+
 /* ---------- ZIP 패키지 ---------- */
 async function downloadZip(){
   const v=validDate();
@@ -1113,7 +1133,7 @@ let aiRunning=false;
 async function aiFill(){
   if(aiRunning) return;
   const provider=$('#aiProvider').value, key=$('#aiKey').value.trim(), model=$('#aiModel').value.trim()||AI_MODELS[provider];
-  if(!key){ aiMsg('API 키를 입력하세요.','warn'); $('#aiKey').focus(); return; }
+  if(!key){ aiMsg('API 키가 없습니다. 제목·키워드 없이 그림만 저장하려면 상단 <b>🖼 그림만 ZIP</b> 을 쓰세요.','warn'); $('#aiKey').focus(); return; }
   if(!state.items.length){ aiMsg('먼저 이미지를 올려주세요.','warn'); return; }
   aiRunning=true; $('#aiFill').disabled=true;
   const S=readSettings();
@@ -1143,7 +1163,7 @@ async function aiFill(){
   aiRunning=false; $('#aiFill').disabled=false;
   if(done && !errs.length) aiMsg(`제목·키워드 자동생성 완료 (${done}개) — 이제 📦 업로드 패키지 ZIP 을 누르세요.`,'ok');
   else if(done) aiMsg(`완료 ${done}개 · 오류 ${errs.length}개: ${errs.slice(0,2).join(' / ')}${errs.length>2?' …':''}`,'warn');
-  else aiMsg(`실패: ${errs.slice(0,2).join(' / ')} · 키/모델을 확인하세요. (아티팩트 미리보기는 외부 API가 차단되니 파일을 직접 열어 사용)`,'warn');
+  else aiMsg(`실패: ${errs.slice(0,2).join(' / ')} · 키/모델 확인. 지금 그림만 받으려면 상단 <b>🖼 그림만 ZIP</b> 을 누르세요.`,'warn');
 }
 
 /* ══════════════════════ 수동 크롭 모달 ══════════════════════ */
@@ -1400,6 +1420,7 @@ $('#sizeSeg').addEventListener('click',e=>{
 });
 $('#clearAll').onclick=()=>{ state.items.forEach(it=>it.out&&URL.revokeObjectURL(it.out.url)); state.items=[]; render(); };
 $('#dlZip').onclick=downloadZip;
+$('#dlSimple').onclick=downloadSimpleZip;
 function updateFnPreview(){
   const names=state.items.length ? allBaseNames() : (()=>{ // 이미지 없을 때 샘플
     const v=validDate(); const date=v.ok?v.date:'______';
