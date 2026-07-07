@@ -9,9 +9,9 @@
   ],
   "pacing": {
     "think_before_typing": [1.5, 5.0],
-    "type_char_delay_ms": [90, 260],
+    "type_char_delay_ms": [40, 130],
     "review_before_submit": [2.0, 5.0],
-    "after_submit_wait": [25, 140],
+    "after_submit_wait": [60, 200],
     "jitter": [0, 30],
     "long_break_every": [7, 12],
     "long_break_duration": [180, 420],
