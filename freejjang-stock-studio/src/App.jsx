@@ -418,6 +418,21 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   ].filter(Boolean).join(". ");
 }
 
+/* ── Midjourney 형식 변환 ──
+   우리 프롬프트는 배제어를 문장 안에 넣지만(gpt-image·Gemini는 --no 문법이 없음),
+   Midjourney는 --no 파라미터·--ar·--style raw를 쓴다. 자연어 배제문을 걷어내고 MJ 문법으로 재조립. */
+const MJ_NEG_BASE = "text, letters, numbers, logo, watermark, brand name, signature, deformed hands, extra fingers, distorted anatomy, plastic AI look, oversmoothed skin";
+const MJ_NEG_COMMERCIAL = "backlit, silhouette, lens flare, bokeh, blurry background, out of focus background, cluttered background, crowd";
+function toMidjourney(slot, mode, tone, people, aspect) {
+  /* buildSlotPrompt 결과에서 우리 자연어 배제문(GUARD/COMMERCIAL_GUARD)을 제거해 긍정부만 남긴다 */
+  let pos = slot.finalPrompt || buildSlotPrompt(slot, mode, tone, people);
+  pos = pos.replace(COMMERCIAL_GUARD, "").replace(GUARD, "")
+    .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
+  const neg = mode !== "wallpaper" ? `${MJ_NEG_BASE}, ${MJ_NEG_COMMERCIAL}` : MJ_NEG_BASE;
+  const style = slot.kind === "illustration" ? "" : " --style raw";
+  return `${pos} --ar ${aspect || "16:9"}${style} --no ${neg}`;
+}
+
 export default function App() {
   /* ── 두뇌(에이전트) 설정 ── */
   const [brain, setBrain] = useState("gpt"); // gpt | gemini
@@ -1016,12 +1031,25 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const rows = slots.filter((s) => s.subject);
     if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
     const head =
-      `# FreeJJang 프롬프트 (간편) — 주제: ${topic || "(미지정)"} · 모드: ${mode} · 종횡비: ${aspect}\n` +
-      `# 각 줄의 프롬프트에는 노텍스트 GUARD 규칙이 이미 포함되어 있습니다.\n` +
-      `# Midjourney / Firefly / Stable Diffusion 등 다른 AI에 그대로 붙여넣어 쓰세요.\n\n`;
+      `# FreeJJang 프롬프트 (일반·자연어) — 주제: ${topic || "(미지정)"} · 모드: ${mode} · 종횡비: ${aspect}\n` +
+      `# 배제 규칙이 문장에 포함된 자연어 프롬프트입니다.\n` +
+      `# GPT gpt-image / Firefly / Stable Diffusion / DALL·E 등에 그대로 붙여넣어 쓰세요.\n` +
+      `# (Midjourney는 옆의 'Midjourney용' 버튼을 쓰세요 — --no/--ar 문법으로 변환됩니다)\n\n`;
     const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople)}`).join("\n\n");
     saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-min.txt`);
-    addLog(`[백업] 프롬프트 TXT(간편) 저장 완료 — ${rows.length}슬롯`);
+    addLog(`[백업] 프롬프트 TXT(일반) 저장 완료 — ${rows.length}슬롯`);
+  };
+  /* ── Midjourney 형식 변환: 자연어 배제문 → --no 플래그, --ar/--style raw 부착 ── */
+  const exportPromptsMidjourney = () => {
+    const rows = slots.filter((s) => s.subject);
+    if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
+    const head =
+      `# FreeJJang 프롬프트 (Midjourney 형식) — 주제: ${topic || "(미지정)"} · 종횡비: ${aspect}\n` +
+      `# 배제문을 --no 로, 종횡비를 --ar 로, 사진 슬롯은 --style raw 로 자동 변환했습니다.\n` +
+      `# Midjourney 입력창에 [] 라벨 제외하고 프롬프트 줄만 붙여넣으세요.\n\n`;
+    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${toMidjourney(s, mode, refTone, refPeople, aspect)}`).join("\n\n");
+    saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-midjourney.txt`);
+    addLog(`[백업] 프롬프트 TXT(Midjourney) 저장 완료 — ${rows.length}슬롯`);
   };
   const buildPromptsFullText = (rows) => {
     const head =
@@ -1696,8 +1724,14 @@ Each block content = one short Korean sentence.`,
                         <FolderOpen className="w-3.5 h-3.5" /> {saveDir ? `저장 폴더: ${saveDir.name}` : "저장 폴더 선택"}
                       </button>
                       <button onClick={exportPromptsMin}
+                        title="배제어가 문장에 포함된 자연어 프롬프트 — GPT gpt-image·Firefly·SD·DALL·E용"
                         className="bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
-                        <Download className="w-3.5 h-3.5" /> 프롬프트만 TXT
+                        <Download className="w-3.5 h-3.5" /> 일반 프롬프트 TXT
+                      </button>
+                      <button onClick={exportPromptsMidjourney}
+                        title="--no 네거티브 · --ar 종횡비 · --style raw 로 변환된 Midjourney 전용 프롬프트"
+                        className="bg-neutral-950 hover:bg-neutral-700 border border-sky-700/50 text-sky-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
+                        <Download className="w-3.5 h-3.5" /> Midjourney용 TXT
                       </button>
                       <button onClick={exportPromptsFull}
                         className="bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
