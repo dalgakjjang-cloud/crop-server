@@ -16,8 +16,17 @@ import Pica from "pica";
    파이프라인: 초안 승인(멈춤1) → 순차 생성 → QC(멈춤2) → 제출 팩
    ═══════════════════════════════════════════════════════════ */
 
+/* 항상 배제 (텍스트·로고·저작권·군중) — 상업용/배경화면 모두 공통 */
 const GUARD =
-  "Strictly no text, no letters, no numbers, no logos, no watermarks, no brand names, no branded packaging, no copyrighted characters, no unrequested people.";
+  "Strictly no text, no letters, no numbers, no logos, no watermarks, no brand names, no branded packaging, no copyrighted characters, no unrequested people. " +
+  "Absolutely NO crowd, NO crowded scene, NO too many people, NO large group of people, NO busy street with many pedestrians — this kills commercial sales.";
+
+/* 상업용(non-wallpaper) 전용 배제 — 어도비 베스트셀러 반대편에 있는 것들 :
+   역광/실루엣/렌즈 플레어, 배경 블러/보케/얕은 심도, 번지는 도시 불빛·차량·나뭇잎, 산만/어수선한 배경 */
+const COMMERCIAL_GUARD =
+  "Absolutely NO backlit subject, NO back light against a bright window, NO silhouette, NO lens flare, NO sun glare, NO harsh directional lighting. " +
+  "Absolutely NO blurry background, NO bokeh, NO out-of-focus background, NO shallow depth of field, NO defocused background, NO motion blur, NO blurred city lights, NO blurred traffic, NO blurred foliage. " +
+  "Absolutely NO busy background, NO cluttered background, NO distracting environment — background must stay clean, minimal, even-lit and non-competing with the subject.";
 
 const ASPECTS = ["1:1", "16:9", "4:3", "3:4", "9:16"];
 const OPENAI_SIZE = { "1:1": "1024x1024", "16:9": "1536x1024", "4:3": "1536x1024", "3:4": "1024x1536", "9:16": "1024x1536" };
@@ -402,6 +411,10 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     : slot.regenCount > 0
       ? "This is a re-render requested by the user: produce a NOTICEABLY different composition, styling and prop arrangement from the previous attempt — do not repeat the same look"
       : "";
+  /* 상업용(비-배경화면) 긍정 삽입: 어도비 베스트셀러 공통점 — 깨끗한 배경·고른 조명·copy space */
+  const commercialClean = mode !== "wallpaper" && slot.kind !== "illustration"
+    ? "Clean minimal uncluttered background, even soft frontal or ambient lighting (NOT backlit against a window), background stays clean and non-competing with the main subject, generous copy space"
+    : "";
   return [
     slot.subject,
     fixLine,
@@ -413,10 +426,13 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     toneLine,
     peopleLine,
     `Palette: ${slot.palette || "bright commercial tones"}`,
+    commercialClean,
     slot.kind !== "illustration" ? "Physically plausible staging: every object rests naturally on a realistic surface — cups and drinks on a table, tray, desk or ledge, never directly on a sofa, bed or fabric; nothing floating or oddly placed" : "",
     slot.kind !== "illustration" ? "TECHNICAL QUALITY (stock-review grade, critical): tack-sharp focus across the entire main subject (f/4-f/5.6 feel), accurate even exposure with full detail in both highlights and shadows, clean low-ISO look with zero visible noise or banding, crisp natural micro-texture — absolutely NO plastic over-smoothed AI skin/surfaces, NO over-sharpening halos, NO heavy filter, vignette or HDR look, NO motion blur, NO chromatic aberration" : "",
     slot.kind === "illustration" ? "professional stock illustration" : "8K photorealistic professional stock photograph, crisp detail",
     GUARD,
+    /* 배경화면 모드는 소프트 보케·역광이 오히려 필요할 수 있어 상업용 배제만 제외 */
+    mode !== "wallpaper" ? COMMERCIAL_GUARD : "",
   ].filter(Boolean).join(". ");
 }
 
@@ -940,7 +956,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
         const r = await askBrain(
           `You are a strict stock-photo QC inspector. Respond ONLY JSON:
 {"pass":true|false,"issues":["short tags"],"reason":"one short Korean sentence explaining the main problem (empty if pass)"}
-Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind, (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode: the subject must clearly dominate (50-70%) and empty area must stay under ~40% — reject if the subject looks small and lost in a vast featureless background, (7) TECHNICAL QUALITY like an Adobe Stock reviewer (Adobe rejects for: exposure problems, soft focus, over-filtering/artifacts, noise): reject on soft or missed focus on the main subject, large blurry featureless areas, visible noise/grain/banding, plastic over-smoothed AI texture, over-sharpening halos, blown-out highlights or muddy shadows, heavy filter/vignette/HDR look. Be strict on text, distortion and technical quality; be lenient on subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
+Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind, (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode: the subject must clearly dominate (50-70%) and empty area must stay under ~40% — reject if the subject looks small and lost in a vast featureless background, (7) TECHNICAL QUALITY like an Adobe Stock reviewer (Adobe rejects for: exposure problems, soft focus, over-filtering/artifacts, noise): reject on soft or missed focus on the main subject, large blurry featureless areas, visible noise/grain/banding, plastic over-smoothed AI texture, over-sharpening halos, blown-out highlights or muddy shadows, heavy filter/vignette/HDR look, (8) COMMERCIAL-SALES KILLERS (commercial mode only — skip for wallpaper mode): backlit subject against a bright window, silhouette look, lens flare, sun glare, harsh directional lighting; blurry/bokeh/out-of-focus background, shallow depth-of-field where the background dissolves, blurred city lights / blurred traffic / blurred foliage; busy, cluttered or visually noisy background that competes with the subject; a visible crowd or too many people (any dense group of humans in the frame that isn't the intentional subject). Be strict on text, distortion, technical quality and commercial-sales killers; be lenient on subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
           `Topic: "${topic}" · Mode: ${mode} · Slot ${t.index} subject: "${t.subject}"\n이 이미지를 검수해줘.`,
           { mime: "image/jpeg", data: b64 }
         );
