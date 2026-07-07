@@ -438,10 +438,12 @@ function buildMidjourneyPrompt(slot, { aspect = "16:9", tone = "realism", people
     slot.copy_space ? `clean negative space (${slot.copy_space})` : "clean negative space for text overlay",
     isIllust ? "" : "tack-sharp, natural true-to-life color, no plastic AI look",
   ].filter(Boolean).join(", ");
-  const params = [`--ar ${aspect}`];
+  // 파라미터 순서: --style → --no → --ar (--ar을 항상 맨 뒤에)
+  const params = [];
   if (!isIllust) params.push("--style raw");
   // GUARD(노텍스트)를 MJ 네거티브 파라미터로 이전 (인물은 설정이 '없음'일 때만 차단)
   params.push(`--no text, letters, numbers, logo, watermark, signature${banPeople ? ", people" : ""}`);
+  params.push(`--ar ${aspect}`);
   return `${core} ${params.join(" ")}`.replace(/\s+/g, " ").trim();
 }
 
