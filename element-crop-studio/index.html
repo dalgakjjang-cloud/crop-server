@@ -954,11 +954,17 @@ function render(){
 }
 
 function downloadBlob(blob,name){
+  const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob); a.download=name;
-  document.body.appendChild(a); a.click();
-  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1000);
+  a.href=url; a.download=name; a.rel='noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  // 큰 파일은 브라우저가 blob URL 을 다 읽을 때까지 시간이 필요 → 넉넉히 뒤 해제
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+  // 샌드박스 iframe 등에서 클릭 다운로드가 막힐 때 대비한 폴백
+  return url;
 }
+// iframe(아티팩트 미리보기) 안에서 실행 중인지
+const inIframe = (()=>{ try{ return window.self!==window.top; }catch(_){ return true; } })();
 
 /* ---------- 파일 로딩 ---------- */
 function loadFiles(fileList){
@@ -997,32 +1003,38 @@ async function processAll(){
   processing=false;
 }
 
+/* 아직 처리 안 된 항목이 있으면 처리 후 "다시 눌러주세요" 안내(사용자 제스처 보존).
+   반환 true = 준비완료(동기 다운로드 진행 가능), false = 준비 중 */
+function ensureReadyThen(retryLabel, cb){
+  const S=readSettings();
+  const notReady=state.items.filter(it=>!it.out);
+  if(notReady.length){
+    showAcct(`이미지 처리 중… 끝나면 <b>${retryLabel}</b> 을 한 번 더 눌러주세요.`,'warn');
+    (async()=>{ for(const it of notReady){ if(!it.out) await processItem(it,S); } render(); showAcct(`준비 완료 — <b>${retryLabel}</b> 을 다시 누르세요.`,'ok'); })();
+    return false;
+  }
+  return true;
+}
+
 /* ---------- 심플 패키지: 처리된 PNG만 (제목·키워드·CSV·API 불필요) ---------- */
-let simpleBusy=false;
-async function downloadSimpleZip(){
-  if(simpleBusy) return;
+function downloadSimpleZip(){
   if(!state.items.length){ showAcct('먼저 이미지를 올려주세요.','warn'); return; }
-  simpleBusy=true; const btn=$('#dlSimple'); btn.disabled=true;
+  if(!ensureReadyThen('🖼 그림만 ZIP', downloadSimpleZip)) return;
   try{
-    const S=readSettings();
-    for(const it of state.items){ if(!it.out) await processItem(it,S); }
-    const names=allBaseNames(); // 제목 없으면 폴백 슬러그로 자동 파일명
+    const names=allBaseNames();
     const files=state.items.map((it,i)=>({name:`${names[i]}.png`, data:it.out.bytes}));
     const v=validDate();
-    const blob=buildZip(files);
-    downloadBlob(blob, `elements_${v.ok?v.date:'save'}.zip`);
-    showAcct(`그림만 ZIP 생성 완료 ✓ (${files.length}장 · 제목/CSV 없이 저장)`, true);
+    downloadBlob(buildZip(files), `elements_${v.ok?v.date:'save'}.zip`);
+    showAcct(`그림만 ZIP 저장됨 ✓ (${files.length}장 · 제목/CSV 없이)${inIframe?' · 저장 안 되면 index.html 파일을 직접 열어 사용하세요.':''}`, true);
   }catch(e){ showAcct('그림만 ZIP 실패: '+(e.message||e),'warn'); }
-  finally{ simpleBusy=false; btn.disabled=false; }
 }
 
 /* ---------- ZIP 패키지 ---------- */
-async function downloadZip(){
+function downloadZip(){
   const v=validDate();
   if(!v.ok){ showAcct(v.msg,false); $('#date').focus(); return; }
   if(!state.items.length) return;
-  const S=readSettings();
-  for(const it of state.items){ if(!it.out) await processItem(it,S); }
+  if(!ensureReadyThen('📦 업로드 패키지 ZIP', downloadZip)) return;
 
   const files=[];
   const rows=[['fileName','uniqueId','elementName','keywords','status','licenseType']];
@@ -1047,10 +1059,10 @@ async function downloadZip(){
   files.push({name:'CSV/miricanvas_metadata.csv', data:strBytes(toCsv(rows))});
   files.push({name:'CSV/filename_mapping.csv', data:strBytes(toCsv(map))});
 
-  const blob=buildZip(files);
-  downloadBlob(blob, `miricanvas_upload_${v.date}.zip`);
-  if(problems.length) showAcct('패키지 생성 완료 (경고: '+problems.join(' · ')+')', 'warn');
-  else showAcct('업로드 패키지 ZIP 생성 완료 ✓', true);
+  downloadBlob(buildZip(files), `miricanvas_upload_${v.date}.zip`);
+  const tail = inIframe?' · 저장 안 되면 index.html 파일을 직접 열어 사용하세요.':'';
+  if(problems.length) showAcct('패키지 저장됨 (경고: '+problems.join(' · ')+')'+tail, 'warn');
+  else showAcct('업로드 패키지 ZIP 저장됨 ✓'+tail, true);
 }
 
 function showAcct(msg,ok){
