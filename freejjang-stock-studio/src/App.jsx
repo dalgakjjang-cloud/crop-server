@@ -271,10 +271,12 @@ async function genOpenAI(key, prompt, aspect, quality) {
   if (!b64) throw new Error("OpenAI가 이미지 데이터를 반환하지 않았습니다.");
   return `data:image/png;base64,${b64}`;
 }
-/* ── 무료 엔진 C: Pollinations (Flux · 가입/키 불필요 · 과금 없음) ── */
-const POLLI_SIZE = { "1:1": [1024, 1024], "16:9": [1344, 768], "4:3": [1152, 864], "3:4": [864, 1152], "9:16": [768, 1344] };
+/* ── 무료 엔진 C: Pollinations (Flux · 가입/키 불필요 · 과금 없음) ──
+   무료(익명) 티어는 긴 변을 ~1024px로 제한한다. 이보다 큰 값을 요청하면 작게 생성한 뒤
+   요청 크기로 강제로 늘려(가로 stretch) 채우므로, 긴 변=1024로 맞춘 정확 비율만 사용한다. */
+const POLLI_SIZE = { "1:1": [1024, 1024], "16:9": [1024, 576], "4:3": [1024, 768], "3:4": [768, 1024], "9:16": [576, 1024] };
 async function genPollinations(prompt, aspect) {
-  const [w, h] = POLLI_SIZE[aspect] || [1344, 768];
+  const [w, h] = POLLI_SIZE[aspect] || [1024, 576];
   const seed = Math.floor(Math.random() * 1e9); // 같은 프롬프트도 매번 새 이미지
   const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${seed}&nologo=true&model=flux`;
   const res = await fetch(url);
