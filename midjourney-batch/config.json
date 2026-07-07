@@ -10,7 +10,7 @@
   "pacing": {
     "think_before_typing": [1.5, 5.0],
     "type_char_delay_ms": [40, 130],
-    "review_before_submit": [2.0, 5.0],
+    "review_before_submit": [12.0, 15.0],
     "after_submit_wait": [60, 200],
     "jitter": [0, 30],
     "long_break_every": [7, 12],
