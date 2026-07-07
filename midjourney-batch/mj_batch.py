@@ -243,17 +243,30 @@ def submit_prompt(page, cfg: dict, prompt: str) -> None:
     except Exception:
         pass
 
-    # 3) 글자 단위로 사람처럼 타이핑(붙여넣기 아님)
+    # 3) 글자 단위로 사람처럼 타이핑(붙여넣기 아님).
+    #    도중에 시간초과·연결 오류가 나도 중단하지 않고, 지금까지 입력된 만큼 그대로 제출.
     char_delay = random.uniform(*p["type_char_delay_ms"])
-    box.type(prompt, delay=char_delay)
+    partial = False
+    try:
+        # Playwright type() 자체 타임아웃도 넉넉히 줘서 웬만하면 끝까지 침
+        box.type(prompt, delay=char_delay, timeout=max(cfg["nav_timeout_ms"], 300000))
+    except Exception as e:
+        partial = True
+        print(f"    ⚠️ 타이핑 도중 중단({e.__class__.__name__}) — 지금까지 입력된 만큼 그대로 제출",
+              flush=True)
 
     # 4) 잠깐 검토하는 척 — 미드저니가 프롬프트 유효성 검사를 마칠 시간 확보
     review = rand_between(p.get("review_before_submit", [2.0, 5.0]))
     human_sleep(review)
 
-    # 5) 제출
-    box.press("Enter")
-    print(f"    ✅ 제출 완료 (타이핑 {char_delay:.0f}ms/글자, 검토 {review:.1f}s)", flush=True)
+    # 5) 제출 (부분 입력이어도 무조건 Enter 시도 → 지금까지 친 만큼이라도 제출)
+    try:
+        box.press("Enter")
+    except Exception:
+        # 입력창 참조가 죽었으면 키보드 이벤트로 직접 발사(폴백)
+        page.keyboard.press("Enter")
+    tag = "⚠️ 부분 제출" if partial else "✅ 제출 완료"
+    print(f"    {tag} (타이핑 {char_delay:.0f}ms/글자, 검토 {review:.1f}s)", flush=True)
 
 
 def default_chrome_user_data_dir() -> Path | None:
