@@ -1,0 +1,11 @@
+# 로그인 세션(쿠키/토큰 포함) — 절대 커밋 금지
+mj_profile/
+
+# 실행 상태 / 산출물
+*.state.json
+screenshots/
+
+# 개인 프롬프트 파일(예시만 커밋)
+prompts.txt
+__pycache__/
+*.pyc
