@@ -82,6 +82,10 @@ DEFAULTS = {
     "max_per_run": 0,
     # 브라우저를 화면에 띄울지(false=headless). 최초 로그인은 무조건 화면 표시.
     "headless": False,
+    # 어떤 브라우저로 열지: "chrome"=컴퓨터에 설치된 진짜 크롬, "msedge"=엣지,
+    # ""(빈값)=Playwright 내장 크로미움. 구글 로그인이 '안전하지 않은 브라우저'로
+    # 막힐 때는 "chrome"으로 두면 대부분 통과됨. 크롬이 없으면 자동으로 크로미움 대체.
+    "browser_channel": "chrome",
     # 페이지 로드/셀렉터 대기 타임아웃(ms)
     "nav_timeout_ms": 60000,
     # 제출 실패 시 재시도 횟수
@@ -241,12 +245,40 @@ def open_context(pw, cfg: dict, headless: bool):
     profile = Path(cfg["profile_dir"]).expanduser().resolve()
     # pw는 sync_playwright() 컨텍스트 객체
     profile.mkdir(parents=True, exist_ok=True)
-    ctx = pw.chromium.launch_persistent_context(
+
+    channel = (cfg.get("browser_channel") or "").strip()
+    launch_kwargs = dict(
         user_data_dir=str(profile),
         headless=headless,
         viewport={"width": 1400, "height": 900},
+        # 자동화 티가 나는 신호 제거 → 구글/미드저니가 '봇'으로 감지하기 어렵게.
         args=["--disable-blink-features=AutomationControlled"],
+        ignore_default_args=["--enable-automation"],
     )
+    if channel:
+        launch_kwargs["channel"] = channel
+
+    try:
+        ctx = pw.chromium.launch_persistent_context(**launch_kwargs)
+        if channel:
+            print(f"(설치된 '{channel}' 브라우저로 실행)")
+    except Exception as e:
+        if channel:
+            # 크롬/엣지가 설치돼 있지 않으면 내장 크로미움으로 대체
+            print(f"(설치된 '{channel}' 브라우저를 못 찾아 내장 Chromium으로 대체합니다: {e})")
+            launch_kwargs.pop("channel", None)
+            ctx = pw.chromium.launch_persistent_context(**launch_kwargs)
+        else:
+            raise
+
+    # navigator.webdriver 흔적까지 지워 자동화 감지를 한 번 더 낮춤
+    try:
+        ctx.add_init_script(
+            "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"
+        )
+    except Exception:
+        pass
+
     ctx.set_default_timeout(cfg["nav_timeout_ms"])
     page = ctx.pages[0] if ctx.pages else ctx.new_page()
     return ctx, page

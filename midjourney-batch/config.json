@@ -19,6 +19,7 @@
   },
   "max_per_run": 0,
   "headless": false,
+  "browser_channel": "chrome",
   "nav_timeout_ms": 60000,
   "retries": 2
 }
