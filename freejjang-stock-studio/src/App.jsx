@@ -271,6 +271,24 @@ async function genOpenAI(key, prompt, aspect, quality) {
   if (!b64) throw new Error("OpenAI가 이미지 데이터를 반환하지 않았습니다.");
   return `data:image/png;base64,${b64}`;
 }
+/* ── 무료 엔진 C: Pollinations (Flux · 가입/키 불필요 · 과금 없음) ── */
+const POLLI_SIZE = { "1:1": [1024, 1024], "16:9": [1344, 768], "4:3": [1152, 864], "3:4": [864, 1152], "9:16": [768, 1344] };
+async function genPollinations(prompt, aspect) {
+  const [w, h] = POLLI_SIZE[aspect] || [1344, 768];
+  const seed = Math.floor(Math.random() * 1e9); // 같은 프롬프트도 매번 새 이미지
+  const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${w}&height=${h}&seed=${seed}&nologo=true&model=flux`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Pollinations: HTTP ${res.status}${res.status === 429 ? " (무료 속도 제한 — 잠시 후 자동 재시도)" : ""}`);
+  const blob = await res.blob();
+  if (!blob.type.startsWith("image/")) throw new Error("Pollinations가 이미지를 반환하지 않았습니다.");
+  return await new Promise((resolve, reject) => {
+    const fr = new FileReader();
+    fr.onload = () => resolve(fr.result);
+    fr.onerror = () => reject(new Error("Pollinations 이미지 변환 실패"));
+    fr.readAsDataURL(blob);
+  });
+}
+
 /* 이코노미 2패스 마감: 승인된 low 드래프트를 참조 이미지로 넣어 같은 구도를 고품질로 리렌더
    (gpt-image는 시드 고정이 없어 그냥 재생성하면 다른 그림이 나옴 → 편집 API로 구도 유지) */
 async function genOpenAIRefine(key, prompt, refDataUrl, aspect, quality) {
@@ -477,33 +495,47 @@ export default function App() {
     return (n * (OPENAI_COST[quality] || 0.041)).toFixed(2);
   };
 
-  /* ── 이미지 엔진 키 (provider별) ── */
-  const imageKey = () => (provider === "gemini" ? googleKey : openaiKey).trim();
-  /* 일시 오류(429/네트워크/서버 혼잡)는 3초→6초 대기 후 자동 재시도, 성공 시 세션 비용 집계.
+  /* ── 이미지 엔진 키 (provider별 · Pollinations는 키 불필요) ── */
+  const imageKey = () => (provider === "pollinations" ? "free" : (provider === "gemini" ? googleKey : openaiKey).trim());
+  const IMG_LABEL = { openai: "GPT", gemini: "Gemini", pollinations: "Pollinations(무료)" };
+  /* 엔진 1개 호출 (재시도 없음) */
+  const genWithEngine = (eng, prompt, q) => {
+    if (eng === "pollinations") return genPollinations(prompt, aspect);
+    if (eng === "gemini") return genGemini(googleKey.trim(), prompt, aspect);
+    return genOpenAI(openaiKey.trim(), prompt, aspect, q);
+  };
+  /* 3중 안전망: 선택 엔진 → (Gemini 키 있으면) Gemini → Pollinations(무료·무제한).
+     의도치 않은 과금 방지를 위해 사용자가 선택하지 않은 OpenAI로는 절대 자동 폴백하지 않는다.
+     엔진마다 일시 오류(429/네트워크)는 3초→6초 재시도, 그래도 실패면 다음 엔진으로.
      qualityOverride: 이코노미 2패스에서 초안을 low로 강제할 때 사용 */
   const generateImage = async (finalPrompt, qualityOverride) => {
-    const key = imageKey();
-    if (!key) throw new Error(`${provider === "gemini" ? "Google" : "OpenAI"} 이미지 API 키를 먼저 연결하세요 (상단 설정).`);
+    if (!imageKey()) throw new Error(`${provider === "gemini" ? "Google" : "OpenAI"} 이미지 API 키를 먼저 연결하세요 (상단 설정).`);
     const q = qualityOverride || quality;
+    const order = [provider];
+    if (provider !== "gemini" && googleKey.trim()) order.push("gemini");
+    if (provider !== "pollinations") order.push("pollinations");
     let lastErr;
-    for (let attempt = 0; attempt <= 2; attempt++) {
-      try {
-        const out = provider === "gemini"
-          ? await genGemini(key, finalPrompt, aspect)
-          : await genOpenAI(key, finalPrompt, aspect, q);
-        const unit = provider === "gemini" ? GEMINI_IMG_COST : (OPENAI_COST[q] || 0.041);
-        setSpent((p) => ({ img: p.img + 1, cost: p.cost + unit }));
-        return out;
-      } catch (err) {
-        lastErr = err;
-        if (attempt < 2 && TRANSIENT_RE.test(err.message)) {
-          const wait = 3000 * (attempt + 1);
-          addLog(`[재시도 ${attempt + 1}/2] 일시 오류 감지 — ${wait / 1000}초 후 자동 재시도: ${err.message}`);
-          await new Promise((r) => setTimeout(r, wait));
-          continue;
+    for (let e = 0; e < order.length; e++) {
+      const eng = order[e];
+      for (let attempt = 0; attempt <= 2; attempt++) {
+        try {
+          const out = await genWithEngine(eng, finalPrompt, q);
+          const unit = eng === "pollinations" ? 0 : eng === "gemini" ? GEMINI_IMG_COST : (OPENAI_COST[q] || 0.041);
+          setSpent((p) => ({ img: p.img + 1, cost: p.cost + unit }));
+          if (e > 0) addLog(`[엔진 폴백] ${IMG_LABEL[order[0]]} 실패 → ${IMG_LABEL[eng]}로 생성 완료`);
+          return out;
+        } catch (err) {
+          lastErr = err;
+          if (attempt < 2 && TRANSIENT_RE.test(err.message)) {
+            const wait = 3000 * (attempt + 1);
+            addLog(`[재시도 ${attempt + 1}/2] ${IMG_LABEL[eng]} 일시 오류 — ${wait / 1000}초 후 재시도: ${err.message}`);
+            await new Promise((r) => setTimeout(r, wait));
+            continue;
+          }
+          break; // 이 엔진 포기 → 다음 엔진
         }
-        throw err;
       }
+      if (e < order.length - 1) addLog(`[엔진 오류] ${IMG_LABEL[eng]}: ${lastErr.message} — ${IMG_LABEL[order[e + 1]]}(으)로 폴백`);
     }
     throw lastErr;
   };
@@ -669,7 +701,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
     const timeUp = () => hasDeadline && Date.now() > deadlineRef.current;
     const ecoOn = ecoTwoPass && provider === "openai";
     const draftQ = ecoOn ? "low" : undefined;
-    addLog(`[생성] 미완료 ${targets.length}슬롯${force ? " · 강제 실행 (시간 무시)" : hasDeadline ? ` · 최대 ${Math.ceil((deadlineRef.current - Date.now()) / 60000)}분 남음` : ""} · ${provider === "openai" ? (ecoOn ? `GPT low 초안 (승인 후 ${finalQuality} 마감)` : `GPT ${quality}`) : "Gemini"}`);
+    addLog(`[생성] 미완료 ${targets.length}슬롯${force ? " · 강제 실행 (시간 무시)" : hasDeadline ? ` · 최대 ${Math.ceil((deadlineRef.current - Date.now()) / 60000)}분 남음` : ""} · ${provider === "openai" ? (ecoOn ? `GPT low 초안 (승인 후 ${finalQuality} 마감)` : `GPT ${quality}`) : provider === "pollinations" ? "Pollinations 무료 (Flux)" : "Gemini"}`);
     let newMade = 0;
     const markSuccess = (idx, dataUrl, fp) => {
       newMade += 1;
@@ -1093,7 +1125,7 @@ Each block content = one short Korean sentence.`,
                 <h1 className="text-lg font-bold tracking-tight text-neutral-100">
                   FreeJJang <span className="text-neutral-500 font-normal">STOCK STUDIO</span>
                   <span className="text-xs font-mono px-1.5 py-0.5 bg-violet-500/10 text-violet-300 border border-violet-500/30 rounded ml-2">
-                    두뇌 {brainName} · 손 {provider === "openai" ? "GPT" : "Gemini"}
+                    두뇌 {brainName} · 손 {provider === "openai" ? "GPT" : provider === "pollinations" ? "Pollinations(무료)" : "Gemini"}
                   </span>
                 </h1>
                 <p className="text-xs text-neutral-500">초안 승인 → 순차 생성 → QC → 제출 팩 · 멈춤은 딱 두 곳</p>
@@ -1153,6 +1185,7 @@ Each block content = one short Korean sentence.`,
                 <select value={provider} onChange={(e) => setProvider(e.target.value)} className={fieldCls}>
                   <option value="openai">GPT (gpt-image · 기본)</option>
                   <option value="gemini">Gemini (2.5-flash-image)</option>
+                  <option value="pollinations">Pollinations (Flux · 완전 무료 · 키 불필요)</option>
                 </select>
               </div>
               {provider === "openai" && (
@@ -1390,7 +1423,7 @@ Each block content = one short Korean sentence.`,
                           <ClipboardCheck className="w-4 h-4" /> 미완료·수정 슬롯 검토
                         </h3>
                         <p className="text-xs text-violet-300/80 mt-0.5">
-                          {slots.length}행 · 모드 {mode === "wallpaper" ? "배경화면(여백 40-60%)" : "상업 사진"} · 엔진 {provider === "openai" ? `GPT ${quality}` : "Gemini"} · 종횡비 {aspect}
+                          {slots.length}행 · 모드 {mode === "wallpaper" ? "배경화면(여백 40-60%)" : "상업 사진"} · 엔진 {provider === "openai" ? `GPT ${quality}` : provider === "pollinations" ? "Pollinations 무료" : "Gemini"} · 종횡비 {aspect}
                           {successCount > 0 && ` · 유효 ${successCount}장 유지, 미완료만 생성`}
                         </p>
                         {provider === "openai" && (
