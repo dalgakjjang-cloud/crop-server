@@ -263,6 +263,25 @@ def default_chrome_user_data_dir() -> Path | None:
     return None
 
 
+def _clear_session_restore(user_data_dir: Path, profile_name: str) -> None:
+    """탭 복원용 세션 상태 파일만 제거(로그인/쿠키는 그대로).
+    이걸 지우면 크롬이 이전 탭을 복원하지 않아 자동화가 깨끗한 창에 붙을 수 있다."""
+    prof = user_data_dir / profile_name
+    targets = ["Current Session", "Current Tabs", "Last Session", "Last Tabs"]
+    for name in targets:
+        try:
+            (prof / name).unlink()
+        except FileNotFoundError:
+            pass
+        except Exception:
+            pass
+    try:
+        import shutil
+        shutil.rmtree(prof / "Sessions", ignore_errors=True)
+    except Exception:
+        pass
+
+
 def open_context(pw, cfg: dict, headless: bool):
     channel = (cfg.get("browser_channel") or "").strip()
     use_my_chrome = bool(cfg.get("use_my_chrome"))
@@ -287,6 +306,12 @@ def open_context(pw, cfg: dict, headless: bool):
         profile = Path(cfg["profile_dir"]).expanduser().resolve()
         profile.mkdir(parents=True, exist_ok=True)
 
+    # 세션 복원 탭이 여러 개 딸려오면 Playwright가 브라우저에 붙지 못해 멈춘다(hang).
+    # 내 크롬을 빌려 쓰기 전에 '복원용 세션 파일'만 지워 깨끗한 단일 창으로 열리게 한다.
+    # (쿠키/로그인은 건드리지 않음 — 탭 복원 정보만 제거)
+    if use_my_chrome:
+        _clear_session_restore(profile, (cfg.get("chrome_profile_directory") or "Default").strip() or "Default")
+
     extra_args = [
         "--disable-blink-features=AutomationControlled",
         # 실제 크롬 프로필을 빌려 쓸 때 뜨는 방해 배너/팝업 억제
@@ -294,7 +319,6 @@ def open_context(pw, cfg: dict, headless: bool):
         "--no-default-browser-check",
         "--disable-session-crashed-bubble",
         "--hide-crash-restore-bubble",
-        "--restore-last-session=false",
     ]
     prof_dir = (cfg.get("chrome_profile_directory") or "").strip()
     if use_my_chrome and prof_dir:
@@ -308,6 +332,8 @@ def open_context(pw, cfg: dict, headless: bool):
         # 자동화 티가 나는 신호 제거 → 구글/미드저니가 '봇'으로 감지하기 어렵게.
         args=extra_args,
         ignore_default_args=["--enable-automation"],
+        # 무한 대기 방지: 붙는 데 오래 걸리면 실패시켜 안내(멈춰있지 않게)
+        timeout=60000,
     )
     # 내 프로필을 쓸 땐 원래 창 크기를 존중(뷰포트 강제 안 함)
     if use_my_chrome:
