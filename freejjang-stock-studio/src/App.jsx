@@ -565,7 +565,7 @@ export default function App() {
         const m = await askBrain(
           `You design a maximally DIVERSE professional stock image set — each image must be clearly a SEPARATE asset to a buyer (no near-duplicates; marketplaces reject similar images). Respond ONLY compact JSON:
 {"concepts":[{"scene":"1 short sentence: main subject doing what, where","location":"the place — must be unique in the set","action":"primary action","angle":"camera angle/framing","time":"time of day + light"}]}
-HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.`,
+HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. NO TEXT-BEARING SCENES (critical — text in the image is auto-rejected): never design a scene whose subject involves readable written content — no presentation slides with titles, no lecturers pointing at worded screens, no documents/handouts/newspapers, no books with visible covers, no signs/labels/menus/whiteboards with writing; use imagery-only equivalents (wordless abstract visuals on screens, blank paper, shape-only charts). If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.`,
           `Topic: "${topic}". Mode: ${mode}. Design exactly ${count} distinct scene concepts.${refinementLine()}${handlingTip.trim() ? `\nUser handling notes (apply thoughtfully WITHOUT reducing diversity): ${handlingTip.trim()}` : ""}${priKw.trim() ? `\nBuyer search terms for context (use as inspiration for DIFFERENT scenes — do NOT put every term into every scene): ${priKw.trim()}` : ""}`
         );
         concepts = (m.concepts || []).filter((c) => c && c.scene).slice(0, count);
@@ -585,7 +585,7 @@ HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "lo
     let doneCnt = 0;
     const detailSystem = `You expand assigned scene concepts into professional stock image slots. Respond ONLY compact JSON:
 {"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"EXACTLY 25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경), same SEO ordering as EN","category":11}]}
-RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject, with subtle real surface texture (never a featureless void). Mode "commercial": medium or wide framing, subject clearly DOMINATES at 50-70% of frame (never edge-to-edge, never a small subject lost in emptiness), 25-35% clean negative space with a HARD CAP of 40% empty area, rule-of-thirds, subject fully in frame. "lighting" must describe correct even exposure (detail kept in highlights and shadows) and "camera" must keep the whole main subject tack-sharp (f/4-f/5.6, no heavy shallow-DOF blur).
+RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. NO TEXT-BEARING ELEMENTS anywhere in subject or props (text in the image is auto-rejected): no slides/screens with words, no documents, handouts, printed pages, book covers, signs, labels, menus or writing of any kind — replace with wordless equivalents (abstract graphics, blank surfaces, shape-only charts). Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject, with subtle real surface texture (never a featureless void). Mode "commercial": medium or wide framing, subject clearly DOMINATES at 50-70% of frame (never edge-to-edge, never a small subject lost in emptiness), 25-35% clean negative space with a HARD CAP of 40% empty area, rule-of-thirds, subject fully in frame. "lighting" must describe correct even exposure (detail kept in highlights and shadows) and "camera" must keep the whole main subject tack-sharp (f/4-f/5.6, no heavy shallow-DOF blur).
 KEYWORDS (Adobe SEO, critical): EXACTLY 35 EN keywords, no duplicates, ordered by buyer importance (first ~10 weigh most): (1) main subject nouns, (2) descriptors/materials/actions, (3) concept/season/emotion, (4) color/lighting, (5) composition (copy space, background), (6) use-case (banner, marketing, web design). All lowercase, only terms literally describing what is visible. "keywords_kr" same ordering in Korean single nouns.
 CATEGORY: pick ONE best Adobe Stock category id: ${ADOBE_CAT_LIST}. Illustration/vector fallback: 8. Integer id only.
 PROPS & VARIETY: props must be SPECIFIC to each scene and DIFFERENT from every other slot in the whole set (set list provided) — never reuse generic filler across slots; tableware must match the dish culture; keep the copy-space area uncluttered; believable and unbranded.`;
@@ -643,35 +643,71 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
     }
   };
 
-  /* ═══ 2단계: 순차 생성 (초안 직후 자동 · 또는 재생성 시 수동) ═══ */
-  const runGeneration = async (slotList) => {
+  /* 실패 슬롯 자동 복구: 두뇌가 장면을 규정(무텍스트·세이프티)에 맞게 다시 씀 — 장소·행동은 유지해 세트 다양성 보존 */
+  const repairSlot = async (t, errMsg) => {
+    const r = await askBrain(
+      `You repair a stock-image slot whose image generation keeps FAILING. Respond ONLY compact JSON: {"subject":"...","props":"...","camera":"...","lighting":"..."}
+Rewrite the scene so it: (1) contains ZERO readable written content — no presentation slides with titles, no documents/handouts/papers with print, no books with visible covers, no signs, labels, whiteboards with writing, no screens showing words; replace them with imagery-only equivalents (abstract wordless graphics, blank surfaces, charts made of pure shapes), (2) avoids anything an image-API safety filter could block, (3) KEEPS the same location, primary action and mood so the set stays diverse. Keep all field styles consistent with professional stock photography.`,
+      `Failing slot — subject: "${t.subject}" | props: "${t.props || ""}" | camera: "${t.camera || ""}" | lighting: "${t.lighting || ""}". Generation error message: "${errMsg}".`
+    );
+    const out = {};
+    for (const k of ["subject", "props", "camera", "lighting"]) if (typeof r[k] === "string" && r[k].trim()) out[k] = r[k].trim();
+    if (!out.subject) throw new Error("복구 응답에 subject가 없습니다.");
+    return out;
+  };
+
+  /* ═══ 2단계: 순차 생성 (초안 직후 자동 · 수동 버튼은 force=시간 무시) ═══ */
+  const runGeneration = async (slotList, force = false) => {
     if (phase === "generating") return;
     if (!imageKey()) { setNotice("이미지 API 키가 필요합니다."); return; }
     cancelRef.current = false;
     setPhase("generating");
     const source = Array.isArray(slotList) ? slotList : slots;
     const targets = source.filter((s) => s.status === "pending" || s.status === "failed" || s.status === "rejected");
-    /* 시간 예산: 초안 시작 시 세팅된 마감(deadlineRef)까지. 재생성 등 마감이 지났으면 시간제한 없이 진행 */
-    const hasDeadline = deadlineRef.current !== Infinity && Date.now() < deadlineRef.current;
+    /* 시간 예산: 초안 시작 시 세팅된 마감(deadlineRef)까지. force(수동 버튼)면 시간 예산 무시하고 강제 실행 */
+    const hasDeadline = !force && deadlineRef.current !== Infinity && Date.now() < deadlineRef.current;
     const timeUp = () => hasDeadline && Date.now() > deadlineRef.current;
     const ecoOn = ecoTwoPass && provider === "openai";
     const draftQ = ecoOn ? "low" : undefined;
-    addLog(`[생성] 미완료 ${targets.length}슬롯${hasDeadline ? ` · 최대 ${Math.ceil((deadlineRef.current - Date.now()) / 60000)}분 남음` : ""} · ${provider === "openai" ? (ecoOn ? `GPT low 초안 (승인 후 ${finalQuality} 마감)` : `GPT ${quality}`) : "Gemini"}`);
+    addLog(`[생성] 미완료 ${targets.length}슬롯${force ? " · 강제 실행 (시간 무시)" : hasDeadline ? ` · 최대 ${Math.ceil((deadlineRef.current - Date.now()) / 60000)}분 남음` : ""} · ${provider === "openai" ? (ecoOn ? `GPT low 초안 (승인 후 ${finalQuality} 마감)` : `GPT ${quality}`) : "Gemini"}`);
     let newMade = 0;
+    const markSuccess = (idx, dataUrl, fp) => {
+      newMade += 1;
+      setSlots((p) => p.map((s) => (s.index === idx
+        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", finalized: false, regenCount: s.regenCount + 1 } : s)));
+    };
     for (const t of targets) {
       if (cancelRef.current) break;
-      if (timeUp()) { addLog(`[시간 상한] 예산 초과 — ${newMade}장 생성 후 중단 (나머지는 '미완료·수정 슬롯 생성'으로 이어서)`); break; }
+      if (timeUp()) { addLog(`[시간 상한] 예산 초과 — ${newMade}장 생성 후 중단 ('미완료·수정 슬롯 생성' 버튼은 시간 무시하고 강제 실행됩니다)`); break; }
       setProg({ done: newMade, total: targets.length, stage: `슬롯 ${t.index} 생성 중` });
       setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
       try {
         if (t.qcNote) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${t.qcNote}`);
         const fp = buildSlotPrompt(t, mode, refTone, refPeople);
         const dataUrl = await generateImage(fp, draftQ);
-        newMade += 1;
-        setSlots((p) => p.map((s) => (s.index === t.index
-          ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", finalized: false, regenCount: s.regenCount + 1 } : s)));
+        markSuccess(t.index, dataUrl, fp);
         addLog(`[성공 ${t.index}] ${t.title_kr || t.title}`);
       } catch (err) {
+        /* 자동 복구: 일시 오류가 아닌 실패(콘텐츠 충돌 등)는 두뇌가 장면을 규정에 맞게 고쳐 쓴 뒤 즉시 1회 재시도 */
+        if (!TRANSIENT_RE.test(err.message) && !t.repaired) {
+          addLog(`[복구 ${t.index}] 실패 원인 분석·장면 자동 수정 — ${err.message}`);
+          try {
+            const fix = await repairSlot(t, err.message);
+            const t2 = { ...t, ...fix, repaired: true };
+            setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, ...fix, repaired: true } : s)));
+            const fp2 = buildSlotPrompt(t2, mode, refTone, refPeople);
+            const dataUrl2 = await generateImage(fp2, draftQ);
+            markSuccess(t.index, dataUrl2, fp2);
+            addLog(`[복구 성공 ${t.index}] 장면 수정 후 생성 완료`);
+            await new Promise((r) => setTimeout(r, 1200));
+            continue;
+          } catch (err2) {
+            setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "failed", rejectReason: `복구 후에도 실패: ${err2.message}`, repaired: true } : s)));
+            addLog(`[복구 실패 ${t.index}] ${err2.message} — 카드에서 SUBJECT를 직접 수정 후 재생성하세요`);
+            await new Promise((r) => setTimeout(r, 1200));
+            continue;
+          }
+        }
         setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "failed", rejectReason: err.message } : s)));
         addLog(`[실패 ${t.index}] ${err.message}`);
       }
@@ -1363,7 +1399,7 @@ Each block content = one short Korean sentence.`,
                           </p>
                         )}
                       </div>
-                      <button onClick={runGeneration} disabled={!imageKey()}
+                      <button onClick={() => runGeneration(null, true)} disabled={!imageKey()} title="시간 예산을 무시하고 강제 실행합니다"
                         className="bg-violet-600 hover:bg-violet-500 disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
                         <Play className="w-4 h-4" /> 미완료·수정 슬롯 생성
                       </button>
@@ -1590,7 +1626,7 @@ Each block content = one short Korean sentence.`,
                           ? <>초안 <b className="text-neutral-200">{slots.length}행</b> 준비됨. 이미지 키를 입력하고 생성을 시작하세요.</>
                           : <>미완료·수정 슬롯이 있습니다. 편집 후 아래 버튼으로 이어서 생성하세요.{successCount > 0 && ` (유효 ${successCount}장 유지)`}</>}
                       </p>
-                      <button onClick={runGeneration} disabled={!imageKey()}
+                      <button onClick={() => runGeneration(null, true)} disabled={!imageKey()} title="시간 예산을 무시하고 강제 실행합니다"
                         style={imageKey() ? attnPulse : undefined}
                         className="w-full bg-violet-600 hover:bg-violet-500 disabled:bg-neutral-700 disabled:text-neutral-500 text-white font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
                         <Play className="w-4 h-4" /> 미완료·수정 슬롯 생성
