@@ -831,10 +831,11 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
       if (cancelRef.current) break;
       if (timeUp()) { addLog(`[시간 상한] 예산 초과 — ${newMade}장 생성 후 중단 ('미완료·수정 슬롯 생성' 버튼은 시간 무시하고 강제 실행됩니다)`); break; }
       setProg({ done: newMade, total: targets.length, stage: `슬롯 ${t.index} 생성 중` });
-      setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
+      /* 프롬프트를 먼저 확정해 슬롯에 깔아둔다 — 생성되는 동안 카드에서 프롬프트 확인 가능 */
+      const fp = buildSlotPrompt(t, mode, refTone, refPeople);
+      setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating", finalPrompt: fp } : s)));
       try {
         if (t.qcNote) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${t.qcNote}`);
-        const fp = buildSlotPrompt(t, mode, refTone, refPeople);
         const dataUrl = await generateImage(fp, draftQ);
         await markSuccess(t.index, dataUrl, fp);
         addLog(`[성공 ${t.index}] ${t.title_kr || t.title}`);
@@ -845,8 +846,8 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
           try {
             const fix = await repairSlot(t, err.message);
             const t2 = { ...t, ...fix, repaired: true };
-            setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, ...fix, repaired: true } : s)));
             const fp2 = buildSlotPrompt(t2, mode, refTone, refPeople);
+            setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, ...fix, repaired: true, finalPrompt: fp2 } : s)));
             const dataUrl2 = await generateImage(fp2, draftQ);
             await markSuccess(t.index, dataUrl2, fp2);
             addLog(`[복구 성공 ${t.index}] 장면 수정 후 생성 완료`);
@@ -1148,13 +1149,13 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
   const regenSlot = async (t) => {
     if (!imageKey()) { setNotice("이미지 API 키가 필요합니다."); return; }
     if (phase === "generating") return;
-    setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
+    /* 거절/플래그 사유가 있으면 교정 지시로 주입 (같은 실수 반복 차단) — 프롬프트를 먼저 깔고 생성 */
+    const note = t.qcNote || t.autoFlag || "";
+    const fp = buildSlotPrompt({ ...t, qcNote: note }, mode, refTone, refPeople);
+    setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating", finalPrompt: fp, dataUrl: "" } : s)));
     addLog(`[재생성 ${t.index}] ${CAMERA_ANGLES[t.angle]?.label || "자동"} · 시작`);
     try {
-      /* 거절/플래그 사유가 있으면 교정 지시로 주입 (같은 실수 반복 차단) */
-      const note = t.qcNote || t.autoFlag || "";
       if (note) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${note}`);
-      const fp = buildSlotPrompt({ ...t, qcNote: note }, mode, refTone, refPeople);
       const dataUrl = await generateImage(fp, ecoTwoPass && provider === "openai" ? "low" : undefined);
       const eng = engineUsedRef.current;
       const px = await getDims(dataUrl).catch(() => null);
@@ -1728,6 +1729,14 @@ Each block content = one short Korean sentence.`,
                                   </div>
                                 )}
                               </>
+                            ) : s.status === "generating" && s.finalPrompt ? (
+                              /* 이미지가 오기 전에 사용 프롬프트를 먼저 표시 */
+                              <div className="w-full h-full p-2 overflow-y-auto text-left">
+                                <div className="text-[10px] font-mono text-violet-300 mb-1 flex items-center gap-1 sticky top-0 bg-neutral-950/90">
+                                  <RefreshCw className="w-3 h-3 animate-spin shrink-0" /> 생성 중 — 사용 프롬프트
+                                </div>
+                                <p className="text-[10px] leading-relaxed text-neutral-400 whitespace-pre-wrap break-words">{s.finalPrompt}</p>
+                              </div>
                             ) : (
                               <span className="text-xs font-mono text-neutral-500">
                                 {s.status === "generating" ? "생성 중…" : s.status === "rejected" ? `격리: ${s.rejectReason}` : s.status === "failed" ? "실패" : "대기 버퍼"}
