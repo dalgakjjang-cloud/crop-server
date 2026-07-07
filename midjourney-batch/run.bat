@@ -1,26 +1,39 @@
 @echo off
-chcp 65001 >nul
 cd /d "%~dp0"
 echo ============================================
-echo    Midjourney 배치 자동 생성
+echo    Midjourney Batch Runner
 echo ============================================
 echo.
-echo  이 폴더의 프롬프트 txt 파일 목록:
+echo  TXT files in this folder:
 echo.
-dir /b *.txt 2>nul | findstr /v "state.json cookies.txt requirements.txt"
+for %%F in (*.txt) do (
+  if /I not "%%~nxF"=="cookies.txt" if /I not "%%~nxF"=="requirements.txt" (
+    echo    %%~nxF
+  )
+)
 echo.
-set /p FILE="실행할 프롬프트 파일 이름을 입력하세요 (예: test.txt): "
+set /p FILE="Type the prompt file name (e.g. test.txt): "
 echo.
 if not exist "%FILE%" (
-  echo [오류] "%FILE%" 파일을 이 폴더에서 찾을 수 없습니다.
-  echo         파일 이름을 다시 확인하세요.
+  echo [ERROR] File "%FILE%" not found in this folder.
+  echo         Please check the file name.
   echo.
   pause
   exit /b 1
 )
+if not exist "cookies.txt" (
+  echo [ERROR] cookies.txt not found in this folder.
+  echo         Export it from Chrome extension "Get cookies.txt LOCALLY"
+  echo         and save as cookies.txt here.
+  echo.
+  pause
+  exit /b 1
+)
+echo Running: python mj_batch.py --prompts "%FILE%" --cookies cookies.txt
+echo.
 python mj_batch.py --prompts "%FILE%" --cookies cookies.txt
 echo.
 echo ============================================
-echo  끝났습니다. 이 창을 닫으려면 아무 키나 누르세요.
+echo  Done. Press any key to close this window.
 echo ============================================
 pause >nul
