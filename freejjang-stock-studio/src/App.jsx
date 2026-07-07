@@ -339,8 +339,9 @@ export default function App() {
   const [topic, setTopic] = useState("");
   const [priKw, setPriKw] = useState("");         // 우선 키워드 (선택 — 초안 키워드 앞줄에 반영)
   const [handlingTip, setHandlingTip] = useState(""); // 구도·소품·인물 처리 팁 (선택 — 모든 슬롯에 적용)
-  const [count, setCount] = useState(6);
-  const [maxNew, setMaxNew] = useState(""); // 생성 상한 (하드캡, 선택)
+  const [count, setCount] = useState(5);      // 목표 장수 (프리셋 3/5/10/15 또는 직접 입력)
+  const [maxMin, setMaxMin] = useState("");   // 최대 시간(분) — 초안+생성 전체 벽시계 예산 (선택, 우선순위)
+  const deadlineRef = useRef(Infinity);       // maxMin으로 계산된 마감 시각(ms). 초안 시작 시 설정
   const [mode, setMode] = useState("commercial"); // commercial | wallpaper
   const [modeAuto, setModeAuto] = useState(true);
   /* ── REEDO식 구조화 구성 (선택 안함이면 무시) ── */
@@ -392,7 +393,7 @@ export default function App() {
     cancelRef.current = true;
     setTopic(""); setPriKw(""); setHandlingTip(""); setSlots([]); setQcRejects({}); setQcReason("");
     setPhase("idle"); setProg(null); setAutoQcProg(null); setAutoQcBusy(false);
-    setMaxNew(""); setLog([]); setNotice(null);
+    setMaxMin(""); setLog([]); setNotice(null); deadlineRef.current = Infinity;
     setModeAuto(true); setMode("commercial");
   };
   const clearSavedKeys = () => {
@@ -524,12 +525,16 @@ export default function App() {
     cancelRef.current = false;
     setPhase("drafting");
     setSlots([]); setQcRejects({});
-    addLog(`[초안] "${topic}" — ${count}행 · 1단계 장면 설계 → 2단계 병렬 상세화 · 두뇌=${brainName}`);
+    /* 최대 시간(분) 예산 — 설정 시 초안+생성 전체의 벽시계 마감. 마감 도달 시 그 시점까지 만든 것으로 마무리 */
+    const mins = parseFloat(maxMin);
+    deadlineRef.current = mins > 0 ? Date.now() + mins * 60000 : Infinity;
+    const timeUp = () => Date.now() > deadlineRef.current;
+    addLog(`[초안] "${topic}" — 목표 ${count}행${mins > 0 ? ` · 최대 ${mins}분` : ""} · 1단계 장면 설계 → 2단계 병렬 상세화 · 두뇌=${brainName}`);
 
     /* ── (A) 장면 매트릭스: 한 번의 호출로 세트 전체의 서로 다른 장면을 설계 ── */
     setProg({ done: 0, total: count, stage: `${brainName} 장면 설계 (다양성 확정)` });
     let concepts = [];
-    for (let attempt = 0; attempt < 3 && concepts.length < count && !cancelRef.current; attempt++) {
+    for (let attempt = 0; attempt < 3 && concepts.length < count && !cancelRef.current && !timeUp(); attempt++) {
       try {
         const m = await askBrain(
           `You design a maximally DIVERSE professional stock image set — each image must be clearly a SEPARATE asset to a buyer (no near-duplicates; marketplaces reject similar images). Respond ONLY compact JSON:
@@ -560,7 +565,7 @@ CATEGORY: pick ONE best Adobe Stock category id: ${ADOBE_CAT_LIST}. Illustration
 PROPS & VARIETY: props must be SPECIFIC to each scene and DIFFERENT from every other slot in the whole set (set list provided) — never reuse generic filler across slots; tableware must match the dish culture; keep the copy-space area uncluttered; believable and unbranded.`;
     const expandPair = async (pairIdx) => {
       const pair = pairIdx.map((i) => concepts[i]);
-      for (let attempt = 0; attempt < 3 && !cancelRef.current; attempt++) {
+      for (let attempt = 0; attempt < 3 && !cancelRef.current && !timeUp(); attempt++) {
         try {
           const r = await askBrain(
             detailSystem,
@@ -591,15 +596,17 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
     for (let i = 0; i < concepts.length; i += 2) pairs.push([i, i + 1].filter((x) => x < concepts.length));
     const queue = [...pairs];
     await Promise.all(Array.from({ length: Math.min(3, queue.length) }, async () => {
-      while (queue.length > 0 && !cancelRef.current) await expandPair(queue.shift());
+      while (queue.length > 0 && !cancelRef.current && !timeUp()) await expandPair(queue.shift());
     }));
 
     setProg(null);
     if (cancelRef.current) { setPhase("idle"); addLog("[초안] 사용자 중단"); return; }
+    if (timeUp()) addLog(`[시간 상한] ${mins}분 초과 — 완성된 초안까지만 진행합니다`);
     const ok = made.filter(Boolean);
     const indexed = ok.map((s, i) => ({ ...s, index: pad2(i + 1) }));
     setSlots(indexed);
-    addLog(`[초안 완료] ${ok.length}행${ok.length < concepts.length ? ` (${concepts.length - ok.length}행 실패)` : ""}`);
+    addLog(`[초안 완료] ${ok.length}행${ok.length < concepts.length ? ` (${concepts.length - ok.length}행 미완)` : ""}`);
+    if (ok.length === 0) { setPhase("idle"); setNotice("시간 내 초안을 만들지 못했습니다. 최대 시간을 늘리거나 장수를 줄이세요."); return; }
     /* 검토 멈춤 없이 곧바로 순차 생성 (생성 후 수정) — 키 없으면 검토 단계에서 대기 */
     if (imageKey()) {
       runGeneration(indexed);
@@ -618,13 +625,15 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
     setPhase("generating");
     const source = Array.isArray(slotList) ? slotList : slots;
     const targets = source.filter((s) => s.status === "pending" || s.status === "failed" || s.status === "rejected");
-    const cap = parseInt(maxNew) > 0 ? parseInt(maxNew) : Infinity;
-    addLog(`[생성] 미완료 ${targets.length}슬롯 (상한 ${cap === Infinity ? "없음" : cap + "장"}) · ${provider === "openai" ? `GPT ${quality}` : "Gemini"}`);
+    /* 시간 예산: 초안 시작 시 세팅된 마감(deadlineRef)까지. 재생성 등 마감이 지났으면 시간제한 없이 진행 */
+    const hasDeadline = deadlineRef.current !== Infinity && Date.now() < deadlineRef.current;
+    const timeUp = () => hasDeadline && Date.now() > deadlineRef.current;
+    addLog(`[생성] 미완료 ${targets.length}슬롯${hasDeadline ? ` · 최대 ${Math.ceil((deadlineRef.current - Date.now()) / 60000)}분 남음` : ""} · ${provider === "openai" ? `GPT ${quality}` : "Gemini"}`);
     let newMade = 0;
     for (const t of targets) {
       if (cancelRef.current) break;
-      if (newMade >= cap) { addLog(`[상한] ${cap}장 하드캡 도달 — 중단`); break; }
-      setProg({ done: newMade, total: Math.min(targets.length, cap), stage: `슬롯 ${t.index} 생성 중` });
+      if (timeUp()) { addLog(`[시간 상한] 예산 초과 — ${newMade}장 생성 후 중단 (나머지는 '미완료·수정 슬롯 생성'으로 이어서)`); break; }
+      setProg({ done: newMade, total: targets.length, stage: `슬롯 ${t.index} 생성 중` });
       setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating" } : s)));
       try {
         if (t.qcNote) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${t.qcNote}`);
@@ -1130,19 +1139,24 @@ Each block content = one short Korean sentence.`,
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="block text-xs font-semibold text-neutral-400 mb-1">장수 (1행=1장)</label>
-                    <select value={count} onChange={(e) => setCount(Number(e.target.value))}
+                    <input list="countPresets" type="number" min="1" max="50" value={count}
+                      onChange={(e) => setCount(Math.max(1, Math.min(50, parseInt(e.target.value) || 1)))}
                       disabled={phase !== "idle" && phase !== "done"}
-                      className={`${fieldCls} w-full disabled:opacity-60`}>
-                      {[3, 6, 9, 12, 15, 20].map((n) => <option key={n} value={n}>{n}장 정확히</option>)}
-                    </select>
+                      className={`${fieldCls} w-full font-mono disabled:opacity-60`} />
+                    <datalist id="countPresets">{[3, 5, 10, 15].map((n) => <option key={n} value={n} />)}</datalist>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-neutral-400 mb-1">생성 상한 (선택)</label>
-                    <input value={maxNew} onChange={(e) => setMaxNew(e.target.value.replace(/[^0-9]/g, ""))}
-                      placeholder="예: 20"
+                    <label className="block text-xs font-semibold text-neutral-400 mb-1">최대 시간(분) <span className="text-neutral-600 font-normal">우선</span></label>
+                    <input list="minPresets" type="number" min="1" max="60" value={maxMin}
+                      onChange={(e) => setMaxMin(e.target.value.replace(/[^0-9.]/g, ""))}
+                      placeholder="예: 10"
                       className={`${fieldCls} w-full font-mono`} />
+                    <datalist id="minPresets">{[5, 10, 15].map((n) => <option key={n} value={n} />)}</datalist>
                   </div>
                 </div>
+                <p className="text-[10px] text-neutral-600 leading-snug -mt-1">
+                  최대 시간을 넣으면 그 시간 안에서 만들 수 있는 만큼만 생성하고 멈춥니다(장수보다 우선). 비우면 목표 장수를 모두 채웁니다.
+                </p>
                 <div>
                   <label className="block text-xs font-semibold text-neutral-400 mb-1">구도 모드 (요청 문구로 자동 판별)</label>
                   <div className="flex gap-1.5">
