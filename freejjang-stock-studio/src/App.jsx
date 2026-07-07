@@ -414,8 +414,7 @@ export default function App() {
         if (typeof s.autoFallback === "boolean") setAutoFallback(s.autoFallback);
         if (s.refTone) setRefTone(s.refTone);
         if (s.refPeople) setRefPeople(s.refPeople);
-        if (s.priKw) setPriKw(s.priKw);
-        if (s.handlingTip) setHandlingTip(s.handlingTip);
+        /* priKw·handlingTip은 새로고침 시 의도적으로 비움 (주제마다 새로 입력) — localStorage에 저장하지 않음 */
       }
     } catch { /* 손상된 저장값 무시 */ }
     settingsLoaded.current = true;
@@ -424,10 +423,10 @@ export default function App() {
     if (!settingsLoaded.current) return;
     try {
       localStorage.setItem("freejjang_settings", JSON.stringify({
-        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, priKw, handlingTip, ecoTwoPass, finalQuality,
+        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality,
       }));
     } catch { /* 저장 불가 환경 무시 */ }
-  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, priKw, handlingTip, ecoTwoPass, finalQuality]);
+  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality]);
 
   /* ── Start Fresh: 파이프라인만 초기화 (키·설정은 유지) ── */
   const startFresh = () => {
