@@ -271,6 +271,26 @@ async function genOpenAI(key, prompt, aspect, quality) {
   if (!b64) throw new Error("OpenAI가 이미지 데이터를 반환하지 않았습니다.");
   return `data:image/png;base64,${b64}`;
 }
+/* 이코노미 2패스 마감: 승인된 low 드래프트를 참조 이미지로 넣어 같은 구도를 고품질로 리렌더
+   (gpt-image는 시드 고정이 없어 그냥 재생성하면 다른 그림이 나옴 → 편집 API로 구도 유지) */
+async function genOpenAIRefine(key, prompt, refDataUrl, aspect, quality) {
+  const blob = await (await fetch(refDataUrl)).blob();
+  const fd = new FormData();
+  fd.append("model", "gpt-image-1");
+  fd.append("image", blob, "draft.png");
+  fd.append("prompt", `Re-render this exact scene at maximum fidelity for stock delivery: keep the SAME composition, subject placement, props, palette and lighting as the reference; increase sharpness, texture detail and photographic realism; remove small artifacts. ${prompt}`);
+  fd.append("size", OPENAI_SIZE[aspect] || "1536x1024");
+  fd.append("quality", quality || "medium");
+  const res = await fetch("https://api.openai.com/v1/images/edits", {
+    method: "POST", headers: { Authorization: `Bearer ${key}` }, body: fd,
+  });
+  const data = await res.json();
+  if (data.error) throw new Error(`OpenAI(마감): ${data.error.message}`);
+  const b64 = data.data?.[0]?.b64_json;
+  if (!b64) throw new Error("OpenAI 마감 리렌더가 이미지를 반환하지 않았습니다.");
+  return `data:image/png;base64,${b64}`;
+}
+const FINAL_QUALITY = "medium"; // 이코노미 2패스 마감 품질
 
 /* 슬롯 필드 → 최종 이미지 프롬프트 (전문 판매 프롬프트 규칙) */
 function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
@@ -326,6 +346,7 @@ export default function App() {
   /* ── 이미지 엔진 설정 ── */
   const [provider, setProvider] = useState("openai"); // openai | gemini (손)
   const [quality, setQuality] = useState("medium");
+  const [ecoTwoPass, setEcoTwoPass] = useState(true); // 이코노미 2패스: low 초안 → 승인분만 medium 마감 (GPT 엔진 전용)
   const [aspect, setAspect] = useState("16:9");
   const [showSettings, setShowSettings] = useState(true);
 
@@ -366,6 +387,7 @@ export default function App() {
         else if (s.brain === "claude") setBrain(s.googleKey && !s.openaiKey ? "gemini" : "gpt");
         if (s.provider) setProvider(s.provider);
         if (s.quality) setQuality(s.quality);
+        if (typeof s.ecoTwoPass === "boolean") setEcoTwoPass(s.ecoTwoPass);
         if (s.aspect) setAspect(s.aspect);
         if (s.gptModel) setGptModel(s.gptModel);
         if (s.geminiModel) setGeminiModel(s.geminiModel);
@@ -382,10 +404,10 @@ export default function App() {
     if (!settingsLoaded.current) return;
     try {
       localStorage.setItem("freejjang_settings", JSON.stringify({
-        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, priKw, handlingTip,
+        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, priKw, handlingTip, ecoTwoPass,
       }));
     } catch { /* 저장 불가 환경 무시 */ }
-  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, priKw, handlingTip]);
+  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, priKw, handlingTip, ecoTwoPass]);
 
   /* ── Start Fresh: 파이프라인만 초기화 (키·설정은 유지) ── */
   const startFresh = () => {
@@ -455,17 +477,19 @@ export default function App() {
 
   /* ── 이미지 엔진 키 (provider별) ── */
   const imageKey = () => (provider === "gemini" ? googleKey : openaiKey).trim();
-  /* 일시 오류(429/네트워크/서버 혼잡)는 3초→6초 대기 후 자동 재시도, 성공 시 세션 비용 집계 */
-  const generateImage = async (finalPrompt) => {
+  /* 일시 오류(429/네트워크/서버 혼잡)는 3초→6초 대기 후 자동 재시도, 성공 시 세션 비용 집계.
+     qualityOverride: 이코노미 2패스에서 초안을 low로 강제할 때 사용 */
+  const generateImage = async (finalPrompt, qualityOverride) => {
     const key = imageKey();
     if (!key) throw new Error(`${provider === "gemini" ? "Google" : "OpenAI"} 이미지 API 키를 먼저 연결하세요 (상단 설정).`);
+    const q = qualityOverride || quality;
     let lastErr;
     for (let attempt = 0; attempt <= 2; attempt++) {
       try {
         const out = provider === "gemini"
           ? await genGemini(key, finalPrompt, aspect)
-          : await genOpenAI(key, finalPrompt, aspect, quality);
-        const unit = provider === "gemini" ? GEMINI_IMG_COST : (OPENAI_COST[quality] || 0.041);
+          : await genOpenAI(key, finalPrompt, aspect, q);
+        const unit = provider === "gemini" ? GEMINI_IMG_COST : (OPENAI_COST[q] || 0.041);
         setSpent((p) => ({ img: p.img + 1, cost: p.cost + unit }));
         return out;
       } catch (err) {
@@ -628,7 +652,9 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
     /* 시간 예산: 초안 시작 시 세팅된 마감(deadlineRef)까지. 재생성 등 마감이 지났으면 시간제한 없이 진행 */
     const hasDeadline = deadlineRef.current !== Infinity && Date.now() < deadlineRef.current;
     const timeUp = () => hasDeadline && Date.now() > deadlineRef.current;
-    addLog(`[생성] 미완료 ${targets.length}슬롯${hasDeadline ? ` · 최대 ${Math.ceil((deadlineRef.current - Date.now()) / 60000)}분 남음` : ""} · ${provider === "openai" ? `GPT ${quality}` : "Gemini"}`);
+    const ecoOn = ecoTwoPass && provider === "openai";
+    const draftQ = ecoOn ? "low" : undefined;
+    addLog(`[생성] 미완료 ${targets.length}슬롯${hasDeadline ? ` · 최대 ${Math.ceil((deadlineRef.current - Date.now()) / 60000)}분 남음` : ""} · ${provider === "openai" ? (ecoOn ? `GPT low 초안 (승인 후 ${FINAL_QUALITY} 마감)` : `GPT ${quality}`) : "Gemini"}`);
     let newMade = 0;
     for (const t of targets) {
       if (cancelRef.current) break;
@@ -638,10 +664,10 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
       try {
         if (t.qcNote) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${t.qcNote}`);
         const fp = buildSlotPrompt(t, mode, refTone, refPeople);
-        const dataUrl = await generateImage(fp);
+        const dataUrl = await generateImage(fp, draftQ);
         newMade += 1;
         setSlots((p) => p.map((s) => (s.index === t.index
-          ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", regenCount: s.regenCount + 1 } : s)));
+          ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", finalized: false, regenCount: s.regenCount + 1 } : s)));
         addLog(`[성공 ${t.index}] ${t.title_kr || t.title}`);
       } catch (err) {
         setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "failed", rejectReason: err.message } : s)));
@@ -827,9 +853,47 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     addLog(`[백업] 프롬프트 TXT(전체) 저장 완료 — ${rows.length}슬롯`);
   };
 
+  /* ═══ 이코노미 2패스 마감 — 승인된 low 드래프트만 편집 API로 medium 리렌더 (구도 유지) ═══ */
+  const finalizeSlots = async (list) => {
+    const targets = list.filter((s) => s.status === "success" && s.dataUrl && !s.finalized);
+    if (targets.length === 0) return list;
+    cancelRef.current = false;
+    setPhase("generating");
+    addLog(`[마감] 이코노미 2패스 — 승인 ${targets.length}장을 ${FINAL_QUALITY}로 리렌더 (구도 유지)`);
+    let out = [...list];
+    for (let i = 0; i < targets.length; i++) {
+      const t = targets[i];
+      if (cancelRef.current) { addLog(`[마감 중단] 나머지는 드래프트 화질로 저장됩니다`); break; }
+      setProg({ done: i, total: targets.length, stage: `슬롯 ${t.index} 마감 리렌더 (${FINAL_QUALITY})` });
+      for (let attempt = 0; attempt <= 1; attempt++) {
+        try {
+          const hi = await genOpenAIRefine(openaiKey.trim(), t.finalPrompt || "", t.dataUrl, aspect, FINAL_QUALITY);
+          setSpent((p) => ({ img: p.img + 1, cost: p.cost + (OPENAI_COST[FINAL_QUALITY] || 0.041) }));
+          out = out.map((s) => (s.index === t.index ? { ...s, dataUrl: hi, finalized: true } : s));
+          setSlots(out);
+          addLog(`[마감 ${t.index}] 완료`);
+          break;
+        } catch (err) {
+          if (attempt === 0 && TRANSIENT_RE.test(err.message)) { await new Promise((r) => setTimeout(r, 4000)); continue; }
+          addLog(`[마감 실패 ${t.index}] ${err.message} — 드래프트 화질로 유지`);
+          break;
+        }
+      }
+      await new Promise((r) => setTimeout(r, 800));
+    }
+    setProg(null);
+    setPhase("done");
+    return out;
+  };
+
   /* ═══ 제출 팩 — ZIP 하나로 묶어 저장 (이미지 + Adobe CSV + 미캔 XLSX + 프롬프트 백업) ═══ */
-  const exportSubmitPack = async () => {
-    const ok = slots.filter((s) => s.status === "success" && s.dataUrl);
+  const exportSubmitPack = async (list) => {
+    let src = Array.isArray(list) ? list : slots;
+    /* 이코노미 2패스: 아직 마감 안 된 승인본이 있으면 먼저 고품질 리렌더 */
+    if (ecoTwoPass && provider === "openai" && src.some((s) => s.status === "success" && s.dataUrl && !s.finalized)) {
+      src = await finalizeSlots(src);
+    }
+    const ok = src.filter((s) => s.status === "success" && s.dataUrl);
     if (ok.length === 0) { setNotice("성공한 이미지가 없습니다."); return; }
     const base = cleanName(topic, 20) || "freejjang";
     addLog(`[제출 팩] ZIP 생성 중 — 이미지 ${ok.length}장…`);
@@ -886,9 +950,9 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       const note = t.qcNote || t.autoFlag || "";
       if (note) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${note}`);
       const fp = buildSlotPrompt({ ...t, qcNote: note }, mode, refTone, refPeople);
-      const dataUrl = await generateImage(fp);
+      const dataUrl = await generateImage(fp, ecoTwoPass && provider === "openai" ? "low" : undefined);
       setSlots((p) => p.map((s) => (s.index === t.index
-        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", autoFlag: "", regenCount: s.regenCount + 1 } : s)));
+        ? { ...s, status: "success", dataUrl, finalPrompt: fp, rejectReason: "", qcNote: "", autoFlag: "", finalized: false, regenCount: s.regenCount + 1 } : s)));
       setQcRejects((p) => { const n = { ...p }; delete n[t.index]; return n; });
       addLog(`[재생성 ${t.index}] 완료`);
     } catch (err) {
@@ -1054,6 +1118,16 @@ Each block content = one short Korean sentence.`,
                 </select>
               </div>
               {provider === "openai" && (
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-400 mb-1">이코노미 2패스</label>
+                  <button onClick={() => setEcoTwoPass(!ecoTwoPass)}
+                    title="초안은 low로 싸고 빠르게 → QC 승인분만 medium으로 구도 유지 리렌더 (반려가 많을수록 절약)"
+                    className={`${fieldCls} font-bold ${ecoTwoPass ? "text-emerald-300 border-emerald-500/50" : "text-neutral-500"}`}>
+                    {ecoTwoPass ? "ON · low 초안 → medium 마감" : "OFF · 1패스 생성"}
+                  </button>
+                </div>
+              )}
+              {provider === "openai" && !ecoTwoPass && (
                 <div>
                   <label className="block text-xs font-semibold text-neutral-400 mb-1">품질 (기본 medium)</label>
                   <select value={quality} onChange={(e) => setQuality(e.target.value)} className={fieldCls}>
