@@ -247,6 +247,25 @@ async function askGemini(key, model, system, user, imageBlock) {
   return extractJSON(text, "Gemini");
 }
 
+/* ── Gemini + 구글 검색 그라운딩: 오늘의 추천용 (실시간 트렌드·뉴스 반영) ── */
+async function askGeminiGrounded(key, model, system, user) {
+  const res = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${model || GEMINI_MODEL_DEFAULT}:generateContent?key=${encodeURIComponent(key)}`,
+    {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: system }] },
+        contents: [{ parts: [{ text: user }] }],
+        tools: [{ google_search: {} }],
+      }),
+    }
+  );
+  const data = await res.json();
+  if (data.error) throw new Error(`Gemini(검색): ${data.error.message}`);
+  const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text).filter(Boolean).join("\n");
+  return extractJSON(text, "Gemini(검색)");
+}
+
 /* ── 이미지 생성 (사용자 키 · 메모리에만 유지) ── */
 async function genGemini(key, prompt, aspect) {
   const res = await fetch(
@@ -486,6 +505,8 @@ export default function App() {
   const [qcReason, setQcReason] = useState("");
   const [autoQcBusy, setAutoQcBusy] = useState(false);
   const [autoQcProg, setAutoQcProg] = useState(null);
+  const [dailyBusy, setDailyBusy] = useState(false);
+  const lastRecoRef = useRef(""); // 직전 추천 주제 (재클릭 시 다른 각도 보장)
   const cancelRef = useRef(false);
 
   /* ── 기본 생성 / 분석 / 공용 ── */
@@ -711,6 +732,43 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
       setNotice("이미지 API 키가 없어 초안에서 멈췄습니다. 상단 설정에서 키를 입력한 뒤 승인하세요.");
       addLog(`[멈춤 1] 이미지 키 없음 — 키 입력 후 승인 시 생성`);
     }
+  };
+
+  /* ═══ 오늘의 추천 — 날짜 기준 판매 리드타임(4~8주) 계산 + 베스트셀러/틈새/이슈 랜덤 로테이션.
+     구글 키가 있으면 구글 검색 그라운딩으로 실시간 트렌드·뉴스까지 반영, 실패 시 두뇌 지식으로 폴백 ═══ */
+  const recommendToday = async () => {
+    if (dailyBusy || phase === "drafting" || phase === "generating") return;
+    setDailyBusy(true);
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+    const seed = Math.floor(Math.random() * 100000);
+    addLog(`[오늘의 추천] ${dateStr} 기준 — 판매 리드타임 4~8주 반영해 주제 선정 중…`);
+    const sys = `You are a top stock-image market strategist for Adobe Stock (global) and MiriCanvas (Korea). Given today's date, propose exactly ONE production topic optimized to SELL within the next 2 months — stock buyers purchase visuals 4-8 weeks before they need them, so target upcoming seasons, holidays, campaigns and business cycles, or a timely news/issue angle (economy, AI, climate, health, lifestyle shifts). Respond ONLY compact JSON:
+{"topic_kr":"프리짱 주제 입력용 한국어 주제 (10-20자, 명확한 촬영 소재)","market":"top|niche|news","priority_keywords":"10-14 lowercase EN buyer search terms, comma-separated, SEO order (most-searched first)","handling_tip_kr":"구도·소품·인물 처리 팁 1-2문장 (한국어)","rationale_kr":"왜 지금 이 주제인지 + 수요 근거 1-2문장 (한국어)","sell_window":"판매 적기 e.g. 9월 초~10월 말"}
+RULES: rotate the market type pseudo-randomly using the seed — top(베스트셀러 수요) ~40%, niche(수요 대비 공급 부족한 틈새: e.g. 시니어 디지털 라이프, 지속가능 포장, 재택 재활운동, 소상공인 디지털 전환) ~40%, news/issue ~20%. The topic must be shootable as AI stock images: NO celebrities, NO brands, NO text-heavy scenes, prefer scenes not requiring identifiable faces. Never repeat the avoided topic. Seed: ${seed}.`;
+    const user = `Today: ${dateStr}. Avoid repeating this previous recommendation: "${lastRecoRef.current || "none"}". Markets: global Adobe Stock + Korean MiriCanvas. Give ONE recommendation now.`;
+    try {
+      let r = null;
+      if (googleKey.trim()) {
+        try {
+          r = await askGeminiGrounded(googleKey.trim(), geminiModel.trim(), sys, `${user}\nFirst, search the web for current stock photography trends, seasonal demand and this week's notable commerce/news topics, then decide.`);
+          addLog(`[오늘의 추천] 구글 실시간 검색 반영 완료`);
+        } catch (e) { addLog(`[오늘의 추천] 실시간 검색 불가(${e.message}) — 두뇌 지식으로 진행`); }
+      }
+      if (!r) r = await askBrain(sys, user);
+      if (!r.topic_kr) throw new Error("추천 응답이 비어 있습니다.");
+      onTopicChange(String(r.topic_kr).trim());
+      setPriKw(normKeywords(r.priority_keywords, 14));
+      setHandlingTip(String(r.handling_tip_kr || "").slice(0, 500));
+      lastRecoRef.current = String(r.topic_kr).trim();
+      const label = r.market === "niche" ? "틈새시장" : r.market === "news" ? "이슈·뉴스" : "베스트셀러";
+      addLog(`[오늘의 추천] (${label}) ${r.topic_kr} — 판매 적기: ${r.sell_window || "향후 2개월"}`);
+      setNotice(`🎯 오늘의 추천 (${label}): "${r.topic_kr}" — ${r.rationale_kr || ""} 판매 적기: ${r.sell_window || "향후 2개월"}. 주제·우선 키워드·팁이 자동으로 채워졌습니다. 마음에 들면 '초안 기획', 다른 주제를 원하면 추천을 한 번 더 누르세요.`);
+    } catch (err) {
+      addLog(`[오류] 오늘의 추천 실패: ${err.message}`);
+      setNotice(`오늘의 추천 실패: ${err.message}`);
+    }
+    setDailyBusy(false);
   };
 
   /* 실패 슬롯 자동 복구: 두뇌가 장면을 규정(무텍스트·세이프티)에 맞게 다시 씀 — 장소·행동은 유지해 세트 다양성 보존 */
@@ -1326,10 +1384,18 @@ Each block content = one short Korean sentence.`,
               <section className="bg-neutral-800 border border-neutral-700 rounded-lg p-4 space-y-3">
                 <h2 className="text-sm font-bold text-neutral-100">1 · 주제와 정확 장수</h2>
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1">주제</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-semibold text-neutral-400">주제</label>
+                    <button onClick={recommendToday} disabled={dailyBusy || phase === "drafting" || phase === "generating"}
+                      title="오늘 날짜 기준 판매 리드타임(4~8주)을 계산해 베스트셀러·틈새시장·이슈 주제를 랜덤 추천하고 주제·키워드·팁을 자동으로 채웁니다. 구글 키가 있으면 실시간 검색 트렌드까지 반영"
+                      className="text-xs font-bold px-2 py-1 rounded border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition">
+                      {dailyBusy ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                      {dailyBusy ? "선정 중…" : "오늘의 추천"}
+                    </button>
+                  </div>
                   <input value={topic} onChange={(e) => onTopicChange(e.target.value)}
                     disabled={phase === "drafting" || phase === "generating"}
-                    placeholder="예: 9월 가을 신학기 계절 배경화면"
+                    placeholder="예: 9월 가을 신학기 계절 배경화면 — 또는 '오늘의 추천' 클릭"
                     className={`${fieldCls} w-full disabled:opacity-60`} />
                 </div>
                 <div>
