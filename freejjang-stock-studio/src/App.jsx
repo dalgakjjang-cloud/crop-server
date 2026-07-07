@@ -1372,9 +1372,12 @@ Each block content = one short Korean sentence.`,
                   className={`${fieldCls} font-mono w-full`} />
               </div>
               <div className="flex-1 min-w-52">
-                <label className="block text-xs font-semibold text-neutral-400 mb-1">Google AI Studio Key (Gemini 두뇌 + 이미지)</label>
-                <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AIzaSy…"
+                <label className="block text-xs font-semibold text-neutral-400 mb-1">Google Gemini API Key (Gemini 두뇌 + 이미지)</label>
+                <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AQ… (신규) 또는 AIzaSy… (구)"
                   className={`${fieldCls} font-mono w-full`} />
+                <p className="text-[11px] text-neutral-500 mt-1 leading-snug">
+                  2026-07-06부터 신규 키는 <b className="text-neutral-400">AQ</b>로 시작합니다. 기존 <b className="text-neutral-400">AIzaSy</b> 키도 그대로 사용 가능.
+                </p>
               </div>
               <div className="max-w-xs pb-1">
                 <p className="text-xs text-neutral-500 leading-relaxed">

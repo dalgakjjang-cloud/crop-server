@@ -121,7 +121,7 @@ npm run preview    # 빌드 결과 로컬 미리보기
 | 엔진 | 키 형식 | 발급처 |
 |---|---|---|
 | GPT (기본) | `sk-…` | OpenAI Platform |
-| Gemini | `AIzaSy…` | Google AI Studio |
+| Gemini | `AQ…` (신규 · 2026-07-06~) 또는 `AIzaSy…` (구) | Google AI Studio |
 | Pollinations | 불필요 (무료) | — |
 
 > 💡 최소 GPT 또는 Gemini 키 하나만 있으면 동작하며, 키가 전부 없어도 **Pollinations 무료 엔진**으로 이미지 생성이 가능합니다.
