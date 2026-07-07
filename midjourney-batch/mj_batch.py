@@ -287,7 +287,15 @@ def open_context(pw, cfg: dict, headless: bool):
         profile = Path(cfg["profile_dir"]).expanduser().resolve()
         profile.mkdir(parents=True, exist_ok=True)
 
-    extra_args = ["--disable-blink-features=AutomationControlled"]
+    extra_args = [
+        "--disable-blink-features=AutomationControlled",
+        # 실제 크롬 프로필을 빌려 쓸 때 뜨는 방해 배너/팝업 억제
+        "--no-first-run",
+        "--no-default-browser-check",
+        "--disable-session-crashed-bubble",
+        "--hide-crash-restore-bubble",
+        "--restore-last-session=false",
+    ]
     prof_dir = (cfg.get("chrome_profile_directory") or "").strip()
     if use_my_chrome and prof_dir:
         # 여러 프로필 중 특정 프로필(예: "Profile 1")을 선택
@@ -338,7 +346,31 @@ def open_context(pw, cfg: dict, headless: bool):
         pass
 
     ctx.set_default_timeout(cfg["nav_timeout_ms"])
-    page = ctx.pages[0] if ctx.pages else ctx.new_page()
+    # 실제 프로필은 복구된 탭이 여러 개 딸려와 page가 엉킨다. 항상 우리가 통제하는
+    # '새 탭'을 만들어 그 위에서만 작업한다(빈 탭들은 무시).
+    page = ctx.new_page()
+    return ctx, page
+
+
+def open_imagine(pw, cfg: dict, headless: bool):
+    """컨텍스트를 열고 Midjourney /imagine 로 확실히 이동한 page를 돌려준다.
+    실제 크롬 프로필의 복구 배너·여러 탭 때문에 이동이 한 번에 안 될 수 있어 재시도한다."""
+    ctx, page = open_context(pw, cfg, headless)
+    last_err = None
+    for attempt in range(3):
+        try:
+            page.goto(cfg["imagine_url"], wait_until="domcontentloaded",
+                      timeout=cfg["nav_timeout_ms"])
+            try:
+                page.bring_to_front()
+            except Exception:
+                pass
+            return ctx, page
+        except Exception as e:
+            last_err = e
+            print(f"(페이지 이동 재시도 {attempt + 1}/3: {e})", flush=True)
+            human_sleep(4)
+    print(f"(주의: /imagine 이동에 반복 실패 — {last_err})", flush=True)
     return ctx, page
 
 
@@ -350,11 +382,7 @@ def cmd_login(cfg: dict) -> int:
     sync_playwright, _ = _import_playwright()
     print("브라우저를 엽니다. Midjourney에 로그인한 뒤 이미지 생성 화면까지 들어가세요.")
     with sync_playwright() as pw:
-        ctx, page = open_context(pw, cfg, headless=False)
-        try:
-            page.goto(cfg["imagine_url"], wait_until="domcontentloaded")
-        except Exception as e:
-            print(f"(페이지 이동 경고: {e})")
+        ctx, page = open_imagine(pw, cfg, headless=False)
         input("\n로그인/설정을 마쳤으면 이 터미널에서 Enter를 누르세요… ")
         ctx.close()
     if cfg.get("use_my_chrome"):
@@ -403,11 +431,7 @@ def cmd_run(cfg: dict, prompts_path: Path, dry_run: bool) -> int:
     done_this_run = 0
 
     with sync_playwright() as pw:
-        ctx, page = open_context(pw, cfg, headless=cfg["headless"])
-        try:
-            page.goto(cfg["imagine_url"], wait_until="domcontentloaded")
-        except Exception as e:
-            print(f"(페이지 이동 경고: {e})")
+        ctx, page = open_imagine(pw, cfg, headless=cfg["headless"])
 
         # 로그인 여부 대략 확인
         human_sleep(3)
