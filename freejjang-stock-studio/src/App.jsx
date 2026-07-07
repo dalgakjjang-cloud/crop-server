@@ -16,17 +16,11 @@ import Pica from "pica";
    파이프라인: 초안 승인(멈춤1) → 순차 생성 → QC(멈춤2) → 제출 팩
    ═══════════════════════════════════════════════════════════ */
 
-/* 항상 배제 (텍스트·로고·저작권·군중) — 상업용/배경화면 모두 공통 */
-const GUARD =
-  "Strictly no text, no letters, no numbers, no logos, no watermarks, no brand names, no branded packaging, no copyrighted characters, no unrequested people. " +
-  "Absolutely NO crowd, NO crowded scene, NO too many people, NO large group of people, NO busy street with many pedestrians — this kills commercial sales.";
+/* 항상 배제 (텍스트·로고·저작권·군중) — 상업용/배경화면 모두 공통 · 짧게 */
+const GUARD = "no text, logos, watermarks, brands, copyrighted characters, or crowd";
 
-/* 상업용(non-wallpaper) 전용 배제 — 어도비 베스트셀러 반대편에 있는 것들 :
-   역광/실루엣/렌즈 플레어, 배경 블러/보케/얕은 심도, 번지는 도시 불빛·차량·나뭇잎, 산만/어수선한 배경 */
-const COMMERCIAL_GUARD =
-  "Absolutely NO backlit subject, NO back light against a bright window, NO silhouette, NO lens flare, NO sun glare, NO harsh directional lighting. " +
-  "Absolutely NO blurry background, NO bokeh, NO out-of-focus background, NO shallow depth of field, NO defocused background, NO motion blur, NO blurred city lights, NO blurred traffic, NO blurred foliage. " +
-  "Absolutely NO busy background, NO cluttered background, NO distracting environment — background must stay clean, minimal, even-lit and non-competing with the subject.";
+/* 상업용(non-wallpaper) 전용 배제 — 역광·보케·산만한 배경 (어도비 판매 킬러) · 짧게 */
+const COMMERCIAL_GUARD = "clean uncluttered background, even lighting, no backlit, no silhouette, no lens flare, no bokeh, no blurry background";
 
 const ASPECTS = ["1:1", "16:9", "4:3", "3:4", "9:16"];
 const OPENAI_SIZE = { "1:1": "1024x1024", "16:9": "1536x1024", "4:3": "1536x1024", "3:4": "1024x1536", "9:16": "1024x1536" };
@@ -67,14 +61,6 @@ const CAMERA_ANGLES = {
 /* 지능형 분위기 필터 — 실내/사무 주제 감지 시 중립 화이트밸런스(노란끼 배제) 적용 */
 const INDOOR_RE = /office|desk|workspace|indoor|meeting|remote\s*work|home\s*office|studio|사무실|재택|실내|회의|책상|워크스페이스|홈\s*오피스|스튜디오|작업실/i;
 const NIGHT_RE = /night|evening|dusk|midnight|sunset|밤|저녁|야간|새벽|노을|야경|일몰/i;
-/* 생성 시점마다 Math.random()으로 진짜 무작위 선택되는 밝은 실내 광원 풀 */
-const BRIGHT_NEUTRAL_STYLES = [
-  "bright professional workspace, color-accurate neutral white balance, no excessive warm or yellow filters",
-  "clean daylight-balanced lighting, airy natural window light, true-to-life neutral colors, transparent atmosphere",
-  "crisp bright interior, neutral 5500K daylight white balance, clean white office lighting, no heavy color cast",
-  "fresh luminous workspace, soft diffused daylight, accurate whites and neutral grays, modern clean look",
-];
-const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 /* REEDO식 구조화 구성 — 드롭다운 선택이 초안 프롬프트 제약으로 조립됨 (선택 안함이면 무시) */
 const REEDO_STYLE = {
@@ -118,9 +104,9 @@ const REEDO_PEOPLE_PHRASE = {
 };
 /* 최종 이미지 프롬프트 주입용 — 부정 키워드까지 강하게 (auto는 미적용) */
 const PEOPLE_FINAL = {
-  none: "Strictly NO people, no persons, no humans, no faces, no hands, no body parts, no silhouettes of people, no mannequins, no crowd — clean empty space and equipment only",
-  few: "Include at most 1-2 people, quiet single-person focus, no crowd, no spectators",
-  small: "Include at most 3 people as a small group, NO large audience, NO bleachers, NO crowd",
+  none: "no people, clean space only",
+  few: "1-2 people only, no crowd",
+  small: "small group of max 3 people, no crowd",
 };
 
 /* 톤(판매 미학) — 2026 베스트셀러 조사 기반: 믿을 수 있는 실사가 팔린다.
@@ -133,12 +119,11 @@ const REEDO_TONE = {
   concept: "미래 컨셉 (네온)",
 };
 const TONE_PHRASE = {
-  realism:
-    "believable present-day commercial photograph that could genuinely be shot in a real 2026 setting: plausible real objects with realistic materials and true-to-life accurate color, natural daylight or realistic practical lighting, natural depth of field, slight organic asymmetry and gentle lived-in imperfection so it never looks templated — absolutely NO floating holograms, NO laser grids, NO sci-fi projections, NOT neon-drenched, NOT cyberpunk, NOT a sterile empty showroom, NOT over-polished CGI perfection. Render exactly the specific supporting props described for THIS scene and nothing generic — do NOT default to a water bottle or a potted plant unless this scene explicitly calls for it",
-  bright: "bright airy minimal commercial look, abundant soft natural daylight, clean neutral palette, realistic true-to-life materials, believable real-world scene",
-  lifestyle: "warm inviting lifestyle photography, golden natural light, cozy human warmth in a believable real space, editorial magazine quality",
-  cinematic: "cinematic moody lighting with dramatic shadows and rich atmosphere, but still a believable real-world scene with plausible equipment — no sci-fi fantasy elements",
-  concept: "futuristic concept aesthetic, neon accent lighting, high-tech atmosphere, stylized commercial render",
+  realism: "believable real-world commercial photo, natural lighting, realistic materials and true color — no sci-fi, no neon, no CGI perfection",
+  bright: "bright airy minimal look, soft daylight, clean neutral palette",
+  lifestyle: "warm lifestyle photo, natural golden light, cozy real space",
+  cinematic: "cinematic moody lighting, rich atmosphere, still a believable real scene",
+  concept: "futuristic concept look, neon accents, high-tech atmosphere",
 };
 
 /* 두뇌(에이전트) 라벨 · 기본 모델
@@ -384,52 +369,49 @@ async function genOpenAIRefine(key, prompt, refDataUrl, aspect, quality) {
   return `data:image/png;base64,${b64}`;
 }
 
-/* 슬롯 필드 → 최종 이미지 프롬프트 (전문 판매 프롬프트 규칙) */
+/* 슬롯 필드 → 최종 이미지 프롬프트 (짧고 핵심적인 판매 프롬프트) */
 function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
+  const isIllust = slot.kind === "illustration";
   const anglePick = CAMERA_ANGLES[slot.angle]?.phrase || "";
   const isTight = slot.angle === "closeup" || slot.angle === "macro";
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
   const comp = mode === "wallpaper"
-    ? `40-60% low-density copy space opposite the subject (${slot.copy_space || "clean margin"}) — the copy-space area must keep subtle REAL surface texture (fabric weave, paper grain, wall texture, soft natural gradient), never a featureless blurred void`
+    ? `40-60% clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
     : isTight
-      ? `intentional detail composition, subject sharply focused with natural background falloff (${slot.copy_space || "clean margin"})`
-      : `balanced commercial framing: the main subject clearly DOMINATES the frame at 50-70%, with 25-35% clean negative space (${slot.copy_space || "calm low-detail area suitable for text overlay"}) — the empty area must NEVER exceed 40% of the frame and must keep subtle real texture, the subject must never look small or lost in a vast empty background; visible environmental context, subject fully within frame and never cropped by the edges, rule-of-thirds — NOT a tight edge-to-edge close-up, NOT mostly-empty minimalism`;
-  const camera = slot.kind === "illustration"
-    ? `Rendering: ${slot.camera || "clean vector-like edges, consistent medium"}`
-    : `Camera: ${[anglePick, slot.camera].filter(Boolean).join(", ") || "one coherent lens, natural depth of field"}`;
-  /* 지능형 분위기: 실내/사무 주제 + 밤 아님 → 중립 화이트밸런스 (매 생성마다 무작위 풀에서 선택) */
+      ? "tight detail shot, subject sharply focused"
+      : `subject fills 50-70% of frame with ~30% clean copy space (${slot.copy_space || "for text overlay"}), rule-of-thirds, subject fully in frame`;
+  const camera = [anglePick, slot.camera].filter(Boolean).join(", ")
+    || (isIllust ? "clean vector edges" : "natural depth of field");
+  /* 지능형 분위기: 실내/사무 주제 + 밤 아님 → 중립 화이트밸런스 (노란끼 배제) */
   const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""}`;
-  const atmosphere = slot.kind !== "illustration" && INDOOR_RE.test(themeText) && !NIGHT_RE.test(themeText)
-    ? pickRandom(BRIGHT_NEUTRAL_STYLES)
+  const atmosphere = !isIllust && INDOOR_RE.test(themeText) && !NIGHT_RE.test(themeText)
+    ? "neutral daylight white balance, no yellow cast"
     : "";
-  const toneLine = slot.kind !== "illustration" ? TONE_PHRASE[tone] || TONE_PHRASE.realism : "";
+  const toneLine = isIllust ? "" : TONE_PHRASE[tone] || TONE_PHRASE.realism;
   const peopleLine = PEOPLE_FINAL[people] || "";
-  const propsLine = slot.props ? `Scene-specific supporting props (render exactly these, no generic filler): ${slot.props}` : "";
+  const propsLine = slot.props ? `props: ${slot.props}` : "";
   /* 재생성 피드백 루프: 직전 거절 사유를 교정 지시로 주입 → 같은 실수 반복 차단 */
   const fixLine = slot.qcNote
-    ? `CRITICAL CORRECTION — the previous render of this exact slot was REJECTED for this reason: "${slot.qcNote}". Fix that specific problem this time; do NOT repeat it`
+    ? `FIX (was rejected): ${slot.qcNote}`
     : slot.regenCount > 0
-      ? "This is a re-render requested by the user: produce a NOTICEABLY different composition, styling and prop arrangement from the previous attempt — do not repeat the same look"
+      ? "clearly different composition from before"
       : "";
-  /* 상업용(비-배경화면) 긍정 삽입: 어도비 베스트셀러 공통점 — 깨끗한 배경·고른 조명·copy space */
-  const commercialClean = mode !== "wallpaper" && slot.kind !== "illustration"
-    ? "Clean minimal uncluttered background, even soft frontal or ambient lighting (NOT backlit against a window), background stays clean and non-competing with the main subject, generous copy space"
-    : "";
+  const quality = isIllust
+    ? "professional stock illustration"
+    : "professional stock photo, tack-sharp focus, even exposure, clean and noise-free, natural texture, no plastic AI look";
   return [
     slot.subject,
     fixLine,
     propsLine,
-    `Focal placement: ${slot.focal_placement || "center"}`,
-    comp, camera,
-    `Lighting: ${slot.lighting || "soft natural light with realistic shadows"}`,
+    comp,
+    `camera: ${camera}`,
+    `lighting: ${slot.lighting || "soft natural light"}`,
     atmosphere,
     toneLine,
     peopleLine,
-    `Palette: ${slot.palette || "bright commercial tones"}`,
-    commercialClean,
-    slot.kind !== "illustration" ? "Physically plausible staging: every object rests naturally on a realistic surface — cups and drinks on a table, tray, desk or ledge, never directly on a sofa, bed or fabric; nothing floating or oddly placed" : "",
-    slot.kind !== "illustration" ? "TECHNICAL QUALITY (stock-review grade, critical): tack-sharp focus across the entire main subject (f/4-f/5.6 feel), accurate even exposure with full detail in both highlights and shadows, clean low-ISO look with zero visible noise or banding, crisp natural micro-texture — absolutely NO plastic over-smoothed AI skin/surfaces, NO over-sharpening halos, NO heavy filter, vignette or HDR look, NO motion blur, NO chromatic aberration" : "",
-    slot.kind === "illustration" ? "professional stock illustration" : "8K photorealistic professional stock photograph, crisp detail",
+    `palette: ${slot.palette || "bright commercial tones"}`,
+    !isIllust ? "objects rest naturally on real surfaces, nothing floating" : "",
+    quality,
     GUARD,
     /* 배경화면 모드는 소프트 보케·역광이 오히려 필요할 수 있어 상업용 배제만 제외 */
     mode !== "wallpaper" ? COMMERCIAL_GUARD : "",
