@@ -1,0 +1,23 @@
+{
+  "vendor": "chatgpt",
+  "urls": {
+    "chatgpt": "https://chatgpt.com/",
+    "gemini": "https://gemini.google.com/app",
+    "grok": "https://grok.com/"
+  },
+  "output_dir": "./out",
+  "agbrowse_cmd": "agbrowse",
+  "extra_args": ["--inline-only"],
+  "pacing": {
+    "before_prompt": [2.0, 6.0],
+    "after_submit_wait": [45, 120],
+    "jitter": [0, 20],
+    "long_break_every": [6, 10],
+    "long_break_duration": [120, 300],
+    "distraction_chance": 0.1,
+    "distraction_extra": [15, 45]
+  },
+  "max_per_run": 0,
+  "per_prompt_timeout_sec": 300,
+  "retries": 2
+}

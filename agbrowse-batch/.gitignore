@@ -1,0 +1,12 @@
+# 실제 프롬프트/결과물은 커밋하지 않음 (예시만 추적)
+prompts.txt
+*-midjourney.txt
+*-agbrowse.txt
+out/
+out-*/
+*.png
+*.jpg
+*.jpeg
+
+# agbrowse 세션 상태 (절대 커밋/공유 금지)
+.browser-agent/

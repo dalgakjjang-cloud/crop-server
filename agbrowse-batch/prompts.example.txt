@@ -1,0 +1,11 @@
+# agbrowse 배치 예시 프롬프트
+# 한 줄 = 프롬프트 하나. '#' 로 시작하는 줄과 빈 줄은 무시됩니다.
+# FreeJJang STOCK STUDIO 앱의 "웹배치 TXT (agbrowse)" 버튼으로 이 형식을 자동 생성할 수 있습니다.
+#
+# 실행:
+#   python agbrowse_batch.py --prompts prompts.example.txt --vendor chatgpt
+#   python agbrowse_batch.py --prompts prompts.example.txt --vendor gemini --out ./out-gemini
+
+Create a photorealistic commercial stock photo of a ceramic coffee cup on a wooden desk, soft morning light, clean negative space on the right, no text or watermark.
+Create a bright airy minimal stock photo of fresh green succulents in a white pot on a marble table, top-down, generous copy space, no text.
+Create a cinematic stock photo of a modern laptop on a dark desk with warm desk-lamp glow, dramatic side lighting, empty space on the left for text, no logo or watermark.

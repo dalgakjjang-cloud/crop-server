@@ -1095,6 +1095,25 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     addLog(`[미드저니] 배치 TXT 저장 — ${rows.length}슬롯 (mj_batch.py 파이프라인용)`);
   };
 
+  /* ── agbrowse 웹배치 TXT — agbrowse-batch/agbrowse_batch.py 로 ChatGPT/Gemini/Grok 웹 UI 대량 생성 ──
+     MJ 문법 대신 문장형 프롬프트(buildSlotPrompt)를 그대로 한 줄씩 내보낸다.
+     웹 UI 자동화는 각 서비스 약관 위반 소지·계정 정지 위험이 있으니 개인 용도로만 쓰세요. */
+  const exportAgbrowseBatch = () => {
+    const rows = slots.filter((s) => s.subject);
+    if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
+    const head =
+      `# FreeJJang → agbrowse 웹배치 — 주제: ${topic || "(미지정)"} · 모드: ${mode} · 종횡비: ${aspect} · ${rows.length}개\n` +
+      `# 사용법: 이 파일을 agbrowse-batch/ 에 두고 실행하세요 (ChatGPT/Gemini/Grok 웹 UI로 생성)\n` +
+      `#   python agbrowse_batch.py --prompts <이파일>.txt --vendor chatgpt\n` +
+      `# 한 줄 = 프롬프트 하나. '#' 줄과 빈 줄은 무시됩니다. 노텍스트 GUARD가 이미 포함돼 있습니다.\n` +
+      `# ⚠ 웹 UI 자동화는 각 서비스 약관 위반 소지·계정 정지 위험이 있습니다(개인 용도 전제).\n\n`;
+    const body = rows
+      .map((s) => (s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople)).replace(/\s*\n\s*/g, " ").trim())
+      .join("\n");
+    saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-agbrowse.txt`);
+    addLog(`[agbrowse] 웹배치 TXT 저장 — ${rows.length}슬롯 (agbrowse_batch.py 파이프라인용)`);
+  };
+
   /* ═══ 이코노미 2패스 마감 — 승인된 low 드래프트만 편집 API로 고품질(medium/high) 리렌더 (구도 유지) ═══ */
   const finalizeSlots = async (list) => {
     const targets = list.filter((s) => s.status === "success" && s.dataUrl && !s.finalized);
@@ -1747,6 +1766,11 @@ Each block content = one short Korean sentence.`,
                         title="Midjourney 배치 자동화(mj_batch.py)용 TXT — 각 슬롯을 MJ 문법(--ar/--style/--no)으로 변환해 한 줄씩 저장"
                         className="bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
                         <Cpu className="w-3.5 h-3.5" /> 미드저니 배치 TXT
+                      </button>
+                      <button onClick={exportAgbrowseBatch}
+                        title="agbrowse 웹배치(agbrowse_batch.py)용 TXT — 각 슬롯을 문장형 프롬프트로 한 줄씩 저장해 ChatGPT/Gemini/Grok 웹 UI로 대량 생성. ⚠ 약관 위반 소지·계정 정지 위험(개인 용도 전제)"
+                        className="bg-teal-600/20 hover:bg-teal-600/30 border border-teal-500/40 text-teal-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
+                        <Cpu className="w-3.5 h-3.5" /> 웹배치 TXT (agbrowse)
                       </button>
                     </div>
                   </section>

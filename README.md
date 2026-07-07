@@ -10,6 +10,13 @@
 > (`mj_batch.py`)에 그대로 넣어 사람처럼 대량 생성할 수 있습니다. 자세한 내용은
 > [`midjourney-batch/README.md`](midjourney-batch/README.md).
 
+> **agbrowse 웹배치 연동(선택)**: `웹배치 TXT (agbrowse)` 버튼으로 슬롯을 문장형 프롬프트로
+> 내보내, `agbrowse-batch/` 도구(`agbrowse_batch.py`)로 **ChatGPT/Gemini/Grok 웹 UI**에서
+> 사람처럼 대량 생성할 수 있습니다. 유료 이미지 API 대신 **구독 계정 웹 UI로 우회**하는
+> 방식이며, 각 서비스 약관 위반 소지·계정 정지 위험이 있으니 개인 용도로만 쓰세요. headed
+> 크롬이 필요한 **로컬 실행 전용** 도구입니다. 자세한 내용은
+> [`agbrowse-batch/README.md`](agbrowse-batch/README.md).
+
 > 이 프론트엔드는 저장소 루트의 Python 크롭 서버(`server.py`)와는 독립적인 별도 앱입니다.
 
 ## 개발 실행
