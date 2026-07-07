@@ -72,9 +72,10 @@ DEFAULTS = {
     # 사람처럼 보이게 하는 페이싱(초 단위). [min, max] 사이 랜덤.
     "pacing": {
         "think_before_typing": [1.5, 5.0],   # 프롬프트 붙여넣기 전 '생각하는' 시간
-        "type_char_delay_ms": [45, 165],     # 글자당 타이핑 간격(ms)
-        "after_submit_wait": [35, 95],       # 제출 후 다음 프롬프트까지 기본 대기
-        "jitter": [0, 12],                   # 매 대기에 더해지는 잔여 흔들림
+        "type_char_delay_ms": [90, 260],     # 글자당 타이핑 간격(ms) — 넉넉해야 미드저니 검증 통과
+        "review_before_submit": [2.0, 5.0],  # 타이핑 완료 후 Enter까지 검토 시간(초)
+        "after_submit_wait": [25, 140],      # 제출 후 다음 프롬프트까지 기본 대기(폭 넓게)
+        "jitter": [0, 30],                   # 매 대기에 더해지는 잔여 흔들림(더 크게 → 불규칙)
         "long_break_every": [7, 12],         # N개마다 긴 휴식(범위 내 랜덤으로 재설정)
         "long_break_duration": [180, 420],   # 긴 휴식 길이(3~7분)
         "distraction_chance": 0.12,          # 가끔 딴짓하는 듯한 추가 멈춤 확률
@@ -246,12 +247,13 @@ def submit_prompt(page, cfg: dict, prompt: str) -> None:
     char_delay = random.uniform(*p["type_char_delay_ms"])
     box.type(prompt, delay=char_delay)
 
-    # 4) 잠깐 검토하는 척
-    human_sleep(random.uniform(0.4, 1.6))
+    # 4) 잠깐 검토하는 척 — 미드저니가 프롬프트 유효성 검사를 마칠 시간 확보
+    review = rand_between(p.get("review_before_submit", [2.0, 5.0]))
+    human_sleep(review)
 
     # 5) 제출
     box.press("Enter")
-    print(f"    ✅ 제출 완료 (타이핑 {char_delay:.0f}ms/글자)", flush=True)
+    print(f"    ✅ 제출 완료 (타이핑 {char_delay:.0f}ms/글자, 검토 {review:.1f}s)", flush=True)
 
 
 def default_chrome_user_data_dir() -> Path | None:
