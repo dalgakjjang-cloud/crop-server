@@ -47,6 +47,26 @@ python mj_batch.py --login
 
 ## 2) 프롬프트 준비
 
+두 가지 방법이 있습니다.
+
+### (A) STOCK STUDIO에서 자동 내보내기 — 파이프라인 연결 ⭐
+
+`freejjang-stock-studio` 앱에서 초안을 생성하면 슬롯마다 프롬프트가 만들어집니다.
+백업·저장 툴바의 **`미드저니 배치 TXT`** 버튼을 누르면, 각 슬롯이 **Midjourney 문법**
+(`--ar` 종횡비, `--style raw`, `--no text,...` 네거티브)으로 변환된 `*-midjourney.txt`가
+저장됩니다. 이 파일을 아래 `--prompts`에 **그대로** 넣으면 됩니다.
+
+```
+STOCK STUDIO  →  [미드저니 배치 TXT]  →  <주제>-midjourney.txt  →  mj_batch.py --prompts
+   (두뇌가 초안·구도·소품 설계)          (MJ 문법 자동 변환)         (사람처럼 대량 생성)
+```
+
+- 종횡비는 스튜디오 상단의 종횡비 설정이, 톤/인물은 리두(Re-do) 설정이 반영됩니다.
+- 인물 설정이 "없음"이면 `--no ...people`이 자동으로 붙습니다.
+- 버전을 고정하고 싶으면 txt의 각 줄 끝에 `--v 6.1` 등을 추가하세요(파일 상단 안내 참고).
+
+### (B) 직접 작성
+
 `prompts.example.txt`를 복사해 `prompts.txt`를 만들고 프롬프트를 채웁니다.
 
 - **한 줄 = 프롬프트 하나**
