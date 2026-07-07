@@ -21,6 +21,7 @@
   "headless": false,
   "browser_channel": "chrome",
   "use_my_chrome": false,
+  "chrome_profile_directory": "",
   "nav_timeout_ms": 60000,
   "retries": 2
 }

@@ -90,6 +90,10 @@ DEFAULTS = {
     # 구글 계정처럼 자동화 로그인이 막히는 경우 유용(재로그인 불필요). 명령줄 --use-my-chrome 로도 켬.
     # 이 모드에서는 실행 중 평소 크롬을 쓸 수 없으니, 먼저 크롬을 완전히 종료해야 함.
     "use_my_chrome": False,
+    # use_my_chrome일 때 어떤 크롬 프로필을 열지. ""(빈값)=기본 "Default" 프로필.
+    # 크롬에 계정/프로필이 여러 개라 로그인이 "Profile 1" 등에 있으면 여기에 폴더명을 적음.
+    # (chrome://version 의 'Profile Path' 마지막 폴더명) 명령줄 --chrome-profile 로도 지정.
+    "chrome_profile_directory": "",
     # 페이지 로드/셀렉터 대기 타임아웃(ms)
     "nav_timeout_ms": 60000,
     # 제출 실패 시 재시도 횟수
@@ -271,16 +275,30 @@ def open_context(pw, cfg: dict, headless: bool):
             sys.exit(1)
         channel = channel or "chrome"  # 내 프로필은 반드시 진짜 크롬으로 열어야 함
         print(f"(내 크롬 프로필 사용: {profile})")
+        # 사용 가능한 프로필 폴더를 안내(로그인이 어디 있는지 못 찾을 때 참고)
+        found = sorted(
+            p.name for p in profile.iterdir()
+            if p.is_dir() and (p.name == "Default" or p.name.startswith("Profile "))
+        ) if profile.exists() else []
+        if found:
+            print(f"  이 크롬의 프로필 폴더들: {', '.join(found)}")
         print("  ⚠️  실행 중에는 평소 크롬을 쓸 수 없습니다. 먼저 크롬을 완전히 종료하세요.")
     else:
         profile = Path(cfg["profile_dir"]).expanduser().resolve()
         profile.mkdir(parents=True, exist_ok=True)
 
+    extra_args = ["--disable-blink-features=AutomationControlled"]
+    prof_dir = (cfg.get("chrome_profile_directory") or "").strip()
+    if use_my_chrome and prof_dir:
+        # 여러 프로필 중 특정 프로필(예: "Profile 1")을 선택
+        extra_args.append(f"--profile-directory={prof_dir}")
+        print(f"  선택한 프로필: {prof_dir}")
+
     launch_kwargs = dict(
         user_data_dir=str(profile),
         headless=headless,
         # 자동화 티가 나는 신호 제거 → 구글/미드저니가 '봇'으로 감지하기 어렵게.
-        args=["--disable-blink-features=AutomationControlled"],
+        args=extra_args,
         ignore_default_args=["--enable-automation"],
     )
     # 내 프로필을 쓸 땐 원래 창 크기를 존중(뷰포트 강제 안 함)
@@ -477,6 +495,9 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--use-my-chrome", action="store_true",
                     help="새 로그인 대신, 이미 로그인된 내 크롬 프로필을 그대로 사용"
                          "(구글 로그인이 막힐 때). 실행 전 크롬을 완전히 종료해야 함")
+    ap.add_argument("--chrome-profile", type=str, default=None,
+                    help="내 크롬에 프로필이 여러 개일 때 열 폴더명(예: \"Profile 1\"). "
+                         "chrome://version 의 Profile Path 마지막 폴더명")
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config)
@@ -486,6 +507,9 @@ def main(argv: list[str]) -> int:
         cfg["max_per_run"] = args.max_per_run
     if args.use_my_chrome:
         cfg["use_my_chrome"] = True
+    if args.chrome_profile is not None:
+        cfg["chrome_profile_directory"] = args.chrome_profile
+        cfg["use_my_chrome"] = True  # 프로필 지정은 내 크롬 모드를 전제로 함
 
     if args.login:
         return cmd_login(cfg)
