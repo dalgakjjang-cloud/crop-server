@@ -50,6 +50,8 @@ def _import_playwright():
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_CONFIG = HERE / "config.json"
+# 추출한 미드저니 로그인 쿠키를 담아두는 파일(작업 폴더 기준)
+MJ_COOKIE_FILE = Path("mj_cookies.json")
 
 # ----------------------------------------------------------------------------
 # 설정
@@ -94,6 +96,9 @@ DEFAULTS = {
     # 크롬에 계정/프로필이 여러 개라 로그인이 "Profile 1" 등에 있으면 여기에 폴더명을 적음.
     # (chrome://version 의 'Profile Path' 마지막 폴더명) 명령줄 --chrome-profile 로도 지정.
     "chrome_profile_directory": "",
+    # 클린 브라우저에 주입할 로그인 쿠키 파일 경로("" = mj_cookies.json 자동 사용).
+    # --grab-cookies 로 만든 파일이나 확장프로그램 내보내기 파일. --cookies 로도 지정.
+    "cookies_file": "",
     # 페이지 로드/셀렉터 대기 타임아웃(ms)
     "nav_timeout_ms": 60000,
     # 제출 실패 시 재시도 횟수
@@ -382,6 +387,9 @@ def open_imagine(pw, cfg: dict, headless: bool):
     """컨텍스트를 열고 Midjourney /imagine 로 확실히 이동한 page를 돌려준다.
     실제 크롬 프로필의 복구 배너·여러 탭 때문에 이동이 한 번에 안 될 수 있어 재시도한다."""
     ctx, page = open_context(pw, cfg, headless)
+    # 클린 프로필로 실행할 때(내 크롬 통째로 빌리기 아님) 저장된 로그인 쿠키 주입
+    if not cfg.get("use_my_chrome"):
+        inject_cookies(ctx, cfg)
     last_err = None
     for attempt in range(3):
         try:
@@ -398,6 +406,120 @@ def open_imagine(pw, cfg: dict, headless: bool):
             human_sleep(4)
     print(f"(주의: /imagine 이동에 반복 실패 — {last_err})", flush=True)
     return ctx, page
+
+
+# ----------------------------------------------------------------------------
+# 쿠키(로그인) 복사 방식 — 크롬 조종에 실패하는 환경용
+# ----------------------------------------------------------------------------
+
+def _norm_samesite(v) -> str:
+    m = {"lax": "Lax", "strict": "Strict", "none": "None",
+         "no_restriction": "None", "unspecified": "Lax"}
+    return m.get(str(v or "").lower(), "Lax")
+
+
+def load_cookies_file(path: Path) -> list[dict]:
+    """확장프로그램/추출기가 내보낸 쿠키 파일을 Playwright 형식으로 읽는다.
+    JSON 배열(Cookie-Editor 등)과 Netscape cookies.txt 둘 다 지원."""
+    text = Path(path).read_text(encoding="utf-8", errors="ignore").strip()
+    out: list[dict] = []
+    if text[:1] in "[{":
+        data = json.loads(text)
+        if isinstance(data, dict):
+            data = data.get("cookies", [])
+        for c in data:
+            ck = {
+                "name": c.get("name"), "value": c.get("value", ""),
+                "domain": c.get("domain"), "path": c.get("path", "/") or "/",
+                "secure": bool(c.get("secure")), "httpOnly": bool(c.get("httpOnly")),
+                "sameSite": _norm_samesite(c.get("sameSite")),
+            }
+            exp = c.get("expirationDate") or c.get("expires")
+            if exp and float(exp) > 0:
+                ck["expires"] = int(float(exp))
+            out.append(ck)
+    else:
+        for line in text.splitlines():
+            raw = line
+            if not raw.strip():
+                continue
+            http_only = raw.startswith("#HttpOnly_")
+            if http_only:
+                raw = raw[len("#HttpOnly_"):]
+            elif raw.startswith("#"):
+                continue
+            parts = raw.split("\t")
+            if len(parts) < 7:
+                continue
+            domain, _flag, cpath, secure, expiry, name, value = parts[:7]
+            ck = {"name": name, "value": value, "domain": domain,
+                  "path": cpath or "/", "secure": secure.upper() == "TRUE",
+                  "httpOnly": http_only, "sameSite": "Lax"}
+            try:
+                if int(expiry) > 0:
+                    ck["expires"] = int(expiry)
+            except ValueError:
+                pass
+            out.append(ck)
+    # 유효한 것만, secure=False인데 sameSite=None이면 Playwright가 거부하므로 보정
+    clean = []
+    for c in out:
+        if not c.get("name") or not c.get("domain"):
+            continue
+        if c.get("sameSite") == "None" and not c.get("secure"):
+            c["sameSite"] = "Lax"
+        clean.append(c)
+    return clean
+
+
+def cmd_grab_cookies(cfg: dict) -> int:
+    """browser_cookie3로 설치된 크롬(Default 프로필)의 midjourney 쿠키를 추출해 저장.
+    크롬을 열지 않으므로 조종/부착 문제가 없다."""
+    try:
+        import browser_cookie3
+    except ImportError:
+        print("browser_cookie3 가 필요합니다. 먼저 설치하세요:\n"
+              "  pip install browser-cookie3\n", file=sys.stderr)
+        return 1
+    try:
+        cj = browser_cookie3.chrome(domain_name="midjourney.com")
+    except Exception as e:
+        print(f"쿠키 추출 실패: {e}\n"
+              "  크롬을 완전히 종료한 뒤 다시 시도하거나, 확장프로그램 방식(--cookies)을 쓰세요.",
+              file=sys.stderr)
+        return 1
+    cookies = []
+    for c in cj:
+        ck = {"name": c.name, "value": c.value,
+              "domain": c.domain, "path": c.path or "/",
+              "secure": bool(c.secure), "sameSite": "Lax"}
+        if getattr(c, "expires", None):
+            ck["expires"] = int(c.expires)
+        cookies.append(ck)
+    if not cookies:
+        print("midjourney 쿠키를 찾지 못했습니다.\n"
+              "  크롬 Default 프로필에서 midjourney.com에 로그인돼 있는지 확인하거나,\n"
+              "  확장프로그램 방식(--cookies)을 쓰세요.", file=sys.stderr)
+        return 1
+    MJ_COOKIE_FILE.write_text(json.dumps(cookies, ensure_ascii=False, indent=2),
+                              encoding="utf-8")
+    print(f"미드저니 쿠키 {len(cookies)}개를 '{MJ_COOKIE_FILE}'에 저장했습니다.\n"
+          f"이제: python mj_batch.py --prompts <파일>.txt")
+    return 0
+
+
+def inject_cookies(ctx, cfg: dict) -> None:
+    """클린 프로필로 실행할 때, 저장된(또는 --cookies로 지정된) 쿠키를 주입."""
+    src = cfg.get("cookies_file")
+    path = Path(src) if src else MJ_COOKIE_FILE
+    if not path.exists():
+        return
+    try:
+        cks = load_cookies_file(path)
+        ctx.add_cookies(cks)
+        print(f"(로그인 쿠키 {len(cks)}개 주입: {path})", flush=True)
+    except Exception as e:
+        print(f"(쿠키 주입 경고: {e})", flush=True)
 
 
 # ----------------------------------------------------------------------------
@@ -548,6 +670,12 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--chrome-profile", type=str, default=None,
                     help="내 크롬에 프로필이 여러 개일 때 열 폴더명(예: \"Profile 1\"). "
                          "chrome://version 의 Profile Path 마지막 폴더명")
+    ap.add_argument("--grab-cookies", action="store_true",
+                    help="설치된 크롬(Default 프로필)에서 midjourney 로그인 쿠키를 추출해 저장"
+                         "(browser_cookie3 필요). 크롬 조종 없이 로그인만 가져옴")
+    ap.add_argument("--cookies", type=str, default=None,
+                    help="확장프로그램 등으로 내보낸 쿠키 파일 경로(JSON 또는 cookies.txt)를 "
+                         "클린 브라우저에 주입")
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config)
@@ -560,6 +688,11 @@ def main(argv: list[str]) -> int:
     if args.chrome_profile is not None:
         cfg["chrome_profile_directory"] = args.chrome_profile
         cfg["use_my_chrome"] = True  # 프로필 지정은 내 크롬 모드를 전제로 함
+    if args.cookies is not None:
+        cfg["cookies_file"] = args.cookies
+
+    if args.grab_cookies:
+        return cmd_grab_cookies(cfg)
 
     if args.login:
         return cmd_login(cfg)

@@ -1,1 +1,3 @@
 playwright>=1.44.0
+# 선택: --grab-cookies(설치된 크롬에서 로그인 쿠키 자동 추출)에만 필요
+browser-cookie3>=0.19.1
