@@ -50,8 +50,8 @@ const CAMERA_ANGLES = {
   wide: { label: "Wide (와이드)", phrase: "wide establishing shot, 24mm lens, generous environmental context and abundant negative space" },
   angle_45: { label: "Angle 45 (사선 45도)", phrase: "45-degree three-quarter angle shot, natural depth and dimensionality" },
   over_shoulder: { label: "Over Shoulder (어깨 너머)", phrase: "over-the-shoulder shot, natural candid framing looking past the subject" },
-  closeup: { label: "Closeup (클로즈업)", phrase: "close-up shot, sharp focus on key details, elegant shallow depth of field, f/2.8" },
-  macro: { label: "Macro (초근접 접사)", phrase: "ultra-close extreme macro lens photography, f/1.8 shallow depth of field, hyper-detailed texture close-up" },
+  closeup: { label: "Closeup (클로즈업)", phrase: "close-up shot, tack-sharp focus across the entire key subject at f/4, gentle natural background separation, no soft-focus haze" },
+  macro: { label: "Macro (초근접 접사)", phrase: "extreme macro photography with focus-stacked front-to-back sharpness on the whole subject, hyper-detailed crisp texture, clean smooth background falloff" },
 };
 
 /* 지능형 분위기 필터 — 실내/사무 주제 감지 시 중립 화이트밸런스(노란끼 배제) 적용 */
@@ -278,7 +278,7 @@ async function genOpenAIRefine(key, prompt, refDataUrl, aspect, quality) {
   const fd = new FormData();
   fd.append("model", "gpt-image-1");
   fd.append("image", blob, "draft.png");
-  fd.append("prompt", `Re-render this exact scene at maximum fidelity for stock delivery: keep the SAME composition, subject placement, props, palette and lighting as the reference; increase sharpness, texture detail and photographic realism; remove small artifacts. ${prompt}`);
+  fd.append("prompt", `Re-render this exact scene at maximum fidelity for stock delivery: keep the SAME composition, subject placement, props, palette and lighting as the reference; make the whole main subject tack-sharp, correct any exposure issues (recover highlight/shadow detail), eliminate noise, banding, halos and AI-plastic textures; crisp natural micro-texture, no filter or vignette look. ${prompt}`);
   fd.append("size", OPENAI_SIZE[aspect] || "1536x1024");
   fd.append("quality", quality || "medium");
   const res = await fetch("https://api.openai.com/v1/images/edits", {
@@ -297,10 +297,10 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   const isTight = slot.angle === "closeup" || slot.angle === "macro";
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
   const comp = mode === "wallpaper"
-    ? `40-60% low-density clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
+    ? `40-60% low-density copy space opposite the subject (${slot.copy_space || "clean margin"}) — the copy-space area must keep subtle REAL surface texture (fabric weave, paper grain, wall texture, soft natural gradient), never a featureless blurred void`
     : isTight
-      ? `intentional detail composition, subject sharply focused with soft fall-off background (${slot.copy_space || "soft blurred margin"})`
-      : `spacious commercial framing with generous breathing room: the main subject occupies AT MOST 60% of the frame, surrounded by clean uncluttered negative space (${slot.copy_space || "~30-40% calm low-detail area suitable for text overlay"}), visible environmental context around the subject, subject fully within frame and never touching or cropped by the edges, rule-of-thirds — strictly NOT a tight edge-to-edge close-up, NOT filling the whole frame`;
+      ? `intentional detail composition, subject sharply focused with natural background falloff (${slot.copy_space || "clean margin"})`
+      : `balanced commercial framing: the main subject clearly DOMINATES the frame at 50-70%, with 25-35% clean negative space (${slot.copy_space || "calm low-detail area suitable for text overlay"}) — the empty area must NEVER exceed 40% of the frame and must keep subtle real texture, the subject must never look small or lost in a vast empty background; visible environmental context, subject fully within frame and never cropped by the edges, rule-of-thirds — NOT a tight edge-to-edge close-up, NOT mostly-empty minimalism`;
   const camera = slot.kind === "illustration"
     ? `Rendering: ${slot.camera || "clean vector-like edges, consistent medium"}`
     : `Camera: ${[anglePick, slot.camera].filter(Boolean).join(", ") || "one coherent lens, natural depth of field"}`;
@@ -330,6 +330,7 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     peopleLine,
     `Palette: ${slot.palette || "bright commercial tones"}`,
     slot.kind !== "illustration" ? "Physically plausible staging: every object rests naturally on a realistic surface — cups and drinks on a table, tray, desk or ledge, never directly on a sofa, bed or fabric; nothing floating or oddly placed" : "",
+    slot.kind !== "illustration" ? "TECHNICAL QUALITY (stock-review grade, critical): tack-sharp focus across the entire main subject (f/4-f/5.6 feel), accurate even exposure with full detail in both highlights and shadows, clean low-ISO look with zero visible noise or banding, crisp natural micro-texture — absolutely NO plastic over-smoothed AI skin/surfaces, NO over-sharpening halos, NO heavy filter, vignette or HDR look, NO motion blur, NO chromatic aberration" : "",
     slot.kind === "illustration" ? "professional stock illustration" : "8K photorealistic professional stock photograph, crisp detail",
     GUARD,
   ].filter(Boolean).join(". ");
@@ -584,7 +585,7 @@ HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "lo
     let doneCnt = 0;
     const detailSystem = `You expand assigned scene concepts into professional stock image slots. Respond ONLY compact JSON:
 {"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"EXACTLY 25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경), same SEO ordering as EN","category":11}]}
-RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject. Mode "commercial": medium or wide framing, subject fills about 50-70% of frame (never edge-to-edge), roughly 25-35% clean negative space, rule-of-thirds, subject fully in frame.
+RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject, with subtle real surface texture (never a featureless void). Mode "commercial": medium or wide framing, subject clearly DOMINATES at 50-70% of frame (never edge-to-edge, never a small subject lost in emptiness), 25-35% clean negative space with a HARD CAP of 40% empty area, rule-of-thirds, subject fully in frame. "lighting" must describe correct even exposure (detail kept in highlights and shadows) and "camera" must keep the whole main subject tack-sharp (f/4-f/5.6, no heavy shallow-DOF blur).
 KEYWORDS (Adobe SEO, critical): EXACTLY 35 EN keywords, no duplicates, ordered by buyer importance (first ~10 weigh most): (1) main subject nouns, (2) descriptors/materials/actions, (3) concept/season/emotion, (4) color/lighting, (5) composition (copy space, background), (6) use-case (banner, marketing, web design). All lowercase, only terms literally describing what is visible. "keywords_kr" same ordering in Korean single nouns.
 CATEGORY: pick ONE best Adobe Stock category id: ${ADOBE_CAT_LIST}. Illustration/vector fallback: 8. Integer id only.
 PROPS & VARIETY: props must be SPECIFIC to each scene and DIFFERENT from every other slot in the whole set (set list provided) — never reuse generic filler across slots; tableware must match the dish culture; keep the copy-space area uncluttered; believable and unbranded.`;
@@ -741,7 +742,7 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
         const r = await askBrain(
           `You are a strict stock-photo QC inspector. Respond ONLY JSON:
 {"pass":true|false,"issues":["short tags"],"reason":"one short Korean sentence explaining the main problem (empty if pass)"}
-Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind, (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode needs a natural full composition without huge empty margins. Be strict on text and distortion; be lenient on subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
+Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind, (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode: the subject must clearly dominate (50-70%) and empty area must stay under ~40% — reject if the subject looks small and lost in a vast featureless background, (7) TECHNICAL QUALITY like an Adobe Stock reviewer (Adobe rejects for: exposure problems, soft focus, over-filtering/artifacts, noise): reject on soft or missed focus on the main subject, large blurry featureless areas, visible noise/grain/banding, plastic over-smoothed AI texture, over-sharpening halos, blown-out highlights or muddy shadows, heavy filter/vignette/HDR look. Be strict on text, distortion and technical quality; be lenient on subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
           `Topic: "${topic}" · Mode: ${mode} · Slot ${t.index} subject: "${t.subject}"\n이 이미지를 검수해줘.`,
           { mime: "image/jpeg", data: b64 }
         );
@@ -926,7 +927,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
     await saveBlob(blob, `${base}-submit-pack.zip`);
     addLog(`[제출 팩] ZIP 저장 완료 — 이미지 ${ok.length}장 + Adobe CSV + 미캔 XLSX + 프롬프트 TXT (요청 ${count}장 대비 ${ok.length === count ? "정확 일치 ✓" : "불일치 ⚠"})`);
-    setNotice(`제출 팩 ZIP 저장 완료: 이미지 ${ok.length}장 · Adobe CSV · 미캔 XLSX · 프롬프트 백업${saveDir ? ` → "${saveDir.name}" 폴더` : ""}${ok.length !== count ? ` — 요청 ${count}장과 다릅니다. 미완료 슬롯을 확인하세요.` : ""}`);
+    setNotice(`제출 팩 ZIP 저장 완료: 이미지 ${ok.length}장 · Adobe CSV · 미캔 XLSX · 프롬프트 백업${saveDir ? ` → "${saveDir.name}" 폴더` : ""}${ok.length !== count ? ` — 요청 ${count}장과 다릅니다. 미완료 슬롯을 확인하세요.` : ""} ⚠ 어도비 제출 전 필수: ① Ps 슈퍼 해상도 2배(4MP 기준 충족) ② 100% 확대로 노이즈·아티팩트·소프트포커스 육안 확인 — 발견 시 해당 슬롯만 재생성하세요.`);
   };
 
   const updateSlot = (index, field, value) =>
