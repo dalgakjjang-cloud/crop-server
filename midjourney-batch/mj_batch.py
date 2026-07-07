@@ -86,6 +86,10 @@ DEFAULTS = {
     # ""(빈값)=Playwright 내장 크로미움. 구글 로그인이 '안전하지 않은 브라우저'로
     # 막힐 때는 "chrome"으로 두면 대부분 통과됨. 크롬이 없으면 자동으로 크로미움 대체.
     "browser_channel": "chrome",
+    # true면 새 로그인 대신 '컴퓨터에 이미 로그인된 진짜 크롬 프로필'을 그대로 사용.
+    # 구글 계정처럼 자동화 로그인이 막히는 경우 유용(재로그인 불필요). 명령줄 --use-my-chrome 로도 켬.
+    # 이 모드에서는 실행 중 평소 크롬을 쓸 수 없으니, 먼저 크롬을 완전히 종료해야 함.
+    "use_my_chrome": False,
     # 페이지 로드/셀렉터 대기 타임아웃(ms)
     "nav_timeout_ms": 60000,
     # 제출 실패 시 재시도 횟수
@@ -241,20 +245,49 @@ def submit_prompt(page, cfg: dict, prompt: str) -> None:
     print(f"    ✅ 제출 완료 (타이핑 {char_delay:.0f}ms/글자)", flush=True)
 
 
-def open_context(pw, cfg: dict, headless: bool):
-    profile = Path(cfg["profile_dir"]).expanduser().resolve()
-    # pw는 sync_playwright() 컨텍스트 객체
-    profile.mkdir(parents=True, exist_ok=True)
+def default_chrome_user_data_dir() -> Path | None:
+    """OS별 '설치된 크롬'의 사용자 프로필(User Data) 폴더 위치를 반환.
+    이미 로그인된 그 프로필을 그대로 쓰면 재로그인이 필요 없다."""
+    if sys.platform.startswith("win"):
+        base = os.environ.get("LOCALAPPDATA")
+        if base:
+            return Path(base) / "Google" / "Chrome" / "User Data"
+    elif sys.platform == "darwin":
+        return Path.home() / "Library" / "Application Support" / "Google" / "Chrome"
+    else:
+        return Path.home() / ".config" / "google-chrome"
+    return None
 
+
+def open_context(pw, cfg: dict, headless: bool):
     channel = (cfg.get("browser_channel") or "").strip()
+    use_my_chrome = bool(cfg.get("use_my_chrome"))
+
+    if use_my_chrome:
+        profile = default_chrome_user_data_dir()
+        if not profile or not profile.exists():
+            print("내 크롬 프로필 폴더를 찾지 못했습니다. 크롬이 설치돼 있는지 확인하세요.",
+                  file=sys.stderr)
+            sys.exit(1)
+        channel = channel or "chrome"  # 내 프로필은 반드시 진짜 크롬으로 열어야 함
+        print(f"(내 크롬 프로필 사용: {profile})")
+        print("  ⚠️  실행 중에는 평소 크롬을 쓸 수 없습니다. 먼저 크롬을 완전히 종료하세요.")
+    else:
+        profile = Path(cfg["profile_dir"]).expanduser().resolve()
+        profile.mkdir(parents=True, exist_ok=True)
+
     launch_kwargs = dict(
         user_data_dir=str(profile),
         headless=headless,
-        viewport={"width": 1400, "height": 900},
         # 자동화 티가 나는 신호 제거 → 구글/미드저니가 '봇'으로 감지하기 어렵게.
         args=["--disable-blink-features=AutomationControlled"],
         ignore_default_args=["--enable-automation"],
     )
+    # 내 프로필을 쓸 땐 원래 창 크기를 존중(뷰포트 강제 안 함)
+    if use_my_chrome:
+        launch_kwargs["no_viewport"] = True
+    else:
+        launch_kwargs["viewport"] = {"width": 1400, "height": 900}
     if channel:
         launch_kwargs["channel"] = channel
 
@@ -263,7 +296,14 @@ def open_context(pw, cfg: dict, headless: bool):
         if channel:
             print(f"(설치된 '{channel}' 브라우저로 실행)")
     except Exception as e:
-        if channel:
+        msg = str(e)
+        if use_my_chrome and ("ProcessSingleton" in msg or "already" in msg.lower()
+                              or "SingletonLock" in msg or "profile" in msg.lower()):
+            print("\n크롬이 아직 켜져 있어 프로필을 열 수 없습니다.\n"
+                  "  → 크롬 창을 모두 닫고(작업관리자에서 chrome.exe 전부 종료) 다시 실행하세요.\n",
+                  file=sys.stderr)
+            sys.exit(1)
+        if channel and not use_my_chrome:
             # 크롬/엣지가 설치돼 있지 않으면 내장 크로미움으로 대체
             print(f"(설치된 '{channel}' 브라우저를 못 찾아 내장 Chromium으로 대체합니다: {e})")
             launch_kwargs.pop("channel", None)
@@ -299,7 +339,11 @@ def cmd_login(cfg: dict) -> int:
             print(f"(페이지 이동 경고: {e})")
         input("\n로그인/설정을 마쳤으면 이 터미널에서 Enter를 누르세요… ")
         ctx.close()
-    print(f"세션이 '{cfg['profile_dir']}'에 저장되었습니다. 이제 --prompts로 실행하세요.")
+    if cfg.get("use_my_chrome"):
+        print("내 크롬 프로필 확인 완료. 이제 다음처럼 실행하세요(매번 --use-my-chrome 필요):\n"
+              "  python mj_batch.py --prompts <파일>.txt --use-my-chrome")
+    else:
+        print(f"세션이 '{cfg['profile_dir']}'에 저장되었습니다. 이제 --prompts로 실행하세요.")
     return 0
 
 
@@ -430,6 +474,9 @@ def main(argv: list[str]) -> int:
                     help="이번 실행에서 최대 처리 개수(하루치 분할)")
     ap.add_argument("--dry-run", action="store_true",
                     help="실제 제출 없이 처리 목록만 출력")
+    ap.add_argument("--use-my-chrome", action="store_true",
+                    help="새 로그인 대신, 이미 로그인된 내 크롬 프로필을 그대로 사용"
+                         "(구글 로그인이 막힐 때). 실행 전 크롬을 완전히 종료해야 함")
     args = ap.parse_args(argv)
 
     cfg = load_config(args.config)
@@ -437,6 +484,8 @@ def main(argv: list[str]) -> int:
         cfg["headless"] = True
     if args.max_per_run is not None:
         cfg["max_per_run"] = args.max_per_run
+    if args.use_my_chrome:
+        cfg["use_my_chrome"] = True
 
     if args.login:
         return cmd_login(cfg)
