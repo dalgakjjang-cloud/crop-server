@@ -1,0 +1,24 @@
+{
+  "imagine_url": "https://www.midjourney.com/imagine",
+  "profile_dir": "./mj_profile",
+  "input_selectors": [
+    "textarea",
+    "input[placeholder*='imagine' i]",
+    "textarea[placeholder*='imagine' i]",
+    "[contenteditable='true']"
+  ],
+  "pacing": {
+    "think_before_typing": [1.5, 5.0],
+    "type_char_delay_ms": [45, 165],
+    "after_submit_wait": [35, 95],
+    "jitter": [0, 12],
+    "long_break_every": [7, 12],
+    "long_break_duration": [180, 420],
+    "distraction_chance": 0.12,
+    "distraction_extra": [20, 60]
+  },
+  "max_per_run": 0,
+  "headless": false,
+  "nav_timeout_ms": 60000,
+  "retries": 2
+}

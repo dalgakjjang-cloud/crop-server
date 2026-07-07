@@ -410,6 +410,41 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   ].filter(Boolean).join(". ");
 }
 
+/* Midjourney 문법 전용 프롬프트 — 스톡 스튜디오 슬롯 → midjourney-batch/mj_batch.py 파이프라인용.
+   GPT/Gemini용 buildSlotPrompt는 문장 나열형이라 MJ에는 과하다(앞 토큰 가중치가 흐려짐).
+   MJ는 앞쪽 토큰에 가중치를 두므로 핵심(피사체·소품·구도·광원·팔레트)만 간결히 담고,
+   규격/네거티브는 --ar / --no 같은 파라미터로 뺀다. 결과는 한 줄(one prompt per line). */
+const MJ_TONE_WORD = {
+  realism: "photorealistic commercial stock photo",
+  bright: "bright airy minimal commercial photo",
+  lifestyle: "warm lifestyle editorial photo, golden natural light",
+  cinematic: "cinematic moody commercial photo, dramatic lighting",
+  concept: "futuristic concept render, neon accents",
+};
+function buildMidjourneyPrompt(slot, { aspect = "16:9", tone = "realism", people = "none" } = {}) {
+  const isIllust = slot.kind === "illustration";
+  const banPeople = people === "none";
+  const anglePhrase = CAMERA_ANGLES[slot.angle]?.phrase || slot.camera || "";
+  const lead = isIllust
+    ? "professional stock illustration, clean vector-like medium"
+    : (MJ_TONE_WORD[tone] || MJ_TONE_WORD.realism);
+  const core = [
+    lead,
+    slot.subject,
+    slot.props ? `featuring ${slot.props}` : "",
+    anglePhrase,
+    slot.lighting,
+    slot.palette,
+    slot.copy_space ? `clean negative space (${slot.copy_space})` : "clean negative space for text overlay",
+    isIllust ? "" : "tack-sharp, natural true-to-life color, no plastic AI look",
+  ].filter(Boolean).join(", ");
+  const params = [`--ar ${aspect}`];
+  if (!isIllust) params.push("--style raw");
+  // GUARD(노텍스트)를 MJ 네거티브 파라미터로 이전 (인물은 설정이 '없음'일 때만 차단)
+  params.push(`--no text, letters, numbers, logo, watermark, signature${banPeople ? ", people" : ""}`);
+  return `${core} ${params.join(" ")}`.replace(/\s+/g, " ").trim();
+}
+
 export default function App() {
   /* ── 두뇌(에이전트) 설정 ── */
   const [brain, setBrain] = useState("gpt"); // gpt | gemini
@@ -1041,6 +1076,21 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
     saveBlob(new Blob([buildPromptsFullText(rows)], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-full.txt`);
     addLog(`[백업] 프롬프트 TXT(전체) 저장 완료 — ${rows.length}슬롯`);
+  };
+
+  /* ── Midjourney 배치 TXT — midjourney-batch/mj_batch.py 로 바로 넣는 파이프라인 ── */
+  const exportMidjourneyBatch = () => {
+    const rows = slots.filter((s) => s.subject);
+    if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
+    const head =
+      `# FreeJJang → Midjourney 배치 — 주제: ${topic || "(미지정)"} · 종횡비: ${aspect} · ${rows.length}개\n` +
+      `# 사용법: 이 파일을 midjourney-batch/mj_batch.py 에 그대로 넣으세요\n` +
+      `#   python mj_batch.py --prompts <이파일>.txt\n` +
+      `# 한 줄 = 프롬프트 하나. '#' 줄과 빈 줄은 무시됩니다.\n` +
+      `# --ar/--style/--no 파라미터는 이미 포함됨. 버전을 고정하려면 각 줄 끝에 --v 6.1 등을 추가하세요.\n\n`;
+    const body = rows.map((s) => buildMidjourneyPrompt(s, { aspect, tone: refTone, people: refPeople })).join("\n");
+    saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-midjourney.txt`);
+    addLog(`[미드저니] 배치 TXT 저장 — ${rows.length}슬롯 (mj_batch.py 파이프라인용)`);
   };
 
   /* ═══ 이코노미 2패스 마감 — 승인된 low 드래프트만 편집 API로 고품질(medium/high) 리렌더 (구도 유지) ═══ */
@@ -1690,6 +1740,11 @@ Each block content = one short Korean sentence.`,
                       <button onClick={exportPromptsFull}
                         className="bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
                         <FileSpreadsheet className="w-3.5 h-3.5" /> 전체 필드 TXT
+                      </button>
+                      <button onClick={exportMidjourneyBatch}
+                        title="Midjourney 배치 자동화(mj_batch.py)용 TXT — 각 슬롯을 MJ 문법(--ar/--style/--no)으로 변환해 한 줄씩 저장"
+                        className="bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
+                        <Cpu className="w-3.5 h-3.5" /> 미드저니 배치 TXT
                       </button>
                     </div>
                   </section>
