@@ -224,23 +224,30 @@ async function askGPT(key, model, system, user, imageBlock) {
   return extractJSON(text, "GPT");
 }
 
-/* ── 두뇌 B: Gemini (Google AI 스튜디오 키) ── */
+/* ── 두뇌 B: Gemini (Google AI 스튜디오 키) ──
+   2026-06 이후 구글은 URL `?key=` 방식 대신 `x-goog-api-key` 헤더 방식을 표준으로 강제한다.
+   신규 AQ 키는 URL 쿼리 방식이 종종 401/403을 뱉으므로 헤더 방식으로 통일. */
+const geminiHeaders = (key) => ({
+  "Content-Type": "application/json",
+  "x-goog-api-key": key,
+});
+const geminiUrl = (model) =>
+  `https://generativelanguage.googleapis.com/v1beta/models/${model || GEMINI_MODEL_DEFAULT}:generateContent`;
+
 async function askGemini(key, model, system, user, imageBlock) {
   if (!key) throw new Error("Gemini: Google API 키가 없습니다.");
   const parts = imageBlock
     ? [{ text: user }, { inlineData: { mimeType: imageBlock.mime, data: imageBlock.data } }]
     : [{ text: user }];
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model || GEMINI_MODEL_DEFAULT}:generateContent?key=${encodeURIComponent(key)}`,
-    {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents: [{ parts }],
-        generationConfig: { responseMimeType: "application/json" },
-      }),
-    }
-  );
+  const res = await fetch(geminiUrl(model), {
+    method: "POST",
+    headers: geminiHeaders(key),
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents: [{ parts }],
+      generationConfig: { responseMimeType: "application/json" },
+    }),
+  });
   const data = await res.json();
   if (data.error) throw new Error(`Gemini: ${data.error.message}`);
   const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text).filter(Boolean).join("\n");
@@ -249,17 +256,16 @@ async function askGemini(key, model, system, user, imageBlock) {
 
 /* ── Gemini + 구글 검색 그라운딩: 오늘의 추천용 (실시간 트렌드·뉴스 반영) ── */
 async function askGeminiGrounded(key, model, system, user) {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model || GEMINI_MODEL_DEFAULT}:generateContent?key=${encodeURIComponent(key)}`,
-    {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents: [{ parts: [{ text: user }] }],
-        tools: [{ google_search: {} }],
-      }),
-    }
-  );
+  if (!key) throw new Error("Gemini(검색): Google API 키가 없습니다.");
+  const res = await fetch(geminiUrl(model), {
+    method: "POST",
+    headers: geminiHeaders(key),
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents: [{ parts: [{ text: user }] }],
+      tools: [{ google_search: {} }],
+    }),
+  });
   const data = await res.json();
   if (data.error) throw new Error(`Gemini(검색): ${data.error.message}`);
   const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text).filter(Boolean).join("\n");
@@ -268,11 +274,15 @@ async function askGeminiGrounded(key, model, system, user) {
 
 /* ── 이미지 생성 (사용자 키 · 메모리에만 유지) ── */
 async function genGemini(key, prompt, aspect) {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${encodeURIComponent(key)}`,
-    { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { imageConfig: { aspectRatio: aspect } } }) }
-  );
+  if (!key) throw new Error("Gemini: Google API 키가 없습니다.");
+  const res = await fetch(geminiUrl("gemini-2.5-flash-image"), {
+    method: "POST",
+    headers: geminiHeaders(key),
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { imageConfig: { aspectRatio: aspect } },
+    }),
+  });
   const data = await res.json();
   if (data.error) throw new Error(`Gemini: ${data.error.message}`);
   const part = (data.candidates?.[0]?.content?.parts || []).find((p) => p.inlineData);
@@ -1376,7 +1386,8 @@ Each block content = one short Korean sentence.`,
                 <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AQ… (신규) 또는 AIzaSy… (구)"
                   className={`${fieldCls} font-mono w-full`} />
                 <p className="text-[11px] text-neutral-500 mt-1 leading-snug">
-                  2026-07-06부터 신규 키는 <b className="text-neutral-400">AQ</b>로 시작합니다. 기존 <b className="text-neutral-400">AIzaSy</b> 키도 그대로 사용 가능.
+                  신규 <b className="text-neutral-400">AQ</b> 키(2026-06 이후 · Auth Key)와 기존 <b className="text-neutral-400">AIzaSy</b> 키 모두 지원.
+                  <br />구글 신규 표준(x-goog-api-key 헤더 방식) 자동 적용 → 401/403 에러 방지.
                 </p>
               </div>
               <div className="max-w-xs pb-1">
