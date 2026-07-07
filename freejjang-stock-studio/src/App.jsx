@@ -507,6 +507,15 @@ export default function App() {
   const [autoQcProg, setAutoQcProg] = useState(null);
   const [dailyBusy, setDailyBusy] = useState(false);
   const lastRecoRef = useRef(""); // 직전 추천 주제 (재클릭 시 다른 각도 보장)
+  const lastRecoDetailRef = useRef(null); // 직전 추천의 시장/판매적기 (이력 기록용)
+  /* 주제 선정 이력 — 판매시기 겹침 방지용. localStorage에서 동기 로드 */
+  const [recoHistory, setRecoHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("freejjang_reco_history")) || []; } catch { return []; }
+  });
+  const [histOpen, setHistOpen] = useState(false);
+  useEffect(() => {
+    try { localStorage.setItem("freejjang_reco_history", JSON.stringify(recoHistory)); } catch { /* 저장 불가 무시 */ }
+  }, [recoHistory]);
   const cancelRef = useRef(false);
 
   /* ── 기본 생성 / 분석 / 공용 ── */
@@ -642,6 +651,16 @@ export default function App() {
     cancelRef.current = false;
     setPhase("drafting");
     setSlots([]); setQcRejects({});
+    /* 주제 선정 이력에 기록 (판매시기 겹침 방지) — 같은 주제는 중복 기록 안 함 */
+    const nowD = new Date();
+    const todayStr = `${nowD.getFullYear()}-${pad2(nowD.getMonth() + 1)}-${pad2(nowD.getDate())}`;
+    setRecoHistory((p) => {
+      const t = topic.trim();
+      if (p.some((h) => h.t === t)) return p;
+      const d = lastRecoDetailRef.current;
+      const fromReco = d && d.topic === t;
+      return [{ t, d: todayStr, w: fromReco ? d.window : "", m: fromReco ? d.market : "" }, ...p].slice(0, 40);
+    });
     /* 최대 시간(분) 예산 — 설정 시 초안+생성 전체의 벽시계 마감. 마감 도달 시 그 시점까지 만든 것으로 마무리 */
     const mins = parseFloat(maxMin);
     deadlineRef.current = mins > 0 ? Date.now() + mins * 60000 : Infinity;
@@ -746,7 +765,8 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
     const sys = `You are a top stock-image market strategist for Adobe Stock (global) and MiriCanvas (Korea). Given today's date, propose exactly ONE production topic optimized to SELL within the next 2 months — stock buyers purchase visuals 4-8 weeks before they need them, so target upcoming seasons, holidays, campaigns and business cycles, or a timely news/issue angle (economy, AI, climate, health, lifestyle shifts). Respond ONLY compact JSON:
 {"topic_kr":"프리짱 주제 입력용 한국어 주제 (10-20자, 명확한 촬영 소재)","market":"top|niche|news","priority_keywords":"10-14 lowercase EN buyer search terms, comma-separated, SEO order (most-searched first)","handling_tip_kr":"구도·소품·인물 처리 팁 1-2문장 (한국어)","rationale_kr":"왜 지금 이 주제인지 + 수요 근거 1-2문장 (한국어)","sell_window":"판매 적기 e.g. 9월 초~10월 말"}
 RULES: rotate the market type pseudo-randomly using the seed — top(베스트셀러 수요) ~40%, niche(수요 대비 공급 부족한 틈새: e.g. 시니어 디지털 라이프, 지속가능 포장, 재택 재활운동, 소상공인 디지털 전환) ~40%, news/issue ~20%. The topic must be shootable as AI stock images: NO celebrities, NO brands, NO text-heavy scenes, prefer scenes not requiring identifiable faces. Never repeat the avoided topic. Seed: ${seed}.`;
-    const user = `Today: ${dateStr}. Avoid repeating this previous recommendation: "${lastRecoRef.current || "none"}". Markets: global Adobe Stock + Korean MiriCanvas. Give ONE recommendation now.`;
+    const histLines = recoHistory.slice(0, 20).map((h) => `- ${h.d} | ${h.t}${h.w ? ` | 판매적기 ${h.w}` : ""}`).join("\n");
+    const user = `Today: ${dateStr}. Avoid repeating this previous recommendation: "${lastRecoRef.current || "none"}". Markets: global Adobe Stock + Korean MiriCanvas.${histLines ? `\nALREADY-PRODUCED TOPICS (with sell windows). HARD RULE: never propose the same or clearly similar subject as any entry whose sell window overlaps your new sell window — a DIFFERENT subject in the same window is fine:\n${histLines}` : ""}\nGive ONE recommendation now.`;
     try {
       let r = null;
       if (googleKey.trim()) {
@@ -761,6 +781,7 @@ RULES: rotate the market type pseudo-randomly using the seed — top(베스트�
       setPriKw(normKeywords(r.priority_keywords, 14));
       setHandlingTip(String(r.handling_tip_kr || "").slice(0, 500));
       lastRecoRef.current = String(r.topic_kr).trim();
+      lastRecoDetailRef.current = { topic: String(r.topic_kr).trim(), market: r.market || "", window: r.sell_window || "" };
       const label = r.market === "niche" ? "틈새시장" : r.market === "news" ? "이슈·뉴스" : "베스트셀러";
       addLog(`[오늘의 추천] (${label}) ${r.topic_kr} — 판매 적기: ${r.sell_window || "향후 2개월"}`);
       setNotice(`🎯 오늘의 추천 (${label}): "${r.topic_kr}" — ${r.rationale_kr || ""} 판매 적기: ${r.sell_window || "향후 2개월"}. 주제·우선 키워드·팁이 자동으로 채워졌습니다. 마음에 들면 '초안 기획', 다른 주제를 원하면 추천을 한 번 더 누르세요.`);
@@ -1397,6 +1418,31 @@ Each block content = one short Korean sentence.`,
                     disabled={phase === "drafting" || phase === "generating"}
                     placeholder="예: 9월 가을 신학기 계절 배경화면 — 또는 '오늘의 추천' 클릭"
                     className={`${fieldCls} w-full disabled:opacity-60`} />
+                  {/* 주제 선정 이력 (접이식) — 추천이 판매시기 겹침을 피하는 근거 */}
+                  {recoHistory.length > 0 && (
+                    <div className="mt-1.5 border border-neutral-700/60 rounded bg-neutral-950/40">
+                      <button onClick={() => setHistOpen(!histOpen)}
+                        className="w-full flex items-center gap-1 px-2 py-1.5 text-[11px] text-neutral-500 hover:text-neutral-300 transition">
+                        <ChevronRight className={`w-3 h-3 transition-transform ${histOpen ? "rotate-90" : ""}`} />
+                        주제 선정 이력 ({recoHistory.length}) · 추천 시 판매시기 겹침 자동 회피
+                      </button>
+                      {histOpen && (
+                        <div className="px-2 pb-2 space-y-1 max-h-40 overflow-y-auto">
+                          {recoHistory.map((h, i) => (
+                            <div key={`${h.t}-${i}`} className="flex items-center gap-1.5 text-[11px]">
+                              <span className="text-neutral-600 font-mono shrink-0">{h.d}</span>
+                              <span className="truncate flex-1 text-neutral-300" title={h.t}>{h.t}</span>
+                              {h.w && <span className="text-amber-300/80 shrink-0">{h.w}</span>}
+                              <button onClick={() => setRecoHistory((p) => p.filter((_, j) => j !== i))}
+                                title="이력에서 제거" className="text-neutral-600 hover:text-red-400 shrink-0"><X className="w-3 h-3" /></button>
+                            </div>
+                          ))}
+                          <button onClick={() => window.confirm("주제 선정 이력을 모두 지울까요?") && setRecoHistory([])}
+                            className="text-[10px] text-neutral-600 hover:text-red-400 transition">전체 비우기</button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-neutral-400 mb-1">
