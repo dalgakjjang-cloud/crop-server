@@ -1439,14 +1439,14 @@ Each block content = one short Korean sentence.`,
 
   const TabBtn = ({ id, icon: Icon, label }) => (
     <button onClick={() => setTab(id)}
-      className={`flex items-center gap-1.5 px-4 py-2 text-sm font-bold rounded-t-lg border-b-2 transition ${
+      className={`flex items-center gap-1 px-3 py-1.5 text-xs font-bold rounded-t-lg border-b-2 transition ${
         tab === id ? "border-violet-500 text-violet-300 bg-neutral-800" : "border-transparent text-neutral-500 hover:text-neutral-300"}`}>
-      <Icon className="w-4 h-4" /> {label}
+      <Icon className="w-3.5 h-3.5" /> {label}
     </button>
   );
 
   /* 공용 다크 입력/셀렉트 클래스 */
-  const fieldCls = "text-sm px-3 py-2 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none focus:border-violet-500";
+  const fieldCls = "text-xs px-2.5 py-1.5 bg-neutral-950 border border-neutral-700 rounded text-neutral-100 focus:outline-none focus:border-violet-500";
   /* 승인 대기 시 주의를 끄는 글로우 펄스 (buildSlotPrompt 무관, UI 전용) */
   const attnPulse = { animation: "attnGlow 1.4s ease-in-out infinite" };
 
@@ -1496,48 +1496,48 @@ Each block content = one short Korean sentence.`,
 `}</style>
 
       {/* ═══ 헤더 ═══ */}
-      <header className="bg-neutral-800 border-b border-neutral-700 px-5 pt-4">
+      <header className="bg-neutral-800 border-b border-neutral-700 px-4 pt-2">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-wrap items-start justify-between gap-3 pb-3">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-lg bg-neutral-950 border border-neutral-700 flex items-center justify-center">
-                <Cpu className="w-5 h-5 text-violet-400" />
+          <div className="flex flex-wrap items-start justify-between gap-2 pb-1.5">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-lg bg-neutral-950 border border-neutral-700 flex items-center justify-center">
+                <Cpu className="w-4 h-4 text-violet-400" />
               </div>
               <div>
-                <h1 className="text-lg font-bold tracking-tight text-neutral-100">
+                <h1 className="text-sm font-bold tracking-tight text-neutral-100">
                   FreeJJang <span className="text-neutral-500 font-normal">STOCK STUDIO</span>
                   <span className="text-xs font-mono px-1.5 py-0.5 bg-violet-500/10 text-violet-300 border border-violet-500/30 rounded ml-2">
                     두뇌 {brainName} · 손 {provider === "openai" ? "GPT" : provider === "pollinations" ? "Pollinations(무료)" : "Gemini"}
                   </span>
                 </h1>
-                <p className="text-xs text-neutral-500">초안 승인 → 순차 생성 → QC → 제출 팩 · 멈춤은 딱 두 곳</p>
+                <p className="text-[10px] text-neutral-500">초안 승인 → 순차 생성 → QC → 제출 팩 · 멈춤은 딱 두 곳</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
               <button onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
                 title={theme === "dark" ? "밝은 테마로 전환" : "어두운 테마로 전환"}
-                className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded border border-neutral-700 text-neutral-300 hover:text-neutral-100 transition">
-                {theme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-neutral-700 text-neutral-300 hover:text-neutral-100 transition">
+                {theme === "dark" ? <Sun className="w-3 h-3" /> : <Moon className="w-3 h-3" />}
                 {theme === "dark" ? "밝게" : "어둡게"}
               </button>
               <button onClick={startFresh}
                 title="슬롯·이미지·로그를 비우고 새 프로젝트 시작 (API 키·설정은 유지)"
-                className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded border border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 transition">
-                <RefreshCw className="w-3.5 h-3.5" /> Start Fresh
+                className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 transition">
+                <RefreshCw className="w-3 h-3" /> Start Fresh
               </button>
               <button onClick={() => setShowSettings(!showSettings)}
-                className={`flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded border transition ${
+                className={`flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border transition ${
                   imageKey() ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-300" : "bg-amber-500/10 border-amber-500/30 text-amber-300"}`}>
-                <Key className="w-3.5 h-3.5" /> {imageKey() ? "이미지 엔진 연결됨" : "이미지 API 키 필요"} <Settings2 className="w-3.5 h-3.5" />
+                <Key className="w-3 h-3" /> {imageKey() ? "엔진 연결됨" : "API 키 필요"} <Settings2 className="w-3 h-3" />
               </button>
             </div>
           </div>
 
           {showSettings && (
-            <div className="pb-4 flex flex-wrap items-end gap-3">
+            <div className="pb-2 flex flex-wrap items-end gap-2">
               {/* 두뇌 선택 */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-400 mb-1">두뇌 (에이전트)</label>
+                <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">두뇌 (에이전트)</label>
                 <select value={brain} onChange={(e) => setBrain(e.target.value)} className={fieldCls}>
                   <option value="gpt">GPT (Codex 계열) · OpenAI 키</option>
                   <option value="gemini">Gemini · 구글 키</option>
@@ -1545,71 +1545,71 @@ Each block content = one short Korean sentence.`,
               </div>
               {brain === "gpt" && (
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1">GPT 모델명</label>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">GPT 모델명</label>
                   <input list="gptModels" value={gptModel} onChange={(e) => setGptModel(e.target.value)} placeholder={GPT_MODEL_DEFAULT}
-                    className={`${fieldCls} font-mono w-44`} />
+                    className={`${fieldCls} font-mono w-36`} />
                   <datalist id="gptModels">{GPT_MODEL_PRESETS.map((m) => <option key={m} value={m} />)}</datalist>
                 </div>
               )}
               {brain === "gemini" && (
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1">Gemini 모델명</label>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">Gemini 모델명</label>
                   <input list="geminiModels" value={geminiModel} onChange={(e) => setGeminiModel(e.target.value)} placeholder={GEMINI_MODEL_DEFAULT}
-                    className={`${fieldCls} font-mono w-48`} />
+                    className={`${fieldCls} font-mono w-40`} />
                   <datalist id="geminiModels">{GEMINI_MODEL_PRESETS.map((m) => <option key={m} value={m} />)}</datalist>
                 </div>
               )}
-              <label className="flex items-center gap-2 text-xs font-semibold text-neutral-300 pb-2 cursor-pointer select-none">
+              <label className="flex items-center gap-1.5 text-[11px] font-semibold text-neutral-300 pb-1 cursor-pointer select-none">
                 <input type="checkbox" checked={autoFallback} onChange={(e) => setAutoFallback(e.target.checked)}
-                  className="w-4 h-4 accent-violet-500" />
-                한도 초과·실패 시 자동 폴백 (키 등록된 GPT·Gemini 우선, Claude는 맨 마지막)
+                  className="w-3.5 h-3.5 accent-violet-500" />
+                한도 초과·실패 시 자동 폴백 (GPT·Gemini 우선)
               </label>
 
               <div className="w-full border-t border-neutral-700/60" />
 
               {/* 이미지 엔진 */}
               <div>
-                <label className="block text-xs font-semibold text-neutral-400 mb-1">이미지 엔진 (손)</label>
+                <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">이미지 엔진 (손)</label>
                 <select value={provider} onChange={(e) => setProvider(e.target.value)} className={fieldCls}>
                   <option value="openai">GPT (gpt-image · 기본)</option>
                   <option value="gemini">Gemini (2.5-flash-image)</option>
-                  <option value="pollinations">Pollinations (Flux · 완전 무료 · 키 불필요)</option>
+                  <option value="pollinations">Pollinations (무료 · 키 불필요)</option>
                 </select>
                 {provider === "pollinations" && (
-                  <p className="text-[10px] text-amber-300/90 mt-1 leading-snug max-w-56">⚠ 무료 엔진은 원본 해상도가 낮아 어도비 판매용으론 비권장 — 기획·구도 확인용으로 쓰세요</p>
+                  <p className="text-[9px] text-amber-300/90 mt-0.5 leading-snug max-w-52">⚠ 저해상도 — 기획·구도 확인용</p>
                 )}
               </div>
               {provider === "openai" && (
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1">이코노미 2패스</label>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">이코노미 2패스</label>
                   <button onClick={() => setEcoTwoPass(!ecoTwoPass)}
-                    title="초안은 low로 싸고 빠르게 → QC 승인분만 고품질로 구도 유지 리렌더 (반려가 많을수록 절약)"
+                    title="초안은 low로 싸고 빠르게 → QC 승인분만 고품질로 구도 유지 리렌더"
                     className={`${fieldCls} font-bold ${ecoTwoPass ? "text-emerald-300 border-emerald-500/50" : "text-neutral-500"}`}>
-                    {ecoTwoPass ? `ON · low 초안 → ${finalQuality} 마감` : "OFF · 1패스 생성"}
+                    {ecoTwoPass ? `ON · low → ${finalQuality} 마감` : "OFF · 1패스"}
                   </button>
                 </div>
               )}
               {provider === "openai" && ecoTwoPass && (
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1">마감 품질</label>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">마감 품질</label>
                   <select value={finalQuality} onChange={(e) => setFinalQuality(e.target.value)} className={fieldCls}>
-                    <option value="medium">medium — 기본 (~$0.04/장)</option>
-                    <option value="high">high — 최고 정밀 (~$0.17/장)</option>
+                    <option value="medium">medium (~$0.04/장)</option>
+                    <option value="high">high (~$0.17/장)</option>
                   </select>
                 </div>
               )}
               {provider === "openai" && !ecoTwoPass && (
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1">품질 (기본 medium)</label>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">품질</label>
                   <select value={quality} onChange={(e) => setQuality(e.target.value)} className={fieldCls}>
-                    <option value="low">low — 초안/최저비 명시 시</option>
+                    <option value="low">low — 최저비</option>
                     <option value="medium">medium — 기본</option>
-                    <option value="high">high — 명시 요청 시</option>
+                    <option value="high">high — 최고</option>
                   </select>
                 </div>
               )}
               <div>
-                <label className="block text-xs font-semibold text-neutral-400 mb-1">종횡비</label>
+                <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">종횡비</label>
                 <select value={aspect} onChange={(e) => setAspect(e.target.value)} className={`${fieldCls} font-mono`}>
                   {ASPECTS.map((a) => <option key={a} value={a}>{a}</option>)}
                 </select>
@@ -1618,28 +1618,27 @@ Each block content = one short Korean sentence.`,
               <div className="w-full border-t border-neutral-700/60" />
 
               {/* 키 2칸 분리 — 항상 별도 행 */}
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-2">
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1">OpenAI API Key (GPT 두뇌 + gpt-image)</label>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">OpenAI API Key (GPT 두뇌 + gpt-image)</label>
                   <input type="password" value={openaiKey} onChange={(e) => setOpenaiKey(e.target.value)} placeholder="sk-…"
                     className={`${fieldCls} font-mono w-full`} />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-neutral-400 mb-1">Google Gemini API Key (Gemini 두뇌 + 이미지)</label>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">Google Gemini API Key (Gemini 두뇌 + 이미지)</label>
                   <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AQ… (신규) 또는 AIzaSy… (구)"
                     className={`${fieldCls} font-mono w-full`} />
-                  <p className="text-[11px] text-neutral-500 mt-1 leading-snug">
-                    신규 <b className="text-neutral-400">AQ</b> 키(2026-06 이후 · Auth Key)와 기존 <b className="text-neutral-400">AIzaSy</b> 키 모두 지원.
-                    <br />구글 신규 표준(x-goog-api-key 헤더 방식) 자동 적용 → 401/403 에러 방지.
+                  <p className="text-[10px] text-neutral-500 mt-0.5 leading-tight">
+                    신규 <b className="text-neutral-400">AQ</b> 키 + 기존 <b className="text-neutral-400">AIzaSy</b> 키 모두 지원 · x-goog-api-key 헤더 방식 자동 적용
                   </p>
                 </div>
               </div>
-              <div className="w-full">
-                <p className="text-xs text-neutral-500 leading-relaxed">
-                  키는 <b className="text-neutral-400">이 브라우저에만 자동 저장</b>되어 다음에 재입력이 필요 없습니다 (서버 전송 없음). 공용 PC에서는 사용 후 아래 버튼으로 지우세요.
+              <div className="w-full flex items-center gap-3">
+                <p className="text-[10px] text-neutral-500">
+                  키는 <b className="text-neutral-400">이 브라우저에만 자동 저장</b> (서버 전송 없음)
                 </p>
                 <button onClick={clearSavedKeys}
-                  className="mt-1 text-xs text-rose-300/80 hover:text-rose-300 underline underline-offset-2">
+                  className="text-[10px] text-rose-300/80 hover:text-rose-300 underline underline-offset-2 shrink-0">
                   저장된 키 삭제
                 </button>
               </div>
@@ -1654,7 +1653,7 @@ Each block content = one short Korean sentence.`,
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto p-5">
+      <div className="max-w-7xl mx-auto px-4 py-3">
 
         {/* ═══════════ 파이프라인 탭 ═══════════ */}
         {tab === "pipeline" && (
