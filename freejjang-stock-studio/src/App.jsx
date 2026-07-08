@@ -51,6 +51,7 @@ const BESTSELLER_REFERENCE = `PROVEN BESTSELLER FORMULAS — when the topic fits
 - Solo daily-life moments (highly reusable MiriCanvas base): a woman journaling in a spiral notebook on a wooden table with an open book, ceramic coffee cup and a small plant lit by warm window light; a young Korean man smiling at a smartphone in a bright home office; hands holding a coffee cup — quiet mindful mood, shallow depth of field, subject to one side, wide 45-60% low-detail area for Korean text overlay.
 - Golf lifestyle (bright MiriCanvas leisure seller): golfer lining up a putt with tight focus on hands and club, a couple walking a fairway with a golf cart, a lesson swing at a green driving range — bright daylight, crisp green turf, blue sky, no crowd.
 - Healthcare (major Adobe Stock global seller): a warm interaction between a doctor and a patient in a modern clinic (doctor listening, gentle stethoscope moment), a nurse reassuring an elderly patient, a diverse care team reviewing a tablet chart, a laboratory researcher at a microscope, a therapist in a bright counseling office — modern clean facility, pale blue/white/warm wood palette, honest editorial realism, hopeful reassuring mood; diverse global casting (mixed ethnicities) unless the topic explicitly names Korea, then Korean casting.
+- Practical Korean home-life packages (sells on BOTH MiriCanvas AND Adobe Stock): themed sets of related useful lifestyle moments — travel packing (folding clothes into a suitcase on a white bed), pet-travel prep (packing a pet carrier while the dog waits), meal-prep (portioning banchan into glass containers on a bright kitchen counter, storing prepped meals in a fridge drawer), home organization (drawer sorting, closet folding, decluttering), receiving-delivery moments (accepting a chilled box at the apartment door). Signature: bright airy white/beige Korean home, cream sweater / linen apron wardrobe, warm-neutral palette, one Korean woman doing something practical with her hands, tack-sharp product/prop hero, gentle window daylight. These package well because buyers use the whole set on a single blog/newsletter/marketing sequence.
 UNIVERSAL MIRICANVAS SIGNATURE for the lifestyle categories above: bright airy, warm-neutral palette (cream/beige/soft wood), authentic Korean people with genuine natural smiles (never stiff Western stock look), soft window daylight, one gentle plant, tack-sharp subject with gently blurred background, and a clean low-detail area (~45-55% of frame) reserved for Korean text overlay.
 UNIVERSAL ADOBE STOCK SIGNATURE for the Adobe-first categories (healthcare, business, etc.): globally diverse casting (mix of ethnicities, ages, genders) UNLESS the topic explicitly names Korea/Korean cities — then Korean casting; strong subject-focused composition (rule of thirds, subject fills 50-70% of frame); editorial realism; less need for wide text-overlay areas; cinematic or moody lighting is welcome when the topic calls for it.`;
 
@@ -586,6 +587,7 @@ export default function App() {
   const deadlineRef = useRef(Infinity);       // maxMin으로 계산된 마감 시각(ms). 초안 시작 시 설정
   const [mode, setMode] = useState("commercial"); // commercial | wallpaper
   const [modeAuto, setModeAuto] = useState(true);
+  const [packageMode, setPackageMode] = useState(false); // 패키지 모드 — 세팅/인물/팔레트 응집, 순간만 다르게
   /* ── REEDO식 구조화 구성 (선택 안함이면 무시) ── */
   const [refStyle, setRefStyle] = useState("");
   const [refRegion, setRefRegion] = useState("");
@@ -823,7 +825,13 @@ export default function App() {
     for (let attempt = 0; attempt < 3 && concepts.length < count && !cancelRef.current && !timeUp(); attempt++) {
       try {
         const m = await askBrain(
-          `You design a maximally DIVERSE professional stock image set — each image must be clearly a SEPARATE asset to a buyer (no near-duplicates; marketplaces reject similar images). Respond ONLY compact JSON:
+          packageMode
+            ? `You design a COHESIVE professional stock image PACKAGE — the set is used together on one blog/marketing sequence, so buyers want a shared look with varied moments (like a themed lifestyle set: travel packing / pet-travel prep / meal-prep / home organization). Respond ONLY compact JSON:
+{"concepts":[{"scene":"1 short sentence: main subject doing what, where","location":"the place — MAY repeat across concepts (that's the point)","action":"primary action — must be DIFFERENT per concept","angle":"camera angle/framing","time":"time of day + light — must be SAME across concepts (unified look)"}]}
+HARD COHESION RULES: return EXACTLY the requested number of concepts. Every concept shares the SAME setting style (e.g. same bright Korean home), the SAME character look (same age/gender/wardrobe/hair style — e.g. one Korean woman in a cream sweater or linen apron), the SAME palette (warm neutrals / cream + beige + soft wood), the SAME lighting (soft window daylight, bright airy). What VARIES per concept: the specific moment/action being performed, the specific hero prop in that moment, and the framing/angle. No two concepts have the same primary action. PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. NO TEXT-BEARING SCENES (critical — text in the image is auto-rejected): never design a scene whose subject involves readable written content — no presentation slides with titles, no lecturers pointing at worded screens, no documents/handouts/newspapers, no books with visible covers, no signs/labels/menus/whiteboards with writing; use imagery-only equivalents.
+${BESTSELLER_REFERENCE}
+Treat this topic as a "practical Korean home-life package" if it fits — that formula is exactly what package mode is best at.`
+            : `You design a maximally DIVERSE professional stock image set — each image must be clearly a SEPARATE asset to a buyer (no near-duplicates; marketplaces reject similar images). Respond ONLY compact JSON:
 {"concepts":[{"scene":"1 short sentence: main subject doing what, where","location":"the place — must be unique in the set","action":"primary action","angle":"camera angle/framing","time":"time of day + light"}]}
 HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. NO TEXT-BEARING SCENES (critical — text in the image is auto-rejected): never design a scene whose subject involves readable written content — no presentation slides with titles, no lecturers pointing at worded screens, no documents/handouts/newspapers, no books with visible covers, no signs/labels/menus/whiteboards with writing; use imagery-only equivalents (wordless abstract visuals on screens, blank paper, shape-only charts). If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.
 ${BESTSELLER_REFERENCE}
@@ -858,7 +866,7 @@ BRIGHTNESS RULE (Adobe Stock + MiriCanvas commercial default): the "lighting" an
         try {
           const r = await askBrain(
             detailSystem,
-            `Topic: "${topic}". Mode: ${mode}. Whole-set overview (make THIS pair's props/palette clearly distinct from all): ${setSummary}
+            `Topic: "${topic}". Mode: ${mode}.${packageMode ? " PACKAGE MODE ON — this pair MUST share the same character look, wardrobe, palette, and lighting as the rest of the set; only the specific action/prop varies. Do NOT push differentiation on palette/lighting." : ""} Whole-set overview (${packageMode ? "keep THIS pair visually cohesive with the whole set — only the action/prop varies" : "make THIS pair's props/palette clearly distinct from all"}): ${setSummary}
 Expand EXACTLY these ${pair.length} assigned concepts, one item each, in order:
 ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | action: ${c.action} | angle: ${c.angle} | time: ${c.time}`).join("\n")}${refinementLine()}${handlingTip.trim() ? `\nUser handling notes — apply to these slots: ${handlingTip.trim()}` : ""}${priKw.trim() ? `\nPRIORITY KEYWORDS (metadata ordering only — for each slot, place the ones that are LITERALLY VISIBLE in that slot near the FRONT of "keywords"; NEVER add ones not visible, NEVER alter the scene to include them): ${priKw.trim()}` : ""}`
           );
@@ -1695,6 +1703,12 @@ Each block content = one short Korean sentence.`,
                       배경화면<span className="block text-[10px] font-normal opacity-70">여백 40-60%</span>
                     </button>
                   </div>
+                  <button onClick={() => setPackageMode((v) => !v)}
+                    title="켜면 세팅·인물·팔레트·라이팅을 응집시키고 액션·소품만 다르게 — 여행팩킹·밀프렙·홈오거나이징 등 라이프 패키지용. 끄면 각 슬롯을 최대한 다르게(기본)."
+                    className={`w-full mt-1.5 text-xs font-bold py-2 rounded border transition ${packageMode ? "bg-sky-600 text-white border-sky-600" : "bg-neutral-950 border-neutral-700 text-neutral-400 hover:text-neutral-200"}`}>
+                    📦 패키지 모드 {packageMode ? "ON" : "OFF"}
+                    <span className="block text-[10px] font-normal opacity-70">{packageMode ? "세팅·인물·팔레트 응집 · 액션만 다르게" : "슬롯마다 최대 다양성 (기본)"}</span>
+                  </button>
                 </div>
                 {/* REEDO식 구조화 구성 — 선택 항목이 모든 슬롯 초안에 주입됨 */}
                 <div className="pt-1 border-t border-neutral-700">
