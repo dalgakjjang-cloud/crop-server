@@ -1218,7 +1218,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `# FreeJJang 프롬프트 (Midjourney 형식) — 주제: ${topic || "(미지정)"} · 종횡비: ${aspect}\n` +
       `# 배제문을 --no 로, 종횡비를 --ar 로, 사진 슬롯은 --style raw 로 자동 변환했습니다.\n` +
       `# Midjourney 입력창에 [] 라벨 제외하고 프롬프트 줄만 붙여넣으세요.\n\n`;
-    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${toMidjourney(s, mode, refTone, refPeople, aspect)}`).join("\n\n");
+    const body = rows.map((s) => `# [${s.index}] ${s.title_kr || s.title || ""}\n${toMidjourney(s, mode, refTone, refPeople, aspect)}`).join("\n\n");
     saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-midjourney.txt`);
     addLog(`[백업] 프롬프트 TXT(Midjourney) 저장 완료 — ${rows.length}슬롯`);
   };
