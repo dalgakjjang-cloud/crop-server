@@ -87,6 +87,7 @@ const CAMERA_ANGLES = {
   eye_level: { label: "Eye Level (정면)", phrase: "eye-level straight-on shot, balanced calm perspective, 50mm lens, orderly composition" },
   low_angle: { label: "Low Angle (올려다보기)", phrase: "dynamic low-angle shot, looking slightly upward, powerful perspective, majestic presence" },
   high_angle: { label: "High Angle (내려다보기)", phrase: "clean high-angle shot looking down, comprehensive organized top-down view" },
+  top_down: { label: "Top-Down (탑다운/항공뷰)", phrase: "straight-down 90-degree top-down flat lay, bird's-eye aerial view shot directly overhead, neatly arranged composition with balanced negative space, everything evenly in focus" },
   wide: { label: "Wide (와이드)", phrase: "wide establishing shot, 24mm lens, generous environmental context and abundant negative space" },
   angle_45: { label: "Angle 45 (사선 45도)", phrase: "45-degree three-quarter angle shot, natural depth and dimensionality" },
   over_shoulder: { label: "Over Shoulder (어깨 너머)", phrase: "over-the-shoulder shot, natural candid framing looking past the subject" },
@@ -544,7 +545,7 @@ const MJ_NEG_BASE = "text, letters, numbers, logo, watermark, brand name, signat
 const MJ_NEG_COMMERCIAL = "backlit, backlight, silhouette, lens flare, bokeh, blurry background, out of focus background, cluttered background, crowd, window, glass storefront, street view, traffic, pedestrians, city lights, neon sign, signage";
 /* CLEAN_STUDIO_BG의 MJ 안전판 — 부정문 없이 원하는 배경만 서술 */
 const MJ_CLEAN_BG = "backdrop is a simple tidy plain interior wall of a premium minimal space with calm empty space directly behind the subject, everything sharp and in focus front-to-back like a crisp commercial set, distraction-free";
-const MJ_FRONT_LIGHT = "subject lit from the front-side, key light from the camera side, bright open evenly lit faces, ";
+const MJ_FRONT_LIGHT = "subject evenly lit from the front-side, key light from the camera side, bright open illumination on the subject, ";
 /* 부정문 → 긍정문 치환 테이블 (모든 MJ 내보내기에 공통 적용) */
 const MJ_POSITIVE_FIXES = [
   [CLEAN_STUDIO_BG, MJ_CLEAN_BG],
