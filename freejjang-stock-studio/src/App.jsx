@@ -30,10 +30,20 @@ const FAITH_GUARD = "clean reverent composition, warm golden-hour or soft sanctu
 const EMOTIONAL_ATMOS = "warm golden-hour glow or soft dramatic sky with gentle light rays beaming through clouds, serene inspirational mood, soft backlight and subtle lens flare welcome";
 const EMOTIONAL_GUARD = "simple clean composition with a calm low-detail area reserved for text overlay, no busy clutter";
 
+/* 미캔 라이프스타일 시그니처 — 부동산·가족·저널링·솔로 데일리·골프 등 밝은 홈 미학 */
+const MIRI_LIFESTYLE_RE = /부동산|아파트|인테리어|모델하우스|임장|매매|이사|입주|열쇠|전세|월세|realestate|real\s*estate|apartment|interior|home|저널|일기|다이어리|독서|공부|힐링|명상|재활용|분리수거|보드게임|가족|일상|라이프스타일|골프|퍼팅|스마트폰|모닝|출근|커피\s*한잔|햇살|창가/i;
+const MIRI_LIFESTYLE_STYLING = "authentic bright airy Korean home aesthetic: warm-neutral palette (cream, soft beige, warm wood), natural Korean people with genuine relaxed smiles (never stiff stock poses), soft window daylight, one gentle plant, tack-sharp subject with gently blurred background, wide 16:9-style framing";
+const MIRI_LIFESTYLE_GUARD = "bright and appetizing with soft natural window light, subject tack-sharp, gently blurred background welcome, generous low-detail area reserved for Korean text overlay, no dark or moody underexposure, no crowd";
+
 /* 검증된 판매 공식 — 두뇌(추천·초안)가 주제에 맞을 때 이 구도로 기울이도록 참고 주입 */
 const BESTSELLER_REFERENCE = `PROVEN BESTSELLER FORMULAS — when the topic fits one of these, lean into its exact winning composition:
 - Faith / worship (top seller on Korean MiriCanvas): church interior, a choir singing, a cross silhouetted against a golden-hour or sunset sky, praying hands, an open bible beside candles, a worship band — reverent warm mood; here golden-hour backlight and a gentle silhouette ARE desirable (do NOT flatten them).
-- Business growth / finance (top seller on BOTH Adobe Stock & MiriCanvas): stacked gold coins with an upward arrow, a glowing arrow rising through a blue data grid, an ascending stock candlestick chart on a screen — clean, professional, blue-and-gold palette, conveying growth and success.`;
+- Business growth / finance (top seller on BOTH Adobe Stock & MiriCanvas): stacked gold coins with an upward arrow, a glowing arrow rising through a blue data grid, an ascending stock candlestick chart on a screen — clean, professional, blue-and-gold palette, conveying growth and success.
+- Real estate / modern Korean apartment (huge MiriCanvas seller): a bright modern minimalist Korean apartment interior with floor-to-ceiling windows and a city skyline view, a young Korean couple touring an empty living room with a realtor pointing at features, a hand receiving keys, an empty freshly-painted room with warm wooden floor and one plant, an architect's model apartment on a desk — bright airy palette, warm wood + white + soft beige, generous negative space for text overlay.
+- Korean family lifestyle everyday moments (MiriCanvas core): a Korean family (2-3 generations) laughing around a low living-room table playing a board game, parents and a small child sorting recyclables in a bright utility room, a warm dinner scene around a Korean home table — natural genuine smiles (never stiff stock poses), soft window daylight, wooden furniture, one calm plant, clean uncluttered background.
+- Solo daily-life moments (highly reusable MiriCanvas base): a woman journaling in a spiral notebook on a wooden table with an open book, ceramic coffee cup and a small plant lit by warm window light; a young Korean man smiling at a smartphone in a bright home office; hands holding a coffee cup — quiet mindful mood, shallow depth of field, subject to one side, wide 45-60% low-detail area for Korean text overlay.
+- Golf lifestyle (bright MiriCanvas leisure seller): golfer lining up a putt with tight focus on hands and club, a couple walking a fairway with a golf cart, a lesson swing at a green driving range — bright daylight, crisp green turf, blue sky, no crowd.
+UNIVERSAL MIRICANVAS SIGNATURE for the lifestyle categories above: bright airy, warm-neutral palette (cream/beige/soft wood), authentic Korean people with genuine natural smiles (never stiff Western stock look), soft window daylight, one gentle plant, tack-sharp subject with gently blurred background, and a clean low-detail area (~45-55% of frame) reserved for Korean text overlay.`;
 
 const ASPECTS = ["1:1", "16:9", "4:3", "3:4", "9:16"];
 const OPENAI_SIZE = { "1:1": "1024x1024", "16:9": "1536x1024", "4:3": "1536x1024", "3:4": "1024x1536", "9:16": "1024x1536" };
@@ -413,8 +423,11 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   const anglePick = CAMERA_ANGLES[slot.angle]?.phrase || "";
   const isTight = slot.angle === "closeup" || slot.angle === "macro";
   const isEmotional = mode === "emotional";
+  const themeAll = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`;
   /* 음식은 밝은 초근접 실사 인스타 느낌이 기본 — 배경화면/감성 모드가 아니면 프레임을 꽉 채운다 */
-  const isFood = !isIllust && FOOD_RE.test(`${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`);
+  const isFood = !isIllust && FOOD_RE.test(themeAll);
+  /* 미캔 라이프스타일 — 부동산·가족·솔로 데일리·골프 등 밝은 홈 미학 (감성·음식 아닐 때만) */
+  const isMiriLifestyle = !isIllust && !isEmotional && !isFood && MIRI_LIFESTYLE_RE.test(themeAll);
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
   const comp = mode === "wallpaper"
     ? `40-60% clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
@@ -422,9 +435,11 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
       ? `wide emotional background for text overlay: subject off to one side, 45-60% low-detail copy space with a calm darker zone where Korean text will be placed (${slot.copy_space || "open sky or soft area"})`
       : isFood
         ? "extreme close-up macro food shot, the dish fills almost the entire frame, tight appetizing crop, shallow depth of field with the food tack-sharp"
-        : isTight
-          ? "tight detail shot, subject sharply focused"
-          : `subject fills 50-70% of frame with ~30% clean copy space (${slot.copy_space || "for text overlay"}), rule-of-thirds, subject fully in frame`;
+        : isMiriLifestyle
+          ? `subject placed to one side of the frame, 45-55% low-detail clean area on the opposite side reserved for Korean text overlay (${slot.copy_space || "soft wall or window light area"}), gentle background blur, natural relaxed pose`
+          : isTight
+            ? "tight detail shot, subject sharply focused"
+            : `subject fills 50-70% of frame with ~30% clean copy space (${slot.copy_space || "for text overlay"}), rule-of-thirds, subject fully in frame`;
   const camera = [anglePick, slot.camera].filter(Boolean).join(", ")
     || (isIllust ? "clean vector edges" : "natural depth of field");
   /* 감성 모드는 골든아워·빛내림 · 그 외 실내/사무 주제(밤 아님)는 중립 화이트밸런스 */
@@ -462,10 +477,12 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     !isIllust ? "objects rest naturally on real surfaces, nothing floating" : "",
     /* 음식이면 밝은 초근접 실사 인스타 스타일링을 최종 프롬프트에 직접 주입 */
     isFood ? FOOD_STYLING : "",
+    /* 미캔 라이프스타일 시그니처 — 부동산·가족·솔로 데일리 등 밝은 홈 미학 */
+    isMiriLifestyle ? MIRI_LIFESTYLE_STYLING : "",
     quality,
     GUARD,
-    /* 배경화면=제외 · 감성=텍스트 여백 · 신앙=골든아워/실루엣 · 음식=밝은근접+배경흐림 허용 · 그 외=상업 배제 */
-    mode === "wallpaper" ? "" : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : isFood ? FOOD_GUARD : COMMERCIAL_GUARD,
+    /* 배경화면=제외 · 감성=텍스트 여백 · 신앙=골든아워/실루엣 · 음식=밝은근접+배경흐림 · 미캔라이프=밝은홈+얕은심도 · 그 외=상업 배제 */
+    mode === "wallpaper" ? "" : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : isFood ? FOOD_GUARD : isMiriLifestyle ? MIRI_LIFESTYLE_GUARD : COMMERCIAL_GUARD,
   ].filter(Boolean).join(". ");
 }
 
@@ -474,11 +491,11 @@ const MJ_NEG_BASE = "text, letters, numbers, logo, watermark, brand name, signat
 const MJ_NEG_COMMERCIAL = "backlit, silhouette, lens flare, bokeh, blurry background, out of focus background, cluttered background, crowd";
 function toMidjourney(slot, mode, tone, people, aspect) {
   let pos = slot.finalPrompt || buildSlotPrompt(slot, mode, tone, people);
-  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(GUARD, "")
+  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(GUARD, "")
     .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
   const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`;
-  /* 역광·보케 배제는 순수 상업 슬롯에만 — 신앙(역광)·음식(얕은 심도)은 그게 판매 포인트라 제외 */
-  const commercialNeg = mode === "commercial" && !FAITH_RE.test(themeText) && !FOOD_RE.test(themeText);
+  /* 역광·보케 배제는 순수 상업 슬롯에만 — 신앙(역광)·음식·미캔라이프(얕은 심도)는 그게 판매 포인트라 제외 */
+  const commercialNeg = mode === "commercial" && !FAITH_RE.test(themeText) && !FOOD_RE.test(themeText) && !MIRI_LIFESTYLE_RE.test(themeText);
   const neg = commercialNeg ? `${MJ_NEG_BASE}, ${MJ_NEG_COMMERCIAL}` : MJ_NEG_BASE;
   const style = slot.kind === "illustration" ? "" : " --style raw";
   return `${pos} --ar ${aspect || "16:9"}${style} --no ${neg}`;
