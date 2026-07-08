@@ -5,6 +5,11 @@
 
 파이프라인: **초안 승인(멈춤1) → 순차 생성 → QC(멈춤2) → 제출 팩(Adobe CSV + 미리캔버스 XLSX)**
 
+> **Midjourney 배치 연동**: 백업·저장 툴바의 `미드저니 배치 TXT` 버튼으로 슬롯을 MJ 문법
+> 프롬프트(`--ar`/`--style raw`/`--no`)로 내보내, 저장소의 `midjourney-batch/` 자동화 도구
+> (`mj_batch.py`)에 그대로 넣어 사람처럼 대량 생성할 수 있습니다. 자세한 내용은
+> [`midjourney-batch/README.md`](midjourney-batch/README.md).
+
 > 이 프론트엔드는 저장소 루트의 Python 크롭 서버(`server.py`)와는 독립적인 별도 앱입니다.
 
 ## 개발 실행

@@ -460,22 +460,50 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   ].filter(Boolean).join(". ");
 }
 
-/* ── Midjourney 형식 변환 ──
-   우리 프롬프트는 배제어를 문장 안에 넣지만(gpt-image·Gemini는 --no 문법이 없음),
-   Midjourney는 --no 파라미터·--ar·--style raw를 쓴다. 자연어 배제문을 걷어내고 MJ 문법으로 재조립. */
+/* ── Midjourney 형식 변환 (수동 내보내기용) ── */
 const MJ_NEG_BASE = "text, letters, numbers, logo, watermark, brand name, signature, deformed hands, extra fingers, distorted anatomy, plastic AI look, oversmoothed skin";
 const MJ_NEG_COMMERCIAL = "backlit, silhouette, lens flare, bokeh, blurry background, out of focus background, cluttered background, crowd";
 function toMidjourney(slot, mode, tone, people, aspect) {
-  /* buildSlotPrompt 결과에서 우리 자연어 배제문(GUARD 계열)을 제거해 긍정부만 남긴다 */
   let pos = slot.finalPrompt || buildSlotPrompt(slot, mode, tone, people);
   pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(GUARD, "")
     .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
-  /* 역광·보케 배제는 순수 상업 슬롯에만 — 배경화면·감성·신앙은 골든아워/역광이 판매 포인트라 제외 */
   const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""}`;
   const commercialNeg = mode === "commercial" && !FAITH_RE.test(themeText);
   const neg = commercialNeg ? `${MJ_NEG_BASE}, ${MJ_NEG_COMMERCIAL}` : MJ_NEG_BASE;
   const style = slot.kind === "illustration" ? "" : " --style raw";
   return `${pos} --ar ${aspect || "16:9"}${style} --no ${neg}`;
+}
+
+/* ── Midjourney 배치 파이프라인용 (mj_batch.py) ── */
+const MJ_TONE_WORD = {
+  realism: "photorealistic commercial stock photo",
+  bright: "bright airy minimal commercial photo",
+  lifestyle: "warm lifestyle editorial photo, golden natural light",
+  cinematic: "cinematic moody commercial photo, dramatic lighting",
+  concept: "futuristic concept render, neon accents",
+};
+function buildMidjourneyPrompt(slot, { aspect = "16:9", tone = "realism", people = "none" } = {}) {
+  const isIllust = slot.kind === "illustration";
+  const banPeople = people === "none";
+  const anglePhrase = CAMERA_ANGLES[slot.angle]?.phrase || slot.camera || "";
+  const lead = isIllust
+    ? "professional stock illustration, clean vector-like medium"
+    : (MJ_TONE_WORD[tone] || MJ_TONE_WORD.realism);
+  const core = [
+    lead,
+    slot.subject,
+    slot.props ? `featuring ${slot.props}` : "",
+    anglePhrase,
+    slot.lighting,
+    slot.palette,
+    slot.copy_space ? `clean negative space (${slot.copy_space})` : "clean negative space for text overlay",
+    isIllust ? "" : "tack-sharp, natural true-to-life color, no plastic AI look",
+  ].filter(Boolean).join(", ");
+  const params = [];
+  if (!isIllust) params.push("--style raw");
+  params.push(`--no text, letters, numbers, logo, watermark, signature${banPeople ? ", people" : ""}`);
+  params.push(`--ar ${aspect}`);
+  return `${core} ${params.join(" ")}`.replace(/\s+/g, " ").trim();
 }
 
 export default function App() {
@@ -1130,6 +1158,21 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
     saveBlob(new Blob([buildPromptsFullText(rows)], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-full.txt`);
     addLog(`[백업] 프롬프트 TXT(전체) 저장 완료 — ${rows.length}슬롯`);
+  };
+
+  /* ── Midjourney 배치 TXT — midjourney-batch/mj_batch.py 로 바로 넣는 파이프라인 ── */
+  const exportMidjourneyBatch = () => {
+    const rows = slots.filter((s) => s.subject);
+    if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
+    const head =
+      `# FreeJJang → Midjourney 배치 — 주제: ${topic || "(미지정)"} · 종횡비: ${aspect} · ${rows.length}개\n` +
+      `# 사용법: 이 파일을 midjourney-batch/mj_batch.py 에 그대로 넣으세요\n` +
+      `#   python mj_batch.py --prompts <이파일>.txt\n` +
+      `# 한 줄 = 프롬프트 하나. '#' 줄과 빈 줄은 무시됩니다.\n` +
+      `# --ar/--style/--no 파라미터는 이미 포함됨. 버전을 고정하려면 각 줄 끝에 --v 6.1 등을 추가하세요.\n\n`;
+    const body = rows.map((s) => buildMidjourneyPrompt(s, { aspect, tone: refTone, people: refPeople })).join("\n");
+    saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-midjourney.txt`);
+    addLog(`[미드저니] 배치 TXT 저장 — ${rows.length}슬롯 (mj_batch.py 파이프라인용)`);
   };
 
   /* ═══ 이코노미 2패스 마감 — 승인된 low 드래프트만 편집 API로 고품질(medium/high) 리렌더 (구도 유지) ═══ */
@@ -1798,6 +1841,11 @@ Each block content = one short Korean sentence.`,
                       <button onClick={exportPromptsFull}
                         className="bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
                         <FileSpreadsheet className="w-3.5 h-3.5" /> 전체 필드 TXT
+                      </button>
+                      <button onClick={exportMidjourneyBatch}
+                        title="Midjourney 배치 자동화(mj_batch.py)용 TXT — 각 슬롯을 MJ 문법(--ar/--style/--no)으로 변환해 한 줄씩 저장"
+                        className="bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
+                        <Cpu className="w-3.5 h-3.5" /> 미드저니 배치 TXT
                       </button>
                     </div>
                   </section>
