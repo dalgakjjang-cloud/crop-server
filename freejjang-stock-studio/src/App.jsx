@@ -37,7 +37,7 @@ const MIRI_LIFESTYLE_STYLING = "authentic bright airy Korean home aesthetic: war
 const MIRI_LIFESTYLE_GUARD = "bright and appetizing with soft natural window light, subject tack-sharp, gently blurred background welcome, generous low-detail area reserved for Korean text overlay, no dark or moody underexposure, no crowd";
 
 /* 어도비 헬스케어 — 글로벌 스톡 톱셀러 (의료·환자 케어·연구·웰니스) */
-const HEALTHCARE_RE = /의사|의료|병원|간호|간호사|환자|진료|처방|약사|약국|치료|재활|물리치료|건강\s*검진|헬스케어|의학|웰니스|정신건강|상담|심리치료|healthcare|hospital|clinic|doctor|nurse|patient|medical|medicine|therapy|wellness|mental\s*health|pharmacist|pharmacy/i;
+const HEALTHCARE_RE = /의사|의료|병원|간호|간호사|환자|진료|처방|약사|약국|치료|재활|물리치료|건강\s*검진|헬스케어|의학|웰니스|정신건강|상담|심리치료|healthcare|hospital|clinic|doctor|\bnurse\b|patient|medical|medicine|therapy|wellness|mental\s*health|pharmacist|pharmacy/i;
 /* 한국 명시 주제 감지 — 어도비 글로벌 다양성 규칙을 이때만 억제 */
 const KOREAN_EXPLICIT_RE = /한국|서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충청|전라|경상|제주|한국인|korean|seoul|busan/i;
 const HEALTHCARE_STYLING = "professional healthcare stock photography for Adobe Stock: authentic diverse medical professionals interacting warmly with a patient, tack-sharp clinical detail, modern hospital or clinic setting with pale blue-white palette, natural but flattering lighting, hopeful reassuring mood — never sterile-cold, never sensationalized";
@@ -151,6 +151,11 @@ const FOOD_RE = /food|dish|meal|cuisine|dessert|bakery|brunch|coffee|drink|bever
 const FOOD_STYLING = "bright airy well-lit food photography, extreme close-up macro with the dish as hero filling almost the whole frame, mouth-watering Instagram appeal, fresh realistic textures you can almost taste, vibrant true-to-life color, tasteful garnish, visible steam on hot dishes and condensation on cold drinks, soft shallow depth of field, clean surface";
 /* 음식 전용 가드 — 상업 가드의 보케·얕은심도 금지를 뒤집는다(음식은 배경 흐림이 판매 포인트) */
 const FOOD_GUARD = "bright and appetizing with soft natural light, the dish tack-sharp in tight close-up, gently blurred background welcome, no dark or moody underexposure, no dull flat color, no plastic gloss, no fake sheen, no cluttered background, no crowd";
+/* 디지털 업무(POS·태블릿·재고·온라인) 자동 감지 — 카페/식당/가게가 '배경'일 뿐 주인공은 디지털 업무인 장면.
+   이게 잡히면 음식 접사·라이프스타일 흐림·헬스케어 오분류를 억제하고 '선명한 상업 업무샷'으로 강제한다. */
+const WORK_TECH_RE = /\bPOS\b|키오스크|kiosk|태블릿|tablet|노트북|laptop|바코드|barcode|스캐너|스캔|scanner|재고|inventory|대시보드|dashboard|스마트폰|smartphone|\bmobile\b|online\s*(?:order|listing|stock|booking|sale)|온라인\s*(?:주문|판매|예약|재고)|디지털\s*전환|스마트\s*(?:업무|스토어|워크|오더|가게)|결제|payment|예약\s*(?:관리|시스템|잡|확인)|appointment|주문\s*(?:관리|접수|확인|큐|queue)/i;
+/* 디지털 업무 시그니처 — 기기·화면·손은 선명, 작업공간과 배경까지 또렷(깊은 심도), 밝은 상업 톤. 과한 아웃포커싱 차단 */
+const WORK_TECH_STYLING = "the digital device and the work itself are the clear hero — screen, hands and product tack-sharp; deep depth of field with the whole workspace and background clearly in focus and readable (no heavy background blur, no strong bokeh); bright clean modern commercial business photography";
 /* 인물 등장 조건 4단계 (People Selector) */
 const REEDO_PEOPLE = {
   auto: "선택 안함 (AI 자율)",
@@ -439,12 +444,14 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
   const isTight = slot.angle === "closeup" || slot.angle === "macro";
   const isEmotional = mode === "emotional";
   const themeAll = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`;
-  /* 음식은 밝은 초근접 실사 인스타 느낌이 기본 — 배경화면/감성 모드가 아니면 프레임을 꽉 채운다 */
-  const isFood = !isIllust && FOOD_RE.test(themeAll);
-  /* 미캔 라이프스타일 — 부동산·가족·솔로 데일리·골프 등 밝은 홈 미학 (감성·음식 아닐 때만) */
-  const isMiriLifestyle = !isIllust && !isEmotional && !isFood && MIRI_LIFESTYLE_RE.test(themeAll);
-  /* 어도비 헬스케어 — 글로벌 다양성 상업 구도 (감성·음식·미캔라이프 아닐 때) */
-  const isHealthcare = !isIllust && !isEmotional && !isFood && !isMiriLifestyle && HEALTHCARE_RE.test(themeAll);
+  /* 디지털 업무(POS·태블릿·재고·온라인)가 주인공이면 음식/라이프스타일/헬스케어 오분류를 억제하고 선명한 상업 업무샷으로 */
+  const isWorkTech = !isIllust && WORK_TECH_RE.test(themeAll);
+  /* 음식은 밝은 초근접 실사 인스타 느낌이 기본 — 배경화면/감성 모드가 아니면 프레임을 꽉 채운다 (디지털 업무 장면은 제외) */
+  const isFood = !isIllust && !isWorkTech && FOOD_RE.test(themeAll);
+  /* 미캔 라이프스타일 — 부동산·가족·솔로 데일리·골프 등 밝은 홈 미학 (감성·음식·디지털업무 아닐 때만) */
+  const isMiriLifestyle = !isIllust && !isEmotional && !isFood && !isWorkTech && MIRI_LIFESTYLE_RE.test(themeAll);
+  /* 어도비 헬스케어 — 글로벌 다양성 상업 구도 (감성·음식·미캔라이프·디지털업무 아닐 때) */
+  const isHealthcare = !isIllust && !isEmotional && !isFood && !isMiriLifestyle && !isWorkTech && HEALTHCARE_RE.test(themeAll);
   /* 한국 명시 시 어도비 글로벌 다양성 규칙 억제 (Korean 캐스팅 유지)
      — 슬롯 영어 텍스트에 Korean이 없어도, 주제/지역이 한국이면(koreanCast) 강제 */
   const isKoreanExplicit = koreanCast || KOREAN_EXPLICIT_RE.test(themeAll);
@@ -510,6 +517,8 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
     isMiriLifestyle ? MIRI_LIFESTYLE_STYLING : "",
     /* 어도비 헬스케어 시그니처 — 글로벌 다양성(한국 명시면 한국인 캐스팅) */
     isHealthcare ? (isKoreanExplicit ? HEALTHCARE_STYLING.replace("authentic diverse medical professionals", "authentic Korean medical professionals") : HEALTHCARE_STYLING) : "",
+    /* 디지털 업무 시그니처 — 기기·화면·배경 모두 선명(과한 아웃포커싱 차단) */
+    isWorkTech ? WORK_TECH_STYLING : "",
     quality,
     GUARD,
     /* 배경화면=제외 · 감성=텍스트여백 · 신앙=골든아워 · 음식=밝은근접 · 미캔라이프=밝은홈 · 헬스케어=클리닉리얼 · 그 외=상업 배제 */
@@ -525,8 +534,10 @@ function toMidjourney(slot, mode, tone, people, aspect) {
   pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(HEALTHCARE_GUARD, "").replace(GUARD, "")
     .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
   const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`;
-  /* 역광·보케 배제는 순수 상업 슬롯에만 — 신앙(역광)·음식·미캔라이프(얕은 심도)는 그게 판매 포인트라 제외 */
-  const commercialNeg = mode === "commercial" && !FAITH_RE.test(themeText) && !FOOD_RE.test(themeText) && !MIRI_LIFESTYLE_RE.test(themeText);
+  /* 디지털 업무(POS·태블릿·재고·온라인)가 주인공이면 음식/라이프스타일 예외를 무시하고 선명 강제 */
+  const isWorkTech = WORK_TECH_RE.test(themeText);
+  /* 역광·보케 배제 = 순수 상업 + 디지털 업무 슬롯. 신앙(역광)·음식·미캔라이프(얕은 심도)는 판매 포인트라 제외하되, 디지털 업무면 선명 우선 */
+  const commercialNeg = mode === "commercial" && (isWorkTech || (!FAITH_RE.test(themeText) && !FOOD_RE.test(themeText) && !MIRI_LIFESTYLE_RE.test(themeText)));
   const neg = commercialNeg ? `${MJ_NEG_BASE}, ${MJ_NEG_COMMERCIAL}` : MJ_NEG_BASE;
   const style = slot.kind === "illustration" ? "" : " --style raw";
   return `${pos} --ar ${aspect || "16:9"}${style} --no ${neg}`;
