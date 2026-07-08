@@ -16,8 +16,24 @@ import Pica from "pica";
    파이프라인: 초안 승인(멈춤1) → 순차 생성 → QC(멈춤2) → 제출 팩
    ═══════════════════════════════════════════════════════════ */
 
-const GUARD =
-  "Strictly no text, no letters, no numbers, no logos, no watermarks, no brand names, no branded packaging, no copyrighted characters, no unrequested people.";
+/* 항상 배제 (텍스트·로고·저작권·군중) — 상업용/배경화면 모두 공통 · 짧게 */
+const GUARD = "no text, logos, watermarks, brands, copyrighted characters, or crowd";
+
+/* 상업용(non-wallpaper) 전용 배제 — 역광·보케·산만한 배경 (어도비 판매 킬러) · 짧게 */
+const COMMERCIAL_GUARD = "clean uncluttered background, even lighting, no backlit, no silhouette, no lens flare, no bokeh, no blurry background";
+
+/* 신앙·워십 장르: 골든아워 역광·십자가 실루엣이 오히려 판매 포인트 (미캔 베스트셀러) → backlit 금지 예외 */
+const FAITH_RE = /church|worship|choir|cross|crucifix|prayer|praying|bible|gospel|christian|faith|congregation|hymn|sanctuary|교회|예배|성가대|찬양|십자가|기도|성경|기독교|신앙|찬송|성도|예수|주님/i;
+const FAITH_GUARD = "clean reverent composition, warm golden-hour or soft sanctuary light welcome, gentle cross silhouette acceptable, no clutter";
+
+/* 감성 배경(미캔형) — 텍스트 얹을 배경. 골든아워·빛내림·역광 환영 + 어두운 텍스트 여백 */
+const EMOTIONAL_ATMOS = "warm golden-hour glow or soft dramatic sky with gentle light rays beaming through clouds, serene inspirational mood, soft backlight and subtle lens flare welcome";
+const EMOTIONAL_GUARD = "simple clean composition with a calm low-detail area reserved for text overlay, no busy clutter";
+
+/* 검증된 판매 공식 — 두뇌(추천·초안)가 주제에 맞을 때 이 구도로 기울이도록 참고 주입 */
+const BESTSELLER_REFERENCE = `PROVEN BESTSELLER FORMULAS — when the topic fits one of these, lean into its exact winning composition:
+- Faith / worship (top seller on Korean MiriCanvas): church interior, a choir singing, a cross silhouetted against a golden-hour or sunset sky, praying hands, an open bible beside candles, a worship band — reverent warm mood; here golden-hour backlight and a gentle silhouette ARE desirable (do NOT flatten them).
+- Business growth / finance (top seller on BOTH Adobe Stock & MiriCanvas): stacked gold coins with an upward arrow, a glowing arrow rising through a blue data grid, an ascending stock candlestick chart on a screen — clean, professional, blue-and-gold palette, conveying growth and success.`;
 
 const ASPECTS = ["1:1", "16:9", "4:3", "3:4", "9:16"];
 const OPENAI_SIZE = { "1:1": "1024x1024", "16:9": "1536x1024", "4:3": "1536x1024", "3:4": "1024x1536", "9:16": "1024x1536" };
@@ -28,6 +44,8 @@ const GEMINI_IMG_COST = 0.039; // gemini-2.5-flash-image 1장 근사 단가
 const TRANSIENT_RE = /429|rate.?limit|overloaded|timeout|temporarily|unavailable|failed to fetch|network|internal|50[023]/i;
 
 const WALLPAPER_RE = /배경화면|월페이퍼|wallpaper|배너|banner|카피\s*스페이스|copy\s*space/i;
+/* 감성 배경 자동 감지 — 절기·예배·감성 문구 (미캔 텍스트 배경 수요) */
+const EMOTIONAL_RE = /추수감사|감사절|thanksgiving|예배|찬양|워십|worship|말씀|성경\s*구절|묵상|은혜|축복|빛내림|감성\s*배경|성탄|크리스마스|부활절|간증|주일|찬송|새해\s*인사|명절\s*인사/i;
 
 const ANALYSIS_BLOCKS = ["주제","스타일","구도","조명","색감","외형","의상","포즈/표정","소품/오브젝트","배경","카메라","분위기","여백/카피스페이스"];
 
@@ -58,14 +76,6 @@ const CAMERA_ANGLES = {
 /* 지능형 분위기 필터 — 실내/사무 주제 감지 시 중립 화이트밸런스(노란끼 배제) 적용 */
 const INDOOR_RE = /office|desk|workspace|indoor|meeting|remote\s*work|home\s*office|studio|사무실|재택|실내|회의|책상|워크스페이스|홈\s*오피스|스튜디오|작업실/i;
 const NIGHT_RE = /night|evening|dusk|midnight|sunset|밤|저녁|야간|새벽|노을|야경|일몰/i;
-/* 생성 시점마다 Math.random()으로 진짜 무작위 선택되는 밝은 실내 광원 풀 */
-const BRIGHT_NEUTRAL_STYLES = [
-  "bright professional workspace, color-accurate neutral white balance, no excessive warm or yellow filters",
-  "clean daylight-balanced lighting, airy natural window light, true-to-life neutral colors, transparent atmosphere",
-  "crisp bright interior, neutral 5500K daylight white balance, clean white office lighting, no heavy color cast",
-  "fresh luminous workspace, soft diffused daylight, accurate whites and neutral grays, modern clean look",
-];
-const pickRandom = (arr) => arr[Math.floor(Math.random() * arr.length)];
 
 /* REEDO식 구조화 구성 — 드롭다운 선택이 초안 프롬프트 제약으로 조립됨 (선택 안함이면 무시) */
 const REEDO_STYLE = {
@@ -93,6 +103,26 @@ const REEDO_BG_PHRASE = {
   office: "modern office setting", outdoor: "natural outdoor environment",
   studio: "professional studio setting", solid: "clean solid color backdrop", bokeh: "soft bokeh blurred background",
 };
+/* 음식 장르 셀렉터 — 음식 주제일 때 장르별 스타일링 주입 (선택 안함이면 무시) */
+const REEDO_FOOD = {
+  "": "선택 안함", brunch: "브런치/카페", dessert: "디저트/베이커리", korean: "한식/집밥",
+  beverage: "음료/커피", finedining: "파인다이닝/플레이팅", healthy: "건강식/샐러드",
+  street: "분식/길거리", homecook: "홈쿠킹/재료", flatlay: "푸드 플랫레이(탑뷰)",
+};
+const REEDO_FOOD_PHRASE = {
+  brunch: "fresh brunch cafe food photography — avocado toast / eggs / greens vibe on a modern cafe table, appetizing natural styling",
+  dessert: "dessert & bakery photography — cakes, pastries, coffee, cozy patisserie styling with soft warm light",
+  korean: "authentic Korean home-food photography — correct Korean tableware (ceramic/stainless banchan bowls), steaming rice and side dishes",
+  beverage: "beverage & coffee photography — the drink as hero with condensation or gentle steam, clean cafe-counter styling",
+  finedining: "fine-dining plated photography — elegant minimal plating on a large plate, upscale restaurant styling",
+  healthy: "healthy & salad photography — vibrant crisp fresh vegetables, clean bright wellness styling",
+  street: "Korean street & snack food photography — tteokbokki, gimbap, hotteok, casual vivid appetizing styling",
+  homecook: "home-cooking ingredients & prep — fresh raw ingredients on a rustic wooden board, natural cooking-in-progress feel",
+  flatlay: "top-down food flat lay — neatly arranged dishes and props shot straight down, balanced negative space",
+};
+/* 음식 자동 감지 + 공통 식욕 자극 스타일링 (장르 미선택이어도 음식이면 자동 적용) */
+const FOOD_RE = /food|dish|meal|cuisine|dessert|bakery|brunch|coffee|drink|beverage|snack|breakfast|lunch|dinner|음식|요리|음료|커피|디저트|베이커리|브런치|한식|간식|분식|샐러드|빵|케이크|반찬|밥|국|찌개|면|과일|채소/i;
+const FOOD_STYLING = "appetizing food styling: fresh natural realistic textures, vibrant true-to-life color, tasteful garnish, steam on hot food and condensation on cold drinks, clean uncluttered surface, the dish as hero — no plastic-looking gloss, no fake sheen, no inedible over-saturation";
 /* 인물 등장 조건 4단계 (People Selector) */
 const REEDO_PEOPLE = {
   auto: "선택 안함 (AI 자율)",
@@ -109,9 +139,9 @@ const REEDO_PEOPLE_PHRASE = {
 };
 /* 최종 이미지 프롬프트 주입용 — 부정 키워드까지 강하게 (auto는 미적용) */
 const PEOPLE_FINAL = {
-  none: "Strictly NO people, no persons, no humans, no faces, no hands, no body parts, no silhouettes of people, no mannequins, no crowd — clean empty space and equipment only",
-  few: "Include at most 1-2 people, quiet single-person focus, no crowd, no spectators",
-  small: "Include at most 3 people as a small group, NO large audience, NO bleachers, NO crowd",
+  none: "no people, clean space only",
+  few: "1-2 people only, no crowd",
+  small: "small group of max 3 people, no crowd",
 };
 
 /* 톤(판매 미학) — 2026 베스트셀러 조사 기반: 믿을 수 있는 실사가 팔린다.
@@ -124,12 +154,11 @@ const REEDO_TONE = {
   concept: "미래 컨셉 (네온)",
 };
 const TONE_PHRASE = {
-  realism:
-    "believable present-day commercial photograph that could genuinely be shot in a real 2026 setting: plausible real objects with realistic materials and true-to-life accurate color, natural daylight or realistic practical lighting, natural depth of field, slight organic asymmetry and gentle lived-in imperfection so it never looks templated — absolutely NO floating holograms, NO laser grids, NO sci-fi projections, NOT neon-drenched, NOT cyberpunk, NOT a sterile empty showroom, NOT over-polished CGI perfection. Render exactly the specific supporting props described for THIS scene and nothing generic — do NOT default to a water bottle or a potted plant unless this scene explicitly calls for it",
-  bright: "bright airy minimal commercial look, abundant soft natural daylight, clean neutral palette, realistic true-to-life materials, believable real-world scene",
-  lifestyle: "warm inviting lifestyle photography, golden natural light, cozy human warmth in a believable real space, editorial magazine quality",
-  cinematic: "cinematic moody lighting with dramatic shadows and rich atmosphere, but still a believable real-world scene with plausible equipment — no sci-fi fantasy elements",
-  concept: "futuristic concept aesthetic, neon accent lighting, high-tech atmosphere, stylized commercial render",
+  realism: "believable real-world commercial photo, natural lighting, realistic materials and true color — no sci-fi, no neon, no CGI perfection",
+  bright: "bright airy minimal look, soft daylight, clean neutral palette",
+  lifestyle: "warm lifestyle photo, natural golden light, cozy real space",
+  cinematic: "cinematic moody lighting, rich atmosphere, still a believable real scene",
+  concept: "futuristic concept look, neon accents, high-tech atmosphere",
 };
 
 /* 두뇌(에이전트) 라벨 · 기본 모델
@@ -224,23 +253,30 @@ async function askGPT(key, model, system, user, imageBlock) {
   return extractJSON(text, "GPT");
 }
 
-/* ── 두뇌 B: Gemini (Google AI 스튜디오 키) ── */
+/* ── 두뇌 B: Gemini (Google AI 스튜디오 키) ──
+   2026-06 이후 구글은 URL `?key=` 방식 대신 `x-goog-api-key` 헤더 방식을 표준으로 강제한다.
+   신규 AQ 키는 URL 쿼리 방식이 종종 401/403을 뱉으므로 헤더 방식으로 통일. */
+const geminiHeaders = (key) => ({
+  "Content-Type": "application/json",
+  "x-goog-api-key": key,
+});
+const geminiUrl = (model) =>
+  `https://generativelanguage.googleapis.com/v1beta/models/${model || GEMINI_MODEL_DEFAULT}:generateContent`;
+
 async function askGemini(key, model, system, user, imageBlock) {
   if (!key) throw new Error("Gemini: Google API 키가 없습니다.");
   const parts = imageBlock
     ? [{ text: user }, { inlineData: { mimeType: imageBlock.mime, data: imageBlock.data } }]
     : [{ text: user }];
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model || GEMINI_MODEL_DEFAULT}:generateContent?key=${encodeURIComponent(key)}`,
-    {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents: [{ parts }],
-        generationConfig: { responseMimeType: "application/json" },
-      }),
-    }
-  );
+  const res = await fetch(geminiUrl(model), {
+    method: "POST",
+    headers: geminiHeaders(key),
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents: [{ parts }],
+      generationConfig: { responseMimeType: "application/json" },
+    }),
+  });
   const data = await res.json();
   if (data.error) throw new Error(`Gemini: ${data.error.message}`);
   const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text).filter(Boolean).join("\n");
@@ -249,17 +285,16 @@ async function askGemini(key, model, system, user, imageBlock) {
 
 /* ── Gemini + 구글 검색 그라운딩: 오늘의 추천용 (실시간 트렌드·뉴스 반영) ── */
 async function askGeminiGrounded(key, model, system, user) {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${model || GEMINI_MODEL_DEFAULT}:generateContent?key=${encodeURIComponent(key)}`,
-    {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: system }] },
-        contents: [{ parts: [{ text: user }] }],
-        tools: [{ google_search: {} }],
-      }),
-    }
-  );
+  if (!key) throw new Error("Gemini(검색): Google API 키가 없습니다.");
+  const res = await fetch(geminiUrl(model), {
+    method: "POST",
+    headers: geminiHeaders(key),
+    body: JSON.stringify({
+      systemInstruction: { parts: [{ text: system }] },
+      contents: [{ parts: [{ text: user }] }],
+      tools: [{ google_search: {} }],
+    }),
+  });
   const data = await res.json();
   if (data.error) throw new Error(`Gemini(검색): ${data.error.message}`);
   const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text).filter(Boolean).join("\n");
@@ -268,11 +303,15 @@ async function askGeminiGrounded(key, model, system, user) {
 
 /* ── 이미지 생성 (사용자 키 · 메모리에만 유지) ── */
 async function genGemini(key, prompt, aspect) {
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image:generateContent?key=${encodeURIComponent(key)}`,
-    { method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { imageConfig: { aspectRatio: aspect } } }) }
-  );
+  if (!key) throw new Error("Gemini: Google API 키가 없습니다.");
+  const res = await fetch(geminiUrl("gemini-2.5-flash-image"), {
+    method: "POST",
+    headers: geminiHeaders(key),
+    body: JSON.stringify({
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: { imageConfig: { aspectRatio: aspect } },
+    }),
+  });
   const data = await res.json();
   if (data.error) throw new Error(`Gemini: ${data.error.message}`);
   const part = (data.candidates?.[0]?.content?.parts || []).find((p) => p.inlineData);
@@ -365,55 +404,77 @@ async function genOpenAIRefine(key, prompt, refDataUrl, aspect, quality) {
   return `data:image/png;base64,${b64}`;
 }
 
-/* 슬롯 필드 → 최종 이미지 프롬프트 (전문 판매 프롬프트 규칙) */
+/* 슬롯 필드 → 최종 이미지 프롬프트 (짧고 핵심적인 판매 프롬프트) */
 function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
+  const isIllust = slot.kind === "illustration";
   const anglePick = CAMERA_ANGLES[slot.angle]?.phrase || "";
   const isTight = slot.angle === "closeup" || slot.angle === "macro";
+  const isEmotional = mode === "emotional";
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
   const comp = mode === "wallpaper"
-    ? `40-60% low-density copy space opposite the subject (${slot.copy_space || "clean margin"}) — the copy-space area must keep subtle REAL surface texture (fabric weave, paper grain, wall texture, soft natural gradient), never a featureless blurred void`
-    : isTight
-      ? `intentional detail composition, subject sharply focused with natural background falloff (${slot.copy_space || "clean margin"})`
-      : `balanced commercial framing: the main subject clearly DOMINATES the frame at 50-70%, with 25-35% clean negative space (${slot.copy_space || "calm low-detail area suitable for text overlay"}) — the empty area must NEVER exceed 40% of the frame and must keep subtle real texture, the subject must never look small or lost in a vast empty background; visible environmental context, subject fully within frame and never cropped by the edges, rule-of-thirds — NOT a tight edge-to-edge close-up, NOT mostly-empty minimalism`;
-  const camera = slot.kind === "illustration"
-    ? `Rendering: ${slot.camera || "clean vector-like edges, consistent medium"}`
-    : `Camera: ${[anglePick, slot.camera].filter(Boolean).join(", ") || "one coherent lens, natural depth of field"}`;
-  /* 지능형 분위기: 실내/사무 주제 + 밤 아님 → 중립 화이트밸런스 (매 생성마다 무작위 풀에서 선택) */
+    ? `40-60% clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
+    : isEmotional
+      ? `wide emotional background for text overlay: subject off to one side, 45-60% low-detail copy space with a calm darker zone where Korean text will be placed (${slot.copy_space || "open sky or soft area"})`
+      : isTight
+        ? "tight detail shot, subject sharply focused"
+        : `subject fills 50-70% of frame with ~30% clean copy space (${slot.copy_space || "for text overlay"}), rule-of-thirds, subject fully in frame`;
+  const camera = [anglePick, slot.camera].filter(Boolean).join(", ")
+    || (isIllust ? "clean vector edges" : "natural depth of field");
+  /* 감성 모드는 골든아워·빛내림 · 그 외 실내/사무 주제(밤 아님)는 중립 화이트밸런스 */
   const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""}`;
-  const atmosphere = slot.kind !== "illustration" && INDOOR_RE.test(themeText) && !NIGHT_RE.test(themeText)
-    ? pickRandom(BRIGHT_NEUTRAL_STYLES)
-    : "";
-  const toneLine = slot.kind !== "illustration" ? TONE_PHRASE[tone] || TONE_PHRASE.realism : "";
+  const atmosphere = isEmotional
+    ? EMOTIONAL_ATMOS
+    : !isIllust && INDOOR_RE.test(themeText) && !NIGHT_RE.test(themeText)
+      ? "neutral daylight white balance, no yellow cast"
+      : "";
+  const toneLine = isIllust ? "" : TONE_PHRASE[tone] || TONE_PHRASE.realism;
   const peopleLine = PEOPLE_FINAL[people] || "";
-  const propsLine = slot.props ? `Scene-specific supporting props (render exactly these, no generic filler): ${slot.props}` : "";
+  const propsLine = slot.props ? `props: ${slot.props}` : "";
   /* 재생성 피드백 루프: 직전 거절 사유를 교정 지시로 주입 → 같은 실수 반복 차단 */
   const fixLine = slot.qcNote
-    ? `CRITICAL CORRECTION — the previous render of this exact slot was REJECTED for this reason: "${slot.qcNote}". Fix that specific problem this time; do NOT repeat it`
+    ? `FIX (was rejected): ${slot.qcNote}`
     : slot.regenCount > 0
-      ? "This is a re-render requested by the user: produce a NOTICEABLY different composition, styling and prop arrangement from the previous attempt — do not repeat the same look"
+      ? "clearly different composition from before"
       : "";
+  const quality = isIllust
+    ? "professional stock illustration"
+    : "professional stock photo, tack-sharp focus, even exposure, clean and noise-free, natural texture, no plastic AI look";
+  /* 신앙·워십 장르면 backlit 금지 대신 골든아워 역광·십자가 실루엣을 허용 (판매 포인트) */
+  const isFaith = !isIllust && FAITH_RE.test(themeText);
   return [
     slot.subject,
     fixLine,
     propsLine,
-    `Focal placement: ${slot.focal_placement || "center"}`,
-    comp, camera,
-    `Lighting: ${slot.lighting || "soft natural light with realistic shadows"}`,
+    comp,
+    `camera: ${camera}`,
+    `lighting: ${slot.lighting || "soft natural light"}`,
     atmosphere,
     toneLine,
     peopleLine,
-    `Palette: ${slot.palette || "bright commercial tones"}`,
-    slot.kind !== "illustration" ? "Physically plausible staging: every object rests naturally on a realistic surface — cups and drinks on a table, tray, desk or ledge, never directly on a sofa, bed or fabric; nothing floating or oddly placed" : "",
-    slot.kind !== "illustration" ? "TECHNICAL QUALITY (stock-review grade, critical): tack-sharp focus across the entire main subject (f/4-f/5.6 feel), accurate even exposure with full detail in both highlights and shadows, clean low-ISO look with zero visible noise or banding, crisp natural micro-texture — absolutely NO plastic over-smoothed AI skin/surfaces, NO over-sharpening halos, NO heavy filter, vignette or HDR look, NO motion blur, NO chromatic aberration" : "",
-    slot.kind === "illustration" ? "professional stock illustration" : "8K photorealistic professional stock photograph, crisp detail",
+    `palette: ${slot.palette || "bright commercial tones"}`,
+    !isIllust ? "objects rest naturally on real surfaces, nothing floating" : "",
+    quality,
     GUARD,
+    /* 배경화면=제외 · 감성=텍스트 여백 가이드 · 신앙=골든아워/실루엣 허용 · 그 외=상업 배제 */
+    mode === "wallpaper" ? "" : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : COMMERCIAL_GUARD,
   ].filter(Boolean).join(". ");
 }
 
-/* Midjourney 문법 전용 프롬프트 — 스톡 스튜디오 슬롯 → midjourney-batch/mj_batch.py 파이프라인용.
-   GPT/Gemini용 buildSlotPrompt는 문장 나열형이라 MJ에는 과하다(앞 토큰 가중치가 흐려짐).
-   MJ는 앞쪽 토큰에 가중치를 두므로 핵심(피사체·소품·구도·광원·팔레트)만 간결히 담고,
-   규격/네거티브는 --ar / --no 같은 파라미터로 뺀다. 결과는 한 줄(one prompt per line). */
+/* ── Midjourney 형식 변환 (수동 내보내기용) ── */
+const MJ_NEG_BASE = "text, letters, numbers, logo, watermark, brand name, signature, deformed hands, extra fingers, distorted anatomy, plastic AI look, oversmoothed skin";
+const MJ_NEG_COMMERCIAL = "backlit, silhouette, lens flare, bokeh, blurry background, out of focus background, cluttered background, crowd";
+function toMidjourney(slot, mode, tone, people, aspect) {
+  let pos = slot.finalPrompt || buildSlotPrompt(slot, mode, tone, people);
+  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(GUARD, "")
+    .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
+  const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""}`;
+  const commercialNeg = mode === "commercial" && !FAITH_RE.test(themeText);
+  const neg = commercialNeg ? `${MJ_NEG_BASE}, ${MJ_NEG_COMMERCIAL}` : MJ_NEG_BASE;
+  const style = slot.kind === "illustration" ? "" : " --style raw";
+  return `${pos} --ar ${aspect || "16:9"}${style} --no ${neg}`;
+}
+
+/* ── Midjourney 배치 파이프라인용 (mj_batch.py) ── */
 const MJ_TONE_WORD = {
   realism: "photorealistic commercial stock photo",
   bright: "bright airy minimal commercial photo",
@@ -438,10 +499,8 @@ function buildMidjourneyPrompt(slot, { aspect = "16:9", tone = "realism", people
     slot.copy_space ? `clean negative space (${slot.copy_space})` : "clean negative space for text overlay",
     isIllust ? "" : "tack-sharp, natural true-to-life color, no plastic AI look",
   ].filter(Boolean).join(", ");
-  // 파라미터 순서: --style → --no → --ar (--ar을 항상 맨 뒤에)
   const params = [];
   if (!isIllust) params.push("--style raw");
-  // GUARD(노텍스트)를 MJ 네거티브 파라미터로 이전 (인물은 설정이 '없음'일 때만 차단)
   params.push(`--no text, letters, numbers, logo, watermark, signature${banPeople ? ", people" : ""}`);
   params.push(`--ar ${aspect}`);
   return `${core} ${params.join(" ")}`.replace(/\s+/g, " ").trim();
@@ -481,6 +540,7 @@ export default function App() {
   const [refStyle, setRefStyle] = useState("");
   const [refRegion, setRefRegion] = useState("");
   const [refBg, setRefBg] = useState("");
+  const [refFood, setRefFood] = useState(""); // 음식 장르 (선택 안함이면 무시)
   const [refPeople, setRefPeople] = useState("none"); // 기본: 인물 없음 (모델 릴리즈 회피)
   const [refAngle, setRefAngle] = useState("auto");   // 초안 전체 기본 카메라 앵글
   const [refTone, setRefTone] = useState("realism");  // 기본: 판매 리얼 (베스트셀러 미학)
@@ -577,7 +637,7 @@ export default function App() {
 
   const onTopicChange = (v) => {
     setTopic(v);
-    if (modeAuto) setMode(WALLPAPER_RE.test(v) ? "wallpaper" : "commercial");
+    if (modeAuto) setMode(EMOTIONAL_RE.test(v) ? "emotional" : WALLPAPER_RE.test(v) ? "wallpaper" : "commercial");
   };
 
   /* REEDO식 구조화 구성 → 초안 브레인에 주입할 제약 문장 (선택된 것만) */
@@ -587,6 +647,9 @@ export default function App() {
     if (REEDO_STYLE_PHRASE[refStyle]) parts.push(`Style: ${REEDO_STYLE_PHRASE[refStyle]}`);
     if (REEDO_REGION_PHRASE[refRegion]) parts.push(`Market: ${REEDO_REGION_PHRASE[refRegion]}`);
     if (REEDO_BG_PHRASE[refBg]) parts.push(`Background: ${REEDO_BG_PHRASE[refBg]}`);
+    if (REEDO_FOOD_PHRASE[refFood]) parts.push(`Food genre: ${REEDO_FOOD_PHRASE[refFood]}`);
+    /* 발전: 장르를 안 골라도 주제/키워드가 음식이면 식욕 자극 스타일링 자동 주입 */
+    if (refFood || FOOD_RE.test(`${topic} ${priKw}`)) parts.push(`Food photography quality: ${FOOD_STYLING}`);
     if (REEDO_PEOPLE_PHRASE[refPeople]) parts.push(`People: ${REEDO_PEOPLE_PHRASE[refPeople]}`);
     if (CAMERA_ANGLES[refAngle]?.phrase) parts.push(`Camera baseline: ${CAMERA_ANGLES[refAngle].phrase}`);
     return parts.length ? `\nApply these refinements to EVERY slot: ${parts.join("; ")}.` : "";
@@ -712,7 +775,9 @@ export default function App() {
         const m = await askBrain(
           `You design a maximally DIVERSE professional stock image set — each image must be clearly a SEPARATE asset to a buyer (no near-duplicates; marketplaces reject similar images). Respond ONLY compact JSON:
 {"concepts":[{"scene":"1 short sentence: main subject doing what, where","location":"the place — must be unique in the set","action":"primary action","angle":"camera angle/framing","time":"time of day + light"}]}
-HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. NO TEXT-BEARING SCENES (critical — text in the image is auto-rejected): never design a scene whose subject involves readable written content — no presentation slides with titles, no lecturers pointing at worded screens, no documents/handouts/newspapers, no books with visible covers, no signs/labels/menus/whiteboards with writing; use imagery-only equivalents (wordless abstract visuals on screens, blank paper, shape-only charts). If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.`,
+HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. NO TEXT-BEARING SCENES (critical — text in the image is auto-rejected): never design a scene whose subject involves readable written content — no presentation slides with titles, no lecturers pointing at worded screens, no documents/handouts/newspapers, no books with visible covers, no signs/labels/menus/whiteboards with writing; use imagery-only equivalents (wordless abstract visuals on screens, blank paper, shape-only charts). If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.
+${BESTSELLER_REFERENCE}
+If the topic matches one of these formulas, make several concepts embody its winning composition (for faith topics, golden-hour cross silhouettes and warm sanctuary scenes are wanted, not to be avoided).`,
           `Topic: "${topic}". Mode: ${mode}. Design exactly ${count} distinct scene concepts.${refinementLine()}${handlingTip.trim() ? `\nUser handling notes (apply thoughtfully WITHOUT reducing diversity): ${handlingTip.trim()}` : ""}${priKw.trim() ? `\nBuyer search terms for context (use as inspiration for DIFFERENT scenes — do NOT put every term into every scene): ${priKw.trim()}` : ""}`
         );
         concepts = (m.concepts || []).filter((c) => c && c.scene).slice(0, count);
@@ -732,7 +797,7 @@ HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "lo
     let doneCnt = 0;
     const detailSystem = `You expand assigned scene concepts into professional stock image slots. Respond ONLY compact JSON:
 {"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"EXACTLY 25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경), same SEO ordering as EN","category":11}]}
-RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. NO TEXT-BEARING ELEMENTS anywhere in subject or props (text in the image is auto-rejected): no slides/screens with words, no documents, handouts, printed pages, book covers, signs, labels, menus or writing of any kind — replace with wordless equivalents (abstract graphics, blank surfaces, shape-only charts). Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject, with subtle real surface texture (never a featureless void). Mode "commercial": medium or wide framing, subject clearly DOMINATES at 50-70% of frame (never edge-to-edge, never a small subject lost in emptiness), 25-35% clean negative space with a HARD CAP of 40% empty area, rule-of-thirds, subject fully in frame. "lighting" must describe correct even exposure (detail kept in highlights and shadows) and "camera" must keep the whole main subject tack-sharp (f/4-f/5.6, no heavy shallow-DOF blur).
+RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. NO TEXT-BEARING ELEMENTS anywhere in subject or props (text in the image is auto-rejected): no slides/screens with words, no documents, handouts, printed pages, book covers, signs, labels, menus or writing of any kind — replace with wordless equivalents (abstract graphics, blank surfaces, shape-only charts). Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject, with subtle real surface texture (never a featureless void). Mode "emotional" (Korean MiriCanvas worship/seasonal text-overlay background): design a warm inspirational background — golden-hour or soft dramatic sky, gentle light rays through clouds, subjects like a cross, wheat field, autumn harvest bounty, open sky, praying hands; copy_space = a 45-60% low-detail area with a calm darker zone reserved for Korean text; here golden-hour backlight and gentle silhouette are DESIRED (do NOT flatten, do NOT force even frontal lighting); "keywords_kr" must include Korean emotional/worship/seasonal search terms (예배, 감사, 은혜, 배경, 감성 등). Mode "commercial": medium or wide framing, subject clearly DOMINATES at 50-70% of frame (never edge-to-edge, never a small subject lost in emptiness), 25-35% clean negative space with a HARD CAP of 40% empty area, rule-of-thirds, subject fully in frame; "lighting" must describe correct even exposure (detail kept in highlights and shadows) and "camera" must keep the whole main subject tack-sharp (f/4-f/5.6, no heavy shallow-DOF blur).
 KEYWORDS (Adobe SEO, critical): EXACTLY 35 EN keywords, no duplicates, ordered by buyer importance (first ~10 weigh most): (1) main subject nouns, (2) descriptors/materials/actions, (3) concept/season/emotion, (4) color/lighting, (5) composition (copy space, background), (6) use-case (banner, marketing, web design). All lowercase, only terms literally describing what is visible. "keywords_kr" same ordering in Korean single nouns.
 CATEGORY: pick ONE best Adobe Stock category id: ${ADOBE_CAT_LIST}. Illustration/vector fallback: 8. Integer id only.
 PROPS & VARIETY: props must be SPECIFIC to each scene and DIFFERENT from every other slot in the whole set (set list provided) — never reuse generic filler across slots; tableware must match the dish culture; keep the copy-space area uncluttered; believable and unbranded.`;
@@ -801,7 +866,9 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
     addLog(`[오늘의 추천] ${dateStr} 기준 — 판매 리드타임 4~8주 반영해 주제 선정 중…`);
     const sys = `You are a top stock-image market strategist for Adobe Stock (global) and MiriCanvas (Korea). Given today's date, propose exactly ONE production topic optimized to SELL within the next 2 months — stock buyers purchase visuals 4-8 weeks before they need them, so target upcoming seasons, holidays, campaigns and business cycles, or a timely news/issue angle (economy, AI, climate, health, lifestyle shifts). Respond ONLY compact JSON:
 {"topic_kr":"프리짱 주제 입력용 한국어 주제 (10-20자, 명확한 촬영 소재)","market":"top|niche|news","priority_keywords":"10-14 lowercase EN buyer search terms, comma-separated, SEO order (most-searched first)","handling_tip_kr":"구도·소품·인물 처리 팁 1-2문장 (한국어)","rationale_kr":"왜 지금 이 주제인지 + 수요 근거 1-2문장 (한국어)","sell_window":"판매 적기 e.g. 9월 초~10월 말"}
-RULES: rotate the market type pseudo-randomly using the seed — top(베스트셀러 수요) ~40%, niche(수요 대비 공급 부족한 틈새: e.g. 시니어 디지털 라이프, 지속가능 포장, 재택 재활운동, 소상공인 디지털 전환) ~40%, news/issue ~20%. The topic must be shootable as AI stock images: NO celebrities, NO brands, NO text-heavy scenes, prefer scenes not requiring identifiable faces. Never repeat the avoided topic. Seed: ${seed}.`;
+RULES: rotate the market type pseudo-randomly using the seed — top(베스트셀러 수요) ~40%, niche(수요 대비 공급 부족한 틈새: e.g. 시니어 디지털 라이프, 지속가능 포장, 재택 재활운동, 소상공인 디지털 전환) ~40%, news/issue ~20%. The topic must be shootable as AI stock images: NO celebrities, NO brands, NO text-heavy scenes, prefer scenes not requiring identifiable faces. Never repeat the avoided topic. Seed: ${seed}.
+${BESTSELLER_REFERENCE}
+When you pick a "top" bestseller topic, strongly consider one of the two proven formulas above (faith/worship for the Korean market, or business-growth/finance for both markets) — they are reliable sellers.`;
     const histLines = recoHistory.slice(0, 20).map((h) => `- ${h.d} | ${h.t}${h.w ? ` | 판매적기 ${h.w}` : ""}`).join("\n");
     const user = `Today: ${dateStr}. Avoid repeating this previous recommendation: "${lastRecoRef.current || "none"}". Markets: global Adobe Stock + Korean MiriCanvas.${histLines ? `\nALREADY-PRODUCED TOPICS (with sell windows). HARD RULE: never propose the same or clearly similar subject as any entry whose sell window overlaps your new sell window — a DIFFERENT subject in the same window is fine:\n${histLines}` : ""}\nGive ONE recommendation now.`;
     try {
@@ -967,7 +1034,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
         const r = await askBrain(
           `You are a strict stock-photo QC inspector. Respond ONLY JSON:
 {"pass":true|false,"issues":["short tags"],"reason":"one short Korean sentence explaining the main problem (empty if pass)"}
-Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind, (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode: the subject must clearly dominate (50-70%) and empty area must stay under ~40% — reject if the subject looks small and lost in a vast featureless background, (7) TECHNICAL QUALITY like an Adobe Stock reviewer (Adobe rejects for: exposure problems, soft focus, over-filtering/artifacts, noise): reject on soft or missed focus on the main subject, large blurry featureless areas, visible noise/grain/banding, plastic over-smoothed AI texture, over-sharpening halos, blown-out highlights or muddy shadows, heavy filter/vignette/HDR look. Be strict on text, distortion and technical quality; be lenient on subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
+Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind, (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode: the subject must clearly dominate (50-70%) and empty area must stay under ~40% — reject if the subject looks small and lost in a vast featureless background, (7) TECHNICAL QUALITY like an Adobe Stock reviewer (Adobe rejects for: exposure problems, soft focus, over-filtering/artifacts, noise): reject on soft or missed focus on the main subject, large blurry featureless areas, visible noise/grain/banding, plastic over-smoothed AI texture, over-sharpening halos, blown-out highlights or muddy shadows, heavy filter/vignette/HDR look, (8) COMMERCIAL-SALES KILLERS (commercial mode only — skip for wallpaper mode): backlit subject against a bright window, silhouette look, lens flare, sun glare, harsh directional lighting; blurry/bokeh/out-of-focus background, shallow depth-of-field where the background dissolves, blurred city lights / blurred traffic / blurred foliage; busy, cluttered or visually noisy background that competes with the subject; a visible crowd or too many people (any dense group of humans in the frame that isn't the intentional subject). Be strict on text, distortion, technical quality and commercial-sales killers; be lenient on subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
           `Topic: "${topic}" · Mode: ${mode} · Slot ${t.index} subject: "${t.subject}"\n이 이미지를 검수해줘.`,
           { mime: "image/jpeg", data: b64 }
         );
@@ -1045,12 +1112,25 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const rows = slots.filter((s) => s.subject);
     if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
     const head =
-      `# FreeJJang 프롬프트 (간편) — 주제: ${topic || "(미지정)"} · 모드: ${mode} · 종횡비: ${aspect}\n` +
-      `# 각 줄의 프롬프트에는 노텍스트 GUARD 규칙이 이미 포함되어 있습니다.\n` +
-      `# Midjourney / Firefly / Stable Diffusion 등 다른 AI에 그대로 붙여넣어 쓰세요.\n\n`;
+      `# FreeJJang 프롬프트 (일반·자연어) — 주제: ${topic || "(미지정)"} · 모드: ${mode} · 종횡비: ${aspect}\n` +
+      `# 배제 규칙이 문장에 포함된 자연어 프롬프트입니다.\n` +
+      `# GPT gpt-image / Firefly / Stable Diffusion / DALL·E 등에 그대로 붙여넣어 쓰세요.\n` +
+      `# (Midjourney는 옆의 'Midjourney용' 버튼을 쓰세요 — --no/--ar 문법으로 변환됩니다)\n\n`;
     const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople)}`).join("\n\n");
     saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-min.txt`);
-    addLog(`[백업] 프롬프트 TXT(간편) 저장 완료 — ${rows.length}슬롯`);
+    addLog(`[백업] 프롬프트 TXT(일반) 저장 완료 — ${rows.length}슬롯`);
+  };
+  /* ── Midjourney 형식 변환: 자연어 배제문 → --no 플래그, --ar/--style raw 부착 ── */
+  const exportPromptsMidjourney = () => {
+    const rows = slots.filter((s) => s.subject);
+    if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
+    const head =
+      `# FreeJJang 프롬프트 (Midjourney 형식) — 주제: ${topic || "(미지정)"} · 종횡비: ${aspect}\n` +
+      `# 배제문을 --no 로, 종횡비를 --ar 로, 사진 슬롯은 --style raw 로 자동 변환했습니다.\n` +
+      `# Midjourney 입력창에 [] 라벨 제외하고 프롬프트 줄만 붙여넣으세요.\n\n`;
+    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${toMidjourney(s, mode, refTone, refPeople, aspect)}`).join("\n\n");
+    saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-midjourney.txt`);
+    addLog(`[백업] 프롬프트 TXT(Midjourney) 저장 완료 — ${rows.length}슬롯`);
   };
   const buildPromptsFullText = (rows) => {
     const head =
@@ -1424,9 +1504,13 @@ Each block content = one short Korean sentence.`,
                   className={`${fieldCls} font-mono w-full`} />
               </div>
               <div className="flex-1 min-w-52">
-                <label className="block text-xs font-semibold text-neutral-400 mb-1">Google AI Studio Key (Gemini 두뇌 + 이미지)</label>
-                <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AIzaSy…"
+                <label className="block text-xs font-semibold text-neutral-400 mb-1">Google Gemini API Key (Gemini 두뇌 + 이미지)</label>
+                <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AQ… (신규) 또는 AIzaSy… (구)"
                   className={`${fieldCls} font-mono w-full`} />
+                <p className="text-[11px] text-neutral-500 mt-1 leading-snug">
+                  신규 <b className="text-neutral-400">AQ</b> 키(2026-06 이후 · Auth Key)와 기존 <b className="text-neutral-400">AIzaSy</b> 키 모두 지원.
+                  <br />구글 신규 표준(x-goog-api-key 헤더 방식) 자동 적용 → 401/403 에러 방지.
+                </p>
               </div>
               <div className="max-w-xs pb-1">
                 <p className="text-xs text-neutral-500 leading-relaxed">
@@ -1542,11 +1626,16 @@ Each block content = one short Korean sentence.`,
                   <div className="flex gap-1.5">
                     <button onClick={() => { setMode("commercial"); setModeAuto(false); }}
                       className={`flex-1 text-xs font-bold py-2 rounded border transition ${mode === "commercial" ? "bg-violet-600 text-white border-violet-600" : "bg-neutral-950 border-neutral-700 text-neutral-400 hover:text-neutral-200"}`}>
-                      상업 사진
+                      상업 사진<span className="block text-[10px] font-normal opacity-70">어도비</span>
+                    </button>
+                    <button onClick={() => { setMode("emotional"); setModeAuto(false); }}
+                      title="골든아워·빛내림·역광 감성 배경 + 텍스트 여백 — 미리캔버스 예배·절기 배경용"
+                      className={`flex-1 text-xs font-bold py-2 rounded border transition ${mode === "emotional" ? "bg-amber-600 text-white border-amber-600" : "bg-neutral-950 border-neutral-700 text-neutral-400 hover:text-neutral-200"}`}>
+                      감성 배경<span className="block text-[10px] font-normal opacity-70">미캔·골든아워</span>
                     </button>
                     <button onClick={() => { setMode("wallpaper"); setModeAuto(false); }}
                       className={`flex-1 text-xs font-bold py-2 rounded border transition ${mode === "wallpaper" ? "bg-violet-600 text-white border-violet-600" : "bg-neutral-950 border-neutral-700 text-neutral-400 hover:text-neutral-200"}`}>
-                      배경화면 (여백 40-60%)
+                      배경화면<span className="block text-[10px] font-normal opacity-70">여백 40-60%</span>
                     </button>
                   </div>
                 </div>
@@ -1579,6 +1668,10 @@ Each block content = one short Korean sentence.`,
                           <div>
                             <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">나라/지역</span>
                             <select value={refRegion} onChange={(e) => setRefRegion(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_REGION)}</select>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">🍽 음식 장르 <span className="text-neutral-600">(음식 주제면 자동 스타일링)</span></span>
+                            <select value={refFood} onChange={(e) => setRefFood(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_FOOD)}</select>
                           </div>
                           <div className="col-span-2">
                             <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">카메라/구도 (전체 기본)</span>
@@ -1649,7 +1742,7 @@ Each block content = one short Korean sentence.`,
                           <ClipboardCheck className="w-4 h-4" /> 미완료·수정 슬롯 검토
                         </h3>
                         <p className="text-xs text-violet-300/80 mt-0.5">
-                          {slots.length}행 · 모드 {mode === "wallpaper" ? "배경화면(여백 40-60%)" : "상업 사진"} · 엔진 {provider === "openai" ? `GPT ${quality}` : provider === "pollinations" ? "Pollinations 무료" : "Gemini"} · 종횡비 {aspect}
+                          {slots.length}행 · 모드 {mode === "wallpaper" ? "배경화면(여백 40-60%)" : mode === "emotional" ? "감성 배경(미캔·골든아워)" : "상업 사진"} · 엔진 {provider === "openai" ? `GPT ${quality}` : provider === "pollinations" ? "Pollinations 무료" : "Gemini"} · 종횡비 {aspect}
                           {successCount > 0 && ` · 유효 ${successCount}장 유지, 미완료만 생성`}
                         </p>
                         {provider === "openai" && (
@@ -1736,8 +1829,14 @@ Each block content = one short Korean sentence.`,
                         <FolderOpen className="w-3.5 h-3.5" /> {saveDir ? `저장 폴더: ${saveDir.name}` : "저장 폴더 선택"}
                       </button>
                       <button onClick={exportPromptsMin}
+                        title="배제어가 문장에 포함된 자연어 프롬프트 — GPT gpt-image·Firefly·SD·DALL·E용"
                         className="bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
-                        <Download className="w-3.5 h-3.5" /> 프롬프트만 TXT
+                        <Download className="w-3.5 h-3.5" /> 일반 프롬프트 TXT
+                      </button>
+                      <button onClick={exportPromptsMidjourney}
+                        title="--no 네거티브 · --ar 종횡비 · --style raw 로 변환된 Midjourney 전용 프롬프트"
+                        className="bg-neutral-950 hover:bg-neutral-700 border border-sky-700/50 text-sky-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
+                        <Download className="w-3.5 h-3.5" /> Midjourney용 TXT
                       </button>
                       <button onClick={exportPromptsFull}
                         className="bg-neutral-950 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
