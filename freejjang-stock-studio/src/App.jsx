@@ -1256,17 +1256,23 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const rows = ok.map((s) =>
       [`${s.index}-${cleanName(topic, 15)}-${s.slug}_adobe.jpg`, s.title, normKeywords(s.keywords, ADOBE_MAX_KEYWORDS), s.category, "", "Yes"].map(esc).join(","));
     zip.file(`${base}-adobe-metadata.csv`, "﻿" + [header.map(esc).join(","), ...rows].join("\r\n"));
-    /* MiriCanvas XLSX */
+    /* MiriCanvas XLSX — 한글 인코딩 정확성을 위해 셀 타입 명시 + BOM 추가 */
     const miriRows = ok.map((s) => ({
       fileName: `${s.index}-${cleanName(topic, 15)}-${s.slug}_miri`,
       elementName: [(s.title_kr || "").substring(0, 8), s.title].filter(Boolean).join(" "),
       keywords: normKeywords(s.keywords_kr, MIRI_MAX_KEYWORDS),
       tier: "Premium", contentType: "Photo",
     }));
-    const ws = XLSX.utils.json_to_sheet(miriRows, { header: ["fileName", "elementName", "keywords", "tier", "contentType"] });
+    const ws = XLSX.utils.json_to_sheet(miriRows, { header: ["fileName", "elementName", "keywords", "tier", "contentType"], cellFormats: true });
+    /* 한글 셀을 명시적으로 텍스트 타입으로 고정 (UTF-16 인코딩 오류 방지) */
+    for (let i = 1; i <= miriRows.length; i++) {
+      if (ws[`B${i}`]) ws[`B${i}`].t = "s"; // elementName (한글)
+      if (ws[`C${i}`]) ws[`C${i}`].t = "s"; // keywords (한글)
+    }
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    zip.file(`${base}-miricanvas.xlsx`, XLSX.write(wb, { bookType: "xlsx", type: "array" }));
+    const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    zip.file(`${base}-miricanvas.xlsx`, buf);
     /* 프롬프트 전체 백업도 동봉 */
     zip.file(`${base}-prompts-full.txt`, buildPromptsFullText(ok));
     /* ZIP 저장 (선택 폴더 or 기본 다운로드) */
