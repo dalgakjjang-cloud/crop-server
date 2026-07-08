@@ -95,6 +95,10 @@ const CAMERA_ANGLES = {
 /* 지능형 분위기 필터 — 실내/사무 주제 감지 시 중립 화이트밸런스(노란끼 배제) 적용 */
 const INDOOR_RE = /office|desk|workspace|indoor|meeting|remote\s*work|home\s*office|studio|사무실|재택|실내|회의|책상|워크스페이스|홈\s*오피스|스튜디오|작업실/i;
 const NIGHT_RE = /night|evening|dusk|midnight|sunset|밤|저녁|야간|새벽|노을|야경|일몰/i;
+/* 어두운·안개 라이팅이 판매 포인트인 니치 (풍경·여행·자연·홀리데이 야경). 이 외 상업 슬롯은 밝게 강제 */
+const MOODY_ALLOWED_RE = /풍경|여행|자연|산|바다|호수|숲|사막|폭포|일출|일몰|노을|안개|눈보라|은하수|밤하늘|야경|크리스마스\s*이브|landscape|travel|scenery|mountain|ocean|forest|desert|waterfall|sunrise|sunset|fog|mist|aurora|milkyway|night\s*sky/i;
+/* 밝기 강제 문구 — 상업 슬롯에 강하게 주입해 어두운 언더익스포저·안개 우연 발생 차단 */
+const BRIGHT_ENFORCEMENT = "brightly lit high-key commercial photography with plenty of ambient light, cheerful daytime feel, clean well-exposed image (never dim, never underexposed, never foggy or misty unless the topic is explicitly landscape/travel/nature)";
 
 /* REEDO식 구조화 구성 — 드롭다운 선택이 초안 프롬프트 제약으로 조립됨 (선택 안함이면 무시) */
 const REEDO_STYLE = {
@@ -462,6 +466,9 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     : !isIllust && INDOOR_RE.test(themeText) && !NIGHT_RE.test(themeText)
       ? "neutral daylight white balance, no yellow cast"
       : "";
+  /* 밝기 강제: 감성/무디풍경/시네마틱 톤/밤·일몰 명시 아닐 때만 적용 (상업 슬롯 기본 판매 규칙) */
+  const moodyOk = isEmotional || tone === "cinematic" || MOODY_ALLOWED_RE.test(themeText) || NIGHT_RE.test(themeText);
+  const brightLine = !isIllust && !moodyOk ? BRIGHT_ENFORCEMENT : "";
   const toneLine = isIllust ? "" : TONE_PHRASE[tone] || TONE_PHRASE.realism;
   const peopleLine = PEOPLE_FINAL[people] || "";
   const propsLine = slot.props ? `props: ${slot.props}` : "";
@@ -484,6 +491,7 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     `camera: ${camera}`,
     `lighting: ${slot.lighting || "soft natural light"}`,
     atmosphere,
+    brightLine,
     toneLine,
     peopleLine,
     `palette: ${slot.palette || "bright commercial tones"}`,
@@ -842,7 +850,8 @@ If the topic matches one of these formulas, make several concepts embody its win
 RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. NO TEXT-BEARING ELEMENTS anywhere in subject or props (text in the image is auto-rejected): no slides/screens with words, no documents, handouts, printed pages, book covers, signs, labels, menus or writing of any kind — replace with wordless equivalents (abstract graphics, blank surfaces, shape-only charts). Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject, with subtle real surface texture (never a featureless void). Mode "emotional" (Korean MiriCanvas worship/seasonal text-overlay background): design a warm inspirational background — golden-hour or soft dramatic sky, gentle light rays through clouds, subjects like a cross, wheat field, autumn harvest bounty, open sky, praying hands; copy_space = a 45-60% low-detail area with a calm darker zone reserved for Korean text; here golden-hour backlight and gentle silhouette are DESIRED (do NOT flatten, do NOT force even frontal lighting); "keywords_kr" must include Korean emotional/worship/seasonal search terms (예배, 감사, 은혜, 배경, 감성 등). Mode "commercial": medium or wide framing, subject clearly DOMINATES at 50-70% of frame (never edge-to-edge, never a small subject lost in emptiness), 25-35% clean negative space with a HARD CAP of 40% empty area, rule-of-thirds, subject fully in frame; "lighting" must describe correct even exposure (detail kept in highlights and shadows) and "camera" must keep the whole main subject tack-sharp (f/4-f/5.6, no heavy shallow-DOF blur).
 KEYWORDS (Adobe SEO, critical): EXACTLY 35 EN keywords, no duplicates, ordered by buyer importance (first ~10 weigh most): (1) main subject nouns, (2) descriptors/materials/actions, (3) concept/season/emotion, (4) color/lighting, (5) composition (copy space, background), (6) use-case (banner, marketing, web design). All lowercase, only terms literally describing what is visible. "keywords_kr" same ordering in Korean single nouns.
 CATEGORY: pick ONE best Adobe Stock category id: ${ADOBE_CAT_LIST}. Illustration/vector fallback: 8. Integer id only.
-PROPS & VARIETY: props must be SPECIFIC to each scene and DIFFERENT from every other slot in the whole set (set list provided) — never reuse generic filler across slots; tableware must match the dish culture; keep the copy-space area uncluttered; believable and unbranded.`;
+PROPS & VARIETY: props must be SPECIFIC to each scene and DIFFERENT from every other slot in the whole set (set list provided) — never reuse generic filler across slots; tableware must match the dish culture; keep the copy-space area uncluttered; believable and unbranded.
+BRIGHTNESS RULE (Adobe Stock + MiriCanvas commercial default): the "lighting" and "time" fields must describe BRIGHT well-lit daytime scenarios (bright natural window light, soft ambient daylight, high-key studio lighting) for the vast majority of slots. NEVER default to "early morning fog", "evening dusk", "misty dawn", "dim ambient", "moody underexposure" — those are NICHE looks that only sell for topics explicitly about: landscape, travel, nature (mountain/ocean/forest/desert), sunrise/sunset scenery, holiday-evening (Christmas eve etc.), cinematic tone, or worship/emotional backgrounds. If the topic is not one of those niches, dim/foggy/dusk lighting is a REJECTED aesthetic — pick bright daytime instead.`;
     const expandPair = async (pairIdx) => {
       const pair = pairIdx.map((i) => concepts[i]);
       for (let attempt = 0; attempt < 3 && !cancelRef.current && !timeUp(); attempt++) {
