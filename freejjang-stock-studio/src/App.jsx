@@ -122,7 +122,10 @@ const REEDO_FOOD_PHRASE = {
 };
 /* 음식 자동 감지 + 공통 식욕 자극 스타일링 (장르 미선택이어도 음식이면 자동 적용) */
 const FOOD_RE = /food|dish|meal|cuisine|dessert|bakery|brunch|coffee|drink|beverage|snack|breakfast|lunch|dinner|음식|요리|음료|커피|디저트|베이커리|브런치|한식|간식|분식|샐러드|빵|케이크|반찬|밥|국|찌개|면|과일|채소/i;
-const FOOD_STYLING = "appetizing food styling: fresh natural realistic textures, vibrant true-to-life color, tasteful garnish, steam on hot food and condensation on cold drinks, clean uncluttered surface, the dish as hero — no plastic-looking gloss, no fake sheen, no inedible over-saturation";
+/* 밝고 초근접 실사 인스타 느낌이 음식 판매의 기본 — 어두운 무드샷은 안 팔린다 */
+const FOOD_STYLING = "bright airy well-lit food photography, extreme close-up macro with the dish as hero filling almost the whole frame, mouth-watering Instagram appeal, fresh realistic textures you can almost taste, vibrant true-to-life color, tasteful garnish, visible steam on hot dishes and condensation on cold drinks, soft shallow depth of field, clean surface";
+/* 음식 전용 가드 — 상업 가드의 보케·얕은심도 금지를 뒤집는다(음식은 배경 흐림이 판매 포인트) */
+const FOOD_GUARD = "bright and appetizing with soft natural light, the dish tack-sharp in tight close-up, gently blurred background welcome, no dark or moody underexposure, no dull flat color, no plastic gloss, no fake sheen, no cluttered background, no crowd";
 /* 인물 등장 조건 4단계 (People Selector) */
 const REEDO_PEOPLE = {
   auto: "선택 안함 (AI 자율)",
@@ -410,14 +413,18 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   const anglePick = CAMERA_ANGLES[slot.angle]?.phrase || "";
   const isTight = slot.angle === "closeup" || slot.angle === "macro";
   const isEmotional = mode === "emotional";
+  /* 음식은 밝은 초근접 실사 인스타 느낌이 기본 — 배경화면/감성 모드가 아니면 프레임을 꽉 채운다 */
+  const isFood = !isIllust && FOOD_RE.test(`${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`);
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
   const comp = mode === "wallpaper"
     ? `40-60% clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
     : isEmotional
       ? `wide emotional background for text overlay: subject off to one side, 45-60% low-detail copy space with a calm darker zone where Korean text will be placed (${slot.copy_space || "open sky or soft area"})`
-      : isTight
-        ? "tight detail shot, subject sharply focused"
-        : `subject fills 50-70% of frame with ~30% clean copy space (${slot.copy_space || "for text overlay"}), rule-of-thirds, subject fully in frame`;
+      : isFood
+        ? "extreme close-up macro food shot, the dish fills almost the entire frame, tight appetizing crop, shallow depth of field with the food tack-sharp"
+        : isTight
+          ? "tight detail shot, subject sharply focused"
+          : `subject fills 50-70% of frame with ~30% clean copy space (${slot.copy_space || "for text overlay"}), rule-of-thirds, subject fully in frame`;
   const camera = [anglePick, slot.camera].filter(Boolean).join(", ")
     || (isIllust ? "clean vector edges" : "natural depth of field");
   /* 감성 모드는 골든아워·빛내림 · 그 외 실내/사무 주제(밤 아님)는 중립 화이트밸런스 */
@@ -453,10 +460,12 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     peopleLine,
     `palette: ${slot.palette || "bright commercial tones"}`,
     !isIllust ? "objects rest naturally on real surfaces, nothing floating" : "",
+    /* 음식이면 밝은 초근접 실사 인스타 스타일링을 최종 프롬프트에 직접 주입 */
+    isFood ? FOOD_STYLING : "",
     quality,
     GUARD,
-    /* 배경화면=제외 · 감성=텍스트 여백 가이드 · 신앙=골든아워/실루엣 허용 · 그 외=상업 배제 */
-    mode === "wallpaper" ? "" : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : COMMERCIAL_GUARD,
+    /* 배경화면=제외 · 감성=텍스트 여백 · 신앙=골든아워/실루엣 · 음식=밝은근접+배경흐림 허용 · 그 외=상업 배제 */
+    mode === "wallpaper" ? "" : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : isFood ? FOOD_GUARD : COMMERCIAL_GUARD,
   ].filter(Boolean).join(". ");
 }
 
@@ -465,10 +474,11 @@ const MJ_NEG_BASE = "text, letters, numbers, logo, watermark, brand name, signat
 const MJ_NEG_COMMERCIAL = "backlit, silhouette, lens flare, bokeh, blurry background, out of focus background, cluttered background, crowd";
 function toMidjourney(slot, mode, tone, people, aspect) {
   let pos = slot.finalPrompt || buildSlotPrompt(slot, mode, tone, people);
-  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(GUARD, "")
+  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(GUARD, "")
     .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
-  const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""}`;
-  const commercialNeg = mode === "commercial" && !FAITH_RE.test(themeText);
+  const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`;
+  /* 역광·보케 배제는 순수 상업 슬롯에만 — 신앙(역광)·음식(얕은 심도)은 그게 판매 포인트라 제외 */
+  const commercialNeg = mode === "commercial" && !FAITH_RE.test(themeText) && !FOOD_RE.test(themeText);
   const neg = commercialNeg ? `${MJ_NEG_BASE}, ${MJ_NEG_COMMERCIAL}` : MJ_NEG_BASE;
   const style = slot.kind === "illustration" ? "" : " --style raw";
   return `${pos} --ar ${aspect || "16:9"}${style} --no ${neg}`;
