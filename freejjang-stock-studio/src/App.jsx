@@ -22,6 +22,15 @@ const GUARD = "no text, logos, watermarks, brands, copyrighted characters, or cr
 /* 상업용(non-wallpaper) 전용 배제 — 역광·보케·산만한 배경 (어도비 판매 킬러) · 짧게 */
 const COMMERCIAL_GUARD = "clean uncluttered background, even lighting, no backlit, no silhouette, no lens flare, no bokeh, no blurry background";
 
+/* 신앙·워십 장르: 골든아워 역광·십자가 실루엣이 오히려 판매 포인트 (미캔 베스트셀러) → backlit 금지 예외 */
+const FAITH_RE = /church|worship|choir|cross|crucifix|prayer|praying|bible|gospel|christian|faith|congregation|hymn|sanctuary|교회|예배|성가대|찬양|십자가|기도|성경|기독교|신앙|찬송|성도|예수|주님/i;
+const FAITH_GUARD = "clean reverent composition, warm golden-hour or soft sanctuary light welcome, gentle cross silhouette acceptable, no clutter";
+
+/* 검증된 판매 공식 — 두뇌(추천·초안)가 주제에 맞을 때 이 구도로 기울이도록 참고 주입 */
+const BESTSELLER_REFERENCE = `PROVEN BESTSELLER FORMULAS — when the topic fits one of these, lean into its exact winning composition:
+- Faith / worship (top seller on Korean MiriCanvas): church interior, a choir singing, a cross silhouetted against a golden-hour or sunset sky, praying hands, an open bible beside candles, a worship band — reverent warm mood; here golden-hour backlight and a gentle silhouette ARE desirable (do NOT flatten them).
+- Business growth / finance (top seller on BOTH Adobe Stock & MiriCanvas): stacked gold coins with an upward arrow, a glowing arrow rising through a blue data grid, an ascending stock candlestick chart on a screen — clean, professional, blue-and-gold palette, conveying growth and success.`;
+
 const ASPECTS = ["1:1", "16:9", "4:3", "3:4", "9:16"];
 const OPENAI_SIZE = { "1:1": "1024x1024", "16:9": "1536x1024", "4:3": "1536x1024", "3:4": "1024x1536", "9:16": "1024x1536" };
 /* gpt-image 1536×1024 기준 근사 단가 (실제 청구액은 상이할 수 있음) */
@@ -399,6 +408,8 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   const quality = isIllust
     ? "professional stock illustration"
     : "professional stock photo, tack-sharp focus, even exposure, clean and noise-free, natural texture, no plastic AI look";
+  /* 신앙·워십 장르면 backlit 금지 대신 골든아워 역광·십자가 실루엣을 허용 (판매 포인트) */
+  const isFaith = !isIllust && FAITH_RE.test(themeText);
   return [
     slot.subject,
     fixLine,
@@ -413,8 +424,8 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     !isIllust ? "objects rest naturally on real surfaces, nothing floating" : "",
     quality,
     GUARD,
-    /* 배경화면 모드는 소프트 보케·역광이 오히려 필요할 수 있어 상업용 배제만 제외 */
-    mode !== "wallpaper" ? COMMERCIAL_GUARD : "",
+    /* 배경화면은 상업 배제 제외 · 신앙은 골든아워/실루엣 허용 · 그 외 상업 배제 */
+    mode === "wallpaper" ? "" : isFaith ? FAITH_GUARD : COMMERCIAL_GUARD,
   ].filter(Boolean).join(". ");
 }
 
@@ -698,7 +709,9 @@ export default function App() {
         const m = await askBrain(
           `You design a maximally DIVERSE professional stock image set — each image must be clearly a SEPARATE asset to a buyer (no near-duplicates; marketplaces reject similar images). Respond ONLY compact JSON:
 {"concepts":[{"scene":"1 short sentence: main subject doing what, where","location":"the place — must be unique in the set","action":"primary action","angle":"camera angle/framing","time":"time of day + light"}]}
-HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. NO TEXT-BEARING SCENES (critical — text in the image is auto-rejected): never design a scene whose subject involves readable written content — no presentation slides with titles, no lecturers pointing at worded screens, no documents/handouts/newspapers, no books with visible covers, no signs/labels/menus/whiteboards with writing; use imagery-only equivalents (wordless abstract visuals on screens, blank paper, shape-only charts). If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.`,
+HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. NO TEXT-BEARING SCENES (critical — text in the image is auto-rejected): never design a scene whose subject involves readable written content — no presentation slides with titles, no lecturers pointing at worded screens, no documents/handouts/newspapers, no books with visible covers, no signs/labels/menus/whiteboards with writing; use imagery-only equivalents (wordless abstract visuals on screens, blank paper, shape-only charts). If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.
+${BESTSELLER_REFERENCE}
+If the topic matches one of these formulas, make several concepts embody its winning composition (for faith topics, golden-hour cross silhouettes and warm sanctuary scenes are wanted, not to be avoided).`,
           `Topic: "${topic}". Mode: ${mode}. Design exactly ${count} distinct scene concepts.${refinementLine()}${handlingTip.trim() ? `\nUser handling notes (apply thoughtfully WITHOUT reducing diversity): ${handlingTip.trim()}` : ""}${priKw.trim() ? `\nBuyer search terms for context (use as inspiration for DIFFERENT scenes — do NOT put every term into every scene): ${priKw.trim()}` : ""}`
         );
         concepts = (m.concepts || []).filter((c) => c && c.scene).slice(0, count);
@@ -787,7 +800,9 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
     addLog(`[오늘의 추천] ${dateStr} 기준 — 판매 리드타임 4~8주 반영해 주제 선정 중…`);
     const sys = `You are a top stock-image market strategist for Adobe Stock (global) and MiriCanvas (Korea). Given today's date, propose exactly ONE production topic optimized to SELL within the next 2 months — stock buyers purchase visuals 4-8 weeks before they need them, so target upcoming seasons, holidays, campaigns and business cycles, or a timely news/issue angle (economy, AI, climate, health, lifestyle shifts). Respond ONLY compact JSON:
 {"topic_kr":"프리짱 주제 입력용 한국어 주제 (10-20자, 명확한 촬영 소재)","market":"top|niche|news","priority_keywords":"10-14 lowercase EN buyer search terms, comma-separated, SEO order (most-searched first)","handling_tip_kr":"구도·소품·인물 처리 팁 1-2문장 (한국어)","rationale_kr":"왜 지금 이 주제인지 + 수요 근거 1-2문장 (한국어)","sell_window":"판매 적기 e.g. 9월 초~10월 말"}
-RULES: rotate the market type pseudo-randomly using the seed — top(베스트셀러 수요) ~40%, niche(수요 대비 공급 부족한 틈새: e.g. 시니어 디지털 라이프, 지속가능 포장, 재택 재활운동, 소상공인 디지털 전환) ~40%, news/issue ~20%. The topic must be shootable as AI stock images: NO celebrities, NO brands, NO text-heavy scenes, prefer scenes not requiring identifiable faces. Never repeat the avoided topic. Seed: ${seed}.`;
+RULES: rotate the market type pseudo-randomly using the seed — top(베스트셀러 수요) ~40%, niche(수요 대비 공급 부족한 틈새: e.g. 시니어 디지털 라이프, 지속가능 포장, 재택 재활운동, 소상공인 디지털 전환) ~40%, news/issue ~20%. The topic must be shootable as AI stock images: NO celebrities, NO brands, NO text-heavy scenes, prefer scenes not requiring identifiable faces. Never repeat the avoided topic. Seed: ${seed}.
+${BESTSELLER_REFERENCE}
+When you pick a "top" bestseller topic, strongly consider one of the two proven formulas above (faith/worship for the Korean market, or business-growth/finance for both markets) — they are reliable sellers.`;
     const histLines = recoHistory.slice(0, 20).map((h) => `- ${h.d} | ${h.t}${h.w ? ` | 판매적기 ${h.w}` : ""}`).join("\n");
     const user = `Today: ${dateStr}. Avoid repeating this previous recommendation: "${lastRecoRef.current || "none"}". Markets: global Adobe Stock + Korean MiriCanvas.${histLines ? `\nALREADY-PRODUCED TOPICS (with sell windows). HARD RULE: never propose the same or clearly similar subject as any entry whose sell window overlaps your new sell window — a DIFFERENT subject in the same window is fine:\n${histLines}` : ""}\nGive ONE recommendation now.`;
     try {
