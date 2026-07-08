@@ -1575,8 +1575,6 @@ Each block content = one short Korean sentence.`,
                 자동 폴백
               </label>
 
-              <div className="w-full border-t border-neutral-700/60" />
-
               {/* 이미지 엔진 */}
               <div>
                 <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">이미지 엔진 (손)</label>
