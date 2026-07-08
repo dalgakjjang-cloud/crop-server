@@ -3,7 +3,7 @@ import {
   Sparkles, Download, Trash2, RefreshCw, Copy, Check, Cpu, AlertTriangle,
   FileSpreadsheet, Wand2, X, Play, Square, Image as ImageIcon, ScanSearch,
   Layers, Key, Settings2, CornerDownLeft, FileText, ClipboardCheck,
-  ShieldAlert, CircleDollarSign, ChevronRight, Ban, FolderOpen
+  ShieldAlert, CircleDollarSign, ChevronRight, Ban, FolderOpen, Sun, Moon
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import JSZip from "jszip";
@@ -571,6 +571,12 @@ export default function App() {
   const [finalQuality, setFinalQuality] = useState("medium"); // 2패스 마감 품질: medium | high
   const [aspect, setAspect] = useState("16:9");
   const [showSettings, setShowSettings] = useState(true);
+
+  /* ── 테마 (다크/라이트) ── */
+  const [theme, setTheme] = useState(() => {
+    try { return localStorage.getItem("freejjang_theme") || "dark"; } catch { return "dark"; }
+  });
+  useEffect(() => { try { localStorage.setItem("freejjang_theme", theme); } catch {} }, [theme]);
 
   /* ── API 키 (서비스별 분리 · 두뇌와 이미지 엔진 공유) ── */
   const [openaiKey, setOpenaiKey] = useState("");
@@ -1445,8 +1451,49 @@ Each block content = one short Korean sentence.`,
   const attnPulse = { animation: "attnGlow 1.4s ease-in-out infinite" };
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-neutral-200" style={{ fontFamily: "'Pretendard','Apple SD Gothic Neo',-apple-system,sans-serif" }}>
-      <style>{`@keyframes attnGlow{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,.6)}50%{box-shadow:0 0 0 9px rgba(139,92,246,0)}}`}</style>
+    <div className={`min-h-screen ${theme === "light" ? "light-theme bg-gray-100 text-gray-800" : "bg-neutral-900 text-neutral-200"}`} style={{ fontFamily: "'Pretendard','Apple SD Gothic Neo',-apple-system,sans-serif" }}>
+      <style>{`@keyframes attnGlow{0%,100%{box-shadow:0 0 0 0 rgba(139,92,246,.6)}50%{box-shadow:0 0 0 9px rgba(139,92,246,0)}}
+.light-theme .bg-neutral-950{background-color:#f9fafb}
+.light-theme .bg-neutral-900{background-color:#f3f4f6}
+.light-theme .bg-neutral-800{background-color:#fff}
+.light-theme .bg-neutral-700{background-color:#e5e7eb}
+.light-theme .text-neutral-100{color:#111827}
+.light-theme .text-neutral-200{color:#1f2937}
+.light-theme .text-neutral-300{color:#374151}
+.light-theme .text-neutral-400{color:#6b7280}
+.light-theme .text-neutral-500{color:#9ca3af}
+.light-theme .text-neutral-600{color:#c9cbd1}
+.light-theme .border-neutral-700{border-color:#d1d5db}
+.light-theme .border-neutral-800{border-color:#e5e7eb}
+.light-theme .border-neutral-600{border-color:#d1d5db}
+.light-theme .border-neutral-700\\/60{border-color:rgba(209,213,219,.6)}
+.light-theme .bg-neutral-950\\/40{background-color:rgba(249,250,251,.4)}
+.light-theme .bg-neutral-950\\/75{background-color:rgba(249,250,251,.75)}
+.light-theme .bg-neutral-950\\/90{background-color:rgba(249,250,251,.9)}
+.light-theme .hover\\:bg-neutral-700:hover{background-color:#e5e7eb}
+.light-theme .hover\\:bg-neutral-800:hover{background-color:#f3f4f6}
+.light-theme .hover\\:text-neutral-200:hover{color:#1f2937}
+.light-theme .hover\\:text-neutral-300:hover{color:#374151}
+.light-theme .hover\\:text-white:hover{color:#111827}
+.light-theme .disabled\\:bg-neutral-700:disabled{background-color:#e5e7eb}
+.light-theme .disabled\\:text-neutral-500:disabled{color:#9ca3af}
+.light-theme .text-violet-300,.light-theme .text-violet-400,.light-theme .text-violet-200{color:#7c3aed}
+.light-theme .text-emerald-300,.light-theme .text-emerald-400,.light-theme .text-emerald-200{color:#059669}
+.light-theme .text-amber-300,.light-theme .text-amber-200{color:#d97706}
+.light-theme .text-red-300,.light-theme .text-red-400{color:#dc2626}
+.light-theme .text-sky-300,.light-theme .text-sky-200{color:#0284c7}
+.light-theme .text-rose-300{color:#e11d48}
+.light-theme .text-indigo-200{color:#4f46e5}
+.light-theme .text-orange-300{color:#ea580c}
+.light-theme .text-violet-300\\/80{color:#7c3aed}
+.light-theme .text-emerald-300\\/80{color:#059669}
+.light-theme .text-amber-300\\/80,.light-theme .text-amber-300\\/90{color:#d97706}
+.light-theme .text-amber-400\\/80{color:#d97706}
+.light-theme .text-rose-300\\/80{color:#e11d48}
+.light-theme .hover\\:text-red-400:hover{color:#dc2626}
+.light-theme .hover\\:text-rose-300:hover{color:#e11d48}
+.light-theme .shadow-xl{box-shadow:0 4px 24px rgba(0,0,0,.08)}
+`}</style>
 
       {/* ═══ 헤더 ═══ */}
       <header className="bg-neutral-800 border-b border-neutral-700 px-5 pt-4">
@@ -1467,6 +1514,12 @@ Each block content = one short Korean sentence.`,
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <button onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
+                title={theme === "dark" ? "밝은 테마로 전환" : "어두운 테마로 전환"}
+                className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded border border-neutral-700 text-neutral-300 hover:text-neutral-100 transition">
+                {theme === "dark" ? <Sun className="w-3.5 h-3.5" /> : <Moon className="w-3.5 h-3.5" />}
+                {theme === "dark" ? "밝게" : "어둡게"}
+              </button>
               <button onClick={startFresh}
                 title="슬롯·이미지·로그를 비우고 새 프로젝트 시작 (API 키·설정은 유지)"
                 className="flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded border border-rose-500/30 bg-rose-500/10 text-rose-300 hover:bg-rose-500/20 transition">
@@ -1562,22 +1615,26 @@ Each block content = one short Korean sentence.`,
                 </select>
               </div>
 
-              {/* 키 2칸 분리 */}
-              <div className="flex-1 min-w-52">
-                <label className="block text-xs font-semibold text-neutral-400 mb-1">OpenAI API Key (GPT 두뇌 + gpt-image)</label>
-                <input type="password" value={openaiKey} onChange={(e) => setOpenaiKey(e.target.value)} placeholder="sk-…"
-                  className={`${fieldCls} font-mono w-full`} />
+              <div className="w-full border-t border-neutral-700/60" />
+
+              {/* 키 2칸 분리 — 항상 별도 행 */}
+              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-400 mb-1">OpenAI API Key (GPT 두뇌 + gpt-image)</label>
+                  <input type="password" value={openaiKey} onChange={(e) => setOpenaiKey(e.target.value)} placeholder="sk-…"
+                    className={`${fieldCls} font-mono w-full`} />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-neutral-400 mb-1">Google Gemini API Key (Gemini 두뇌 + 이미지)</label>
+                  <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AQ… (신규) 또는 AIzaSy… (구)"
+                    className={`${fieldCls} font-mono w-full`} />
+                  <p className="text-[11px] text-neutral-500 mt-1 leading-snug">
+                    신규 <b className="text-neutral-400">AQ</b> 키(2026-06 이후 · Auth Key)와 기존 <b className="text-neutral-400">AIzaSy</b> 키 모두 지원.
+                    <br />구글 신규 표준(x-goog-api-key 헤더 방식) 자동 적용 → 401/403 에러 방지.
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-52">
-                <label className="block text-xs font-semibold text-neutral-400 mb-1">Google Gemini API Key (Gemini 두뇌 + 이미지)</label>
-                <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AQ… (신규) 또는 AIzaSy… (구)"
-                  className={`${fieldCls} font-mono w-full`} />
-                <p className="text-[11px] text-neutral-500 mt-1 leading-snug">
-                  신규 <b className="text-neutral-400">AQ</b> 키(2026-06 이후 · Auth Key)와 기존 <b className="text-neutral-400">AIzaSy</b> 키 모두 지원.
-                  <br />구글 신규 표준(x-goog-api-key 헤더 방식) 자동 적용 → 401/403 에러 방지.
-                </p>
-              </div>
-              <div className="max-w-xs pb-1">
+              <div className="w-full">
                 <p className="text-xs text-neutral-500 leading-relaxed">
                   키는 <b className="text-neutral-400">이 브라우저에만 자동 저장</b>되어 다음에 재입력이 필요 없습니다 (서버 전송 없음). 공용 PC에서는 사용 후 아래 버튼으로 지우세요.
                 </p>
