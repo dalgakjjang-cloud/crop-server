@@ -103,6 +103,26 @@ const REEDO_BG_PHRASE = {
   office: "modern office setting", outdoor: "natural outdoor environment",
   studio: "professional studio setting", solid: "clean solid color backdrop", bokeh: "soft bokeh blurred background",
 };
+/* 음식 장르 셀렉터 — 음식 주제일 때 장르별 스타일링 주입 (선택 안함이면 무시) */
+const REEDO_FOOD = {
+  "": "선택 안함", brunch: "브런치/카페", dessert: "디저트/베이커리", korean: "한식/집밥",
+  beverage: "음료/커피", finedining: "파인다이닝/플레이팅", healthy: "건강식/샐러드",
+  street: "분식/길거리", homecook: "홈쿠킹/재료", flatlay: "푸드 플랫레이(탑뷰)",
+};
+const REEDO_FOOD_PHRASE = {
+  brunch: "fresh brunch cafe food photography — avocado toast / eggs / greens vibe on a modern cafe table, appetizing natural styling",
+  dessert: "dessert & bakery photography — cakes, pastries, coffee, cozy patisserie styling with soft warm light",
+  korean: "authentic Korean home-food photography — correct Korean tableware (ceramic/stainless banchan bowls), steaming rice and side dishes",
+  beverage: "beverage & coffee photography — the drink as hero with condensation or gentle steam, clean cafe-counter styling",
+  finedining: "fine-dining plated photography — elegant minimal plating on a large plate, upscale restaurant styling",
+  healthy: "healthy & salad photography — vibrant crisp fresh vegetables, clean bright wellness styling",
+  street: "Korean street & snack food photography — tteokbokki, gimbap, hotteok, casual vivid appetizing styling",
+  homecook: "home-cooking ingredients & prep — fresh raw ingredients on a rustic wooden board, natural cooking-in-progress feel",
+  flatlay: "top-down food flat lay — neatly arranged dishes and props shot straight down, balanced negative space",
+};
+/* 음식 자동 감지 + 공통 식욕 자극 스타일링 (장르 미선택이어도 음식이면 자동 적용) */
+const FOOD_RE = /food|dish|meal|cuisine|dessert|bakery|brunch|coffee|drink|beverage|snack|breakfast|lunch|dinner|음식|요리|음료|커피|디저트|베이커리|브런치|한식|간식|분식|샐러드|빵|케이크|반찬|밥|국|찌개|면|과일|채소/i;
+const FOOD_STYLING = "appetizing food styling: fresh natural realistic textures, vibrant true-to-life color, tasteful garnish, steam on hot food and condensation on cold drinks, clean uncluttered surface, the dish as hero — no plastic-looking gloss, no fake sheen, no inedible over-saturation";
 /* 인물 등장 조건 4단계 (People Selector) */
 const REEDO_PEOPLE = {
   auto: "선택 안함 (AI 자율)",
@@ -492,6 +512,7 @@ export default function App() {
   const [refStyle, setRefStyle] = useState("");
   const [refRegion, setRefRegion] = useState("");
   const [refBg, setRefBg] = useState("");
+  const [refFood, setRefFood] = useState(""); // 음식 장르 (선택 안함이면 무시)
   const [refPeople, setRefPeople] = useState("none"); // 기본: 인물 없음 (모델 릴리즈 회피)
   const [refAngle, setRefAngle] = useState("auto");   // 초안 전체 기본 카메라 앵글
   const [refTone, setRefTone] = useState("realism");  // 기본: 판매 리얼 (베스트셀러 미학)
@@ -598,6 +619,9 @@ export default function App() {
     if (REEDO_STYLE_PHRASE[refStyle]) parts.push(`Style: ${REEDO_STYLE_PHRASE[refStyle]}`);
     if (REEDO_REGION_PHRASE[refRegion]) parts.push(`Market: ${REEDO_REGION_PHRASE[refRegion]}`);
     if (REEDO_BG_PHRASE[refBg]) parts.push(`Background: ${REEDO_BG_PHRASE[refBg]}`);
+    if (REEDO_FOOD_PHRASE[refFood]) parts.push(`Food genre: ${REEDO_FOOD_PHRASE[refFood]}`);
+    /* 발전: 장르를 안 골라도 주제/키워드가 음식이면 식욕 자극 스타일링 자동 주입 */
+    if (refFood || FOOD_RE.test(`${topic} ${priKw}`)) parts.push(`Food photography quality: ${FOOD_STYLING}`);
     if (REEDO_PEOPLE_PHRASE[refPeople]) parts.push(`People: ${REEDO_PEOPLE_PHRASE[refPeople]}`);
     if (CAMERA_ANGLES[refAngle]?.phrase) parts.push(`Camera baseline: ${CAMERA_ANGLES[refAngle].phrase}`);
     return parts.length ? `\nApply these refinements to EVERY slot: ${parts.join("; ")}.` : "";
@@ -1601,6 +1625,10 @@ Each block content = one short Korean sentence.`,
                           <div>
                             <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">나라/지역</span>
                             <select value={refRegion} onChange={(e) => setRefRegion(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_REGION)}</select>
+                          </div>
+                          <div className="col-span-2">
+                            <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">🍽 음식 장르 <span className="text-neutral-600">(음식 주제면 자동 스타일링)</span></span>
+                            <select value={refFood} onChange={(e) => setRefFood(e.target.value)} disabled={dis} className={sel}>{opts(REEDO_FOOD)}</select>
                           </div>
                           <div className="col-span-2">
                             <span className="block text-[10px] font-mono text-neutral-500 mb-0.5">카메라/구도 (전체 기본)</span>
