@@ -35,6 +35,13 @@ const MIRI_LIFESTYLE_RE = /부동산|아파트|인테리어|모델하우스|임�
 const MIRI_LIFESTYLE_STYLING = "authentic bright airy Korean home aesthetic: warm-neutral palette (cream, soft beige, warm wood), natural Korean people with genuine relaxed smiles (never stiff stock poses), soft window daylight, one gentle plant, tack-sharp subject with gently blurred background, wide 16:9-style framing";
 const MIRI_LIFESTYLE_GUARD = "bright and appetizing with soft natural window light, subject tack-sharp, gently blurred background welcome, generous low-detail area reserved for Korean text overlay, no dark or moody underexposure, no crowd";
 
+/* 어도비 헬스케어 — 글로벌 스톡 톱셀러 (의료·환자 케어·연구·웰니스) */
+const HEALTHCARE_RE = /의사|의료|병원|간호|간호사|환자|진료|처방|약사|약국|치료|재활|물리치료|건강\s*검진|헬스케어|의학|웰니스|정신건강|상담|심리치료|healthcare|hospital|clinic|doctor|nurse|patient|medical|medicine|therapy|wellness|mental\s*health|pharmacist|pharmacy/i;
+/* 한국 명시 주제 감지 — 어도비 글로벌 다양성 규칙을 이때만 억제 */
+const KOREAN_EXPLICIT_RE = /한국|서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충청|전라|경상|제주|한국인|korean|seoul|busan/i;
+const HEALTHCARE_STYLING = "professional healthcare stock photography for Adobe Stock: authentic diverse medical professionals interacting warmly with a patient, tack-sharp clinical detail, modern hospital or clinic setting with pale blue-white palette, natural but flattering lighting, hopeful reassuring mood — never sterile-cold, never sensationalized";
+const HEALTHCARE_GUARD = "clean modern medical setting, honest editorial realism, no fake plastic AI smiles, no branded logos on scrubs or devices, no identifying patient records visible, no unsafe or gory imagery, no crowd";
+
 /* 검증된 판매 공식 — 두뇌(추천·초안)가 주제에 맞을 때 이 구도로 기울이도록 참고 주입 */
 const BESTSELLER_REFERENCE = `PROVEN BESTSELLER FORMULAS — when the topic fits one of these, lean into its exact winning composition:
 - Faith / worship (top seller on Korean MiriCanvas): church interior, a choir singing, a cross silhouetted against a golden-hour or sunset sky, praying hands, an open bible beside candles, a worship band — reverent warm mood; here golden-hour backlight and a gentle silhouette ARE desirable (do NOT flatten them).
@@ -43,7 +50,9 @@ const BESTSELLER_REFERENCE = `PROVEN BESTSELLER FORMULAS — when the topic fits
 - Korean family lifestyle everyday moments (MiriCanvas core): a Korean family (2-3 generations) laughing around a low living-room table playing a board game, parents and a small child sorting recyclables in a bright utility room, a warm dinner scene around a Korean home table — natural genuine smiles (never stiff stock poses), soft window daylight, wooden furniture, one calm plant, clean uncluttered background.
 - Solo daily-life moments (highly reusable MiriCanvas base): a woman journaling in a spiral notebook on a wooden table with an open book, ceramic coffee cup and a small plant lit by warm window light; a young Korean man smiling at a smartphone in a bright home office; hands holding a coffee cup — quiet mindful mood, shallow depth of field, subject to one side, wide 45-60% low-detail area for Korean text overlay.
 - Golf lifestyle (bright MiriCanvas leisure seller): golfer lining up a putt with tight focus on hands and club, a couple walking a fairway with a golf cart, a lesson swing at a green driving range — bright daylight, crisp green turf, blue sky, no crowd.
-UNIVERSAL MIRICANVAS SIGNATURE for the lifestyle categories above: bright airy, warm-neutral palette (cream/beige/soft wood), authentic Korean people with genuine natural smiles (never stiff Western stock look), soft window daylight, one gentle plant, tack-sharp subject with gently blurred background, and a clean low-detail area (~45-55% of frame) reserved for Korean text overlay.`;
+- Healthcare (major Adobe Stock global seller): a warm interaction between a doctor and a patient in a modern clinic (doctor listening, gentle stethoscope moment), a nurse reassuring an elderly patient, a diverse care team reviewing a tablet chart, a laboratory researcher at a microscope, a therapist in a bright counseling office — modern clean facility, pale blue/white/warm wood palette, honest editorial realism, hopeful reassuring mood; diverse global casting (mixed ethnicities) unless the topic explicitly names Korea, then Korean casting.
+UNIVERSAL MIRICANVAS SIGNATURE for the lifestyle categories above: bright airy, warm-neutral palette (cream/beige/soft wood), authentic Korean people with genuine natural smiles (never stiff Western stock look), soft window daylight, one gentle plant, tack-sharp subject with gently blurred background, and a clean low-detail area (~45-55% of frame) reserved for Korean text overlay.
+UNIVERSAL ADOBE STOCK SIGNATURE for the Adobe-first categories (healthcare, business, etc.): globally diverse casting (mix of ethnicities, ages, genders) UNLESS the topic explicitly names Korea/Korean cities — then Korean casting; strong subject-focused composition (rule of thirds, subject fills 50-70% of frame); editorial realism; less need for wide text-overlay areas; cinematic or moody lighting is welcome when the topic calls for it.`;
 
 const ASPECTS = ["1:1", "16:9", "4:3", "3:4", "9:16"];
 const OPENAI_SIZE = { "1:1": "1024x1024", "16:9": "1536x1024", "4:3": "1536x1024", "3:4": "1024x1536", "9:16": "1024x1536" };
@@ -428,6 +437,10 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   const isFood = !isIllust && FOOD_RE.test(themeAll);
   /* 미캔 라이프스타일 — 부동산·가족·솔로 데일리·골프 등 밝은 홈 미학 (감성·음식 아닐 때만) */
   const isMiriLifestyle = !isIllust && !isEmotional && !isFood && MIRI_LIFESTYLE_RE.test(themeAll);
+  /* 어도비 헬스케어 — 글로벌 다양성 상업 구도 (감성·음식·미캔라이프 아닐 때) */
+  const isHealthcare = !isIllust && !isEmotional && !isFood && !isMiriLifestyle && HEALTHCARE_RE.test(themeAll);
+  /* 한국 명시 시 어도비 글로벌 다양성 규칙 억제 (Korean 캐스팅 유지) */
+  const isKoreanExplicit = KOREAN_EXPLICIT_RE.test(themeAll);
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
   const comp = mode === "wallpaper"
     ? `40-60% clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
@@ -479,10 +492,12 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     isFood ? FOOD_STYLING : "",
     /* 미캔 라이프스타일 시그니처 — 부동산·가족·솔로 데일리 등 밝은 홈 미학 */
     isMiriLifestyle ? MIRI_LIFESTYLE_STYLING : "",
+    /* 어도비 헬스케어 시그니처 — 글로벌 다양성(한국 명시면 한국인 캐스팅) */
+    isHealthcare ? (isKoreanExplicit ? HEALTHCARE_STYLING.replace("authentic diverse medical professionals", "authentic Korean medical professionals") : HEALTHCARE_STYLING) : "",
     quality,
     GUARD,
-    /* 배경화면=제외 · 감성=텍스트 여백 · 신앙=골든아워/실루엣 · 음식=밝은근접+배경흐림 · 미캔라이프=밝은홈+얕은심도 · 그 외=상업 배제 */
-    mode === "wallpaper" ? "" : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : isFood ? FOOD_GUARD : isMiriLifestyle ? MIRI_LIFESTYLE_GUARD : COMMERCIAL_GUARD,
+    /* 배경화면=제외 · 감성=텍스트여백 · 신앙=골든아워 · 음식=밝은근접 · 미캔라이프=밝은홈 · 헬스케어=클리닉리얼 · 그 외=상업 배제 */
+    mode === "wallpaper" ? "" : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : isFood ? FOOD_GUARD : isMiriLifestyle ? MIRI_LIFESTYLE_GUARD : isHealthcare ? HEALTHCARE_GUARD : COMMERCIAL_GUARD,
   ].filter(Boolean).join(". ");
 }
 
@@ -491,7 +506,7 @@ const MJ_NEG_BASE = "text, letters, numbers, logo, watermark, brand name, signat
 const MJ_NEG_COMMERCIAL = "backlit, silhouette, lens flare, bokeh, blurry background, out of focus background, cluttered background, crowd";
 function toMidjourney(slot, mode, tone, people, aspect) {
   let pos = slot.finalPrompt || buildSlotPrompt(slot, mode, tone, people);
-  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(GUARD, "")
+  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(HEALTHCARE_GUARD, "").replace(GUARD, "")
     .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
   const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`;
   /* 역광·보케 배제는 순수 상업 슬롯에만 — 신앙(역광)·음식·미캔라이프(얕은 심도)는 그게 판매 포인트라 제외 */
