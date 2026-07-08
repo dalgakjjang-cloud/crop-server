@@ -1535,17 +1535,17 @@ Each block content = one short Korean sentence.`,
 
           {showSettings && (
             <div className="pb-2 flex flex-wrap items-end gap-2">
-              {/* 두뇌 선택 */}
+              {/* 두뇌 + API 키 */}
               <div>
-                <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">두뇌 (에이전트)</label>
+                <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">두뇌</label>
                 <select value={brain} onChange={(e) => setBrain(e.target.value)} className={fieldCls}>
-                  <option value="gpt">GPT (Codex 계열) · OpenAI 키</option>
-                  <option value="gemini">Gemini · 구글 키</option>
+                  <option value="gpt">GPT (Codex)</option>
+                  <option value="gemini">Gemini</option>
                 </select>
               </div>
               {brain === "gpt" && (
                 <div>
-                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">GPT 모델명</label>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">GPT 모델</label>
                   <input list="gptModels" value={gptModel} onChange={(e) => setGptModel(e.target.value)} placeholder={GPT_MODEL_DEFAULT}
                     className={`${fieldCls} font-mono w-36`} />
                   <datalist id="gptModels">{GPT_MODEL_PRESETS.map((m) => <option key={m} value={m} />)}</datalist>
@@ -1553,16 +1553,26 @@ Each block content = one short Korean sentence.`,
               )}
               {brain === "gemini" && (
                 <div>
-                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">Gemini 모델명</label>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">Gemini 모델</label>
                   <input list="geminiModels" value={geminiModel} onChange={(e) => setGeminiModel(e.target.value)} placeholder={GEMINI_MODEL_DEFAULT}
                     className={`${fieldCls} font-mono w-40`} />
                   <datalist id="geminiModels">{GEMINI_MODEL_PRESETS.map((m) => <option key={m} value={m} />)}</datalist>
                 </div>
               )}
+              <div>
+                <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">OpenAI Key</label>
+                <input type="password" value={openaiKey} onChange={(e) => setOpenaiKey(e.target.value)} placeholder="sk-…"
+                  className={`${fieldCls} font-mono w-36`} />
+              </div>
+              <div>
+                <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">Google Key</label>
+                <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AQ… / AIzaSy…"
+                  className={`${fieldCls} font-mono w-40`} />
+              </div>
               <label className="flex items-center gap-1.5 text-[11px] font-semibold text-neutral-300 pb-1 cursor-pointer select-none">
                 <input type="checkbox" checked={autoFallback} onChange={(e) => setAutoFallback(e.target.checked)}
                   className="w-3.5 h-3.5 accent-violet-500" />
-                한도 초과·실패 시 자동 폴백 (GPT·Gemini 우선)
+                자동 폴백
               </label>
 
               <div className="w-full border-t border-neutral-700/60" />
@@ -1615,31 +1625,13 @@ Each block content = one short Korean sentence.`,
                 </select>
               </div>
 
-              <div className="w-full border-t border-neutral-700/60" />
-
-              {/* 키 2칸 분리 — 항상 별도 행 */}
-              <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-2">
-                <div>
-                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">OpenAI API Key (GPT 두뇌 + gpt-image)</label>
-                  <input type="password" value={openaiKey} onChange={(e) => setOpenaiKey(e.target.value)} placeholder="sk-…"
-                    className={`${fieldCls} font-mono w-full`} />
-                </div>
-                <div>
-                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">Google Gemini API Key (Gemini 두뇌 + 이미지)</label>
-                  <input type="password" value={googleKey} onChange={(e) => setGoogleKey(e.target.value)} placeholder="AQ… (신규) 또는 AIzaSy… (구)"
-                    className={`${fieldCls} font-mono w-full`} />
-                  <p className="text-[10px] text-neutral-500 mt-0.5 leading-tight">
-                    신규 <b className="text-neutral-400">AQ</b> 키 + 기존 <b className="text-neutral-400">AIzaSy</b> 키 모두 지원 · x-goog-api-key 헤더 방식 자동 적용
-                  </p>
-                </div>
-              </div>
               <div className="w-full flex items-center gap-3">
                 <p className="text-[10px] text-neutral-500">
-                  키는 <b className="text-neutral-400">이 브라우저에만 자동 저장</b> (서버 전송 없음)
+                  키는 <b className="text-neutral-400">브라우저 저장</b> (서버 전송 없음)
                 </p>
                 <button onClick={clearSavedKeys}
                   className="text-[10px] text-rose-300/80 hover:text-rose-300 underline underline-offset-2 shrink-0">
-                  저장된 키 삭제
+                  키 삭제
                 </button>
               </div>
             </div>
