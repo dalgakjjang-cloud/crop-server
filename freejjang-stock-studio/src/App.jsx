@@ -16,8 +16,9 @@ import Pica from "pica";
    파이프라인: 초안 승인(멈춤1) → 순차 생성 → QC(멈춤2) → 제출 팩
    ═══════════════════════════════════════════════════════════ */
 
-/* 항상 배제 (텍스트·로고·저작권·군중) — 상업용/배경화면 모두 공통 · 짧게 */
-const GUARD = "no text, logos, watermarks, brands, copyrighted characters, or crowd";
+/* 항상 배제 (텍스트·로고·저작권·군중) — 상업용/배경화면 모두 공통.
+   gpt-image가 박스·간판·벽에 엉터리 글자를 그리는 경향이 강해 억제를 명시적으로 강화 */
+const GUARD = "absolutely NO text, letters, words, numbers, captions, labels, printed writing or logos anywhere — on any surface, box, package, wall, sign, object, uniform, cap, badge or clothing (all packaging, boxes, uniforms and caps must be completely plain and blank); no watermarks, no brand names, no copyrighted characters, no crowd";
 
 /* 상업용(non-wallpaper) 전용 배제 — 역광·보케·산만한 배경 (어도비 판매 킬러) · 짧게 */
 const COMMERCIAL_GUARD = "clean uncluttered background, even lighting, no backlit, no silhouette, no lens flare, no bokeh, no blurry background";
@@ -432,7 +433,7 @@ async function genOpenAIRefine(key, prompt, refDataUrl, aspect, quality) {
 }
 
 /* 슬롯 필드 → 최종 이미지 프롬프트 (짧고 핵심적인 판매 프롬프트) */
-function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
+function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCast = false) {
   const isIllust = slot.kind === "illustration";
   const anglePick = CAMERA_ANGLES[slot.angle]?.phrase || "";
   const isTight = slot.angle === "closeup" || slot.angle === "macro";
@@ -444,8 +445,9 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   const isMiriLifestyle = !isIllust && !isEmotional && !isFood && MIRI_LIFESTYLE_RE.test(themeAll);
   /* 어도비 헬스케어 — 글로벌 다양성 상업 구도 (감성·음식·미캔라이프 아닐 때) */
   const isHealthcare = !isIllust && !isEmotional && !isFood && !isMiriLifestyle && HEALTHCARE_RE.test(themeAll);
-  /* 한국 명시 시 어도비 글로벌 다양성 규칙 억제 (Korean 캐스팅 유지) */
-  const isKoreanExplicit = KOREAN_EXPLICIT_RE.test(themeAll);
+  /* 한국 명시 시 어도비 글로벌 다양성 규칙 억제 (Korean 캐스팅 유지)
+     — 슬롯 영어 텍스트에 Korean이 없어도, 주제/지역이 한국이면(koreanCast) 강제 */
+  const isKoreanExplicit = koreanCast || KOREAN_EXPLICIT_RE.test(themeAll);
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
   const comp = mode === "wallpaper"
     ? `40-60% clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
@@ -472,6 +474,10 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
   const brightLine = !isIllust && !moodyOk ? BRIGHT_ENFORCEMENT : "";
   const toneLine = isIllust ? "" : TONE_PHRASE[tone] || TONE_PHRASE.realism;
   const peopleLine = PEOPLE_FINAL[people] || "";
+  /* 한국 주제/지역이면 인물을 반드시 한국인으로 캐스팅 (인물 없음 모드는 제외) */
+  const koreanCastLine = !isIllust && isKoreanExplicit && people !== "none"
+    ? "all people shown are authentically Korean with natural East Asian Korean facial features, hair and styling (NOT Western or Caucasian, NOT Southeast Asian)"
+    : "";
   const propsLine = slot.props ? `props: ${slot.props}` : "";
   /* 재생성 피드백 루프: 직전 거절 사유를 교정 지시로 주입 → 같은 실수 반복 차단 */
   const fixLine = slot.qcNote
@@ -495,6 +501,7 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto") {
     brightLine,
     toneLine,
     peopleLine,
+    koreanCastLine,
     `palette: ${slot.palette || "bright commercial tones"}`,
     !isIllust ? "objects rest naturally on real surfaces, nothing floating" : "",
     /* 음식이면 밝은 초근접 실사 인스타 스타일링을 최종 프롬프트에 직접 주입 */
@@ -698,12 +705,19 @@ export default function App() {
     if (modeAuto) setMode(EMOTIONAL_RE.test(v) ? "emotional" : WALLPAPER_RE.test(v) ? "wallpaper" : "commercial");
   };
 
+  /* 한국인 캐스팅 강제 여부: 지역을 '한국'으로 골랐거나, 지역 미선택인데 주제/키워드에 한국이 명시되면 자동 강제.
+     지역을 미국·유럽·일본 등으로 명시하면 그 의도를 존중해 강제하지 않는다 */
+  const wantKoreanCast = () =>
+    refRegion === "kr" || (refRegion === "" && KOREAN_EXPLICIT_RE.test(`${topic} ${priKw}`));
+
   /* REEDO식 구조화 구성 → 초안 브레인에 주입할 제약 문장 (선택된 것만) */
   const refinementLine = () => {
     const parts = [];
     if (TONE_PHRASE[refTone]) parts.push(`Selling aesthetic (CRITICAL, every subject/lighting/palette must follow this): ${TONE_PHRASE[refTone]}`);
     if (REEDO_STYLE_PHRASE[refStyle]) parts.push(`Style: ${REEDO_STYLE_PHRASE[refStyle]}`);
     if (REEDO_REGION_PHRASE[refRegion]) parts.push(`Market: ${REEDO_REGION_PHRASE[refRegion]}`);
+    /* 지역 미선택이지만 주제가 한국이면, 두뇌가 모든 장면을 한국인 인물로 설계하도록 명시 */
+    else if (wantKoreanCast()) parts.push(`Casting (CRITICAL): every scene featuring people must depict authentically Korean people with natural East Asian Korean features — never Western/Caucasian models. Korean setting and styling.`);
     if (REEDO_BG_PHRASE[refBg]) parts.push(`Background: ${REEDO_BG_PHRASE[refBg]}`);
     if (REEDO_FOOD_PHRASE[refFood]) parts.push(`Food genre: ${REEDO_FOOD_PHRASE[refFood]}`);
     /* 발전: 장르를 안 골라도 주제/키워드가 음식이면 식욕 자극 스타일링 자동 주입 */
@@ -1001,7 +1015,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
       if (timeUp()) { addLog(`[시간 상한] 예산 초과 — ${newMade}장 생성 후 중단 ('미완료·수정 슬롯 생성' 버튼은 시간 무시하고 강제 실행됩니다)`); break; }
       setProg({ done: newMade, total: targets.length, stage: `슬롯 ${t.index} 생성 중` });
       /* 프롬프트를 먼저 확정해 슬롯에 깔아둔다 — 생성되는 동안 카드에서 프롬프트 확인 가능 */
-      const fp = buildSlotPrompt(t, mode, refTone, refPeople);
+      const fp = buildSlotPrompt(t, mode, refTone, refPeople, wantKoreanCast());
       setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating", finalPrompt: fp } : s)));
       try {
         if (t.qcNote) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${t.qcNote}`);
@@ -1015,7 +1029,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
           try {
             const fix = await repairSlot(t, err.message);
             const t2 = { ...t, ...fix, repaired: true };
-            const fp2 = buildSlotPrompt(t2, mode, refTone, refPeople);
+            const fp2 = buildSlotPrompt(t2, mode, refTone, refPeople, wantKoreanCast());
             setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, ...fix, repaired: true, finalPrompt: fp2 } : s)));
             const dataUrl2 = await generateImage(fp2, draftQ);
             await markSuccess(t.index, dataUrl2, fp2);
@@ -1099,7 +1113,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
         const r = await askBrain(
           `You are a strict stock-photo QC inspector. Respond ONLY JSON:
 {"pass":true|false,"issues":["short tags"],"reason":"one short Korean sentence explaining the main problem (empty if pass)"}
-Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind, (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode: the subject must clearly dominate (50-70%) and empty area must stay under ~40% — reject if the subject looks small and lost in a vast featureless background, (7) TECHNICAL QUALITY like an Adobe Stock reviewer (Adobe rejects for: exposure problems, soft focus, over-filtering/artifacts, noise): reject on soft or missed focus on the main subject, large blurry featureless areas, visible noise/grain/banding, plastic over-smoothed AI texture, over-sharpening halos, blown-out highlights or muddy shadows, heavy filter/vignette/HDR look, (8) COMMERCIAL-SALES KILLERS (commercial mode only — skip for wallpaper mode): backlit subject against a bright window, silhouette look, lens flare, sun glare, harsh directional lighting; blurry/bokeh/out-of-focus background, shallow depth-of-field where the background dissolves, blurred city lights / blurred traffic / blurred foliage; busy, cluttered or visually noisy background that competes with the subject; a visible crowd or too many people (any dense group of humans in the frame that isn't the intentional subject). Be strict on text, distortion, technical quality and commercial-sales killers; be lenient on subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
+Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind, (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode: the subject must clearly dominate (50-70%) and empty area must stay under ~40% — reject if the subject looks small and lost in a vast featureless background, (7) TECHNICAL QUALITY like an Adobe Stock reviewer: reject ONLY when the MAIN SUBJECT (the hero object/person) is itself soft, out of focus or missed focus; or visible noise/grain/banding; or obvious plastic over-smoothed AI skin/texture; or clear AI shape distortion; or over-sharpening halos; or blown-out white highlights or crushed muddy shadows; or a heavy filter/vignette/HDR look. IMPORTANT: a soft, gently blurred or bokeh BACKGROUND is NOT a defect by itself — natural shallow depth-of-field with a tack-sharp subject is normal and DESIRABLE in professional lifestyle and product stock, so do NOT reject for background blur alone, (8) COMMERCIAL-SALES KILLERS (commercial mode only — skip for wallpaper/emotional/faith modes): a busy, cluttered or visually noisy background that competes with the subject; a visible crowd or dense group of unintended people; strong lens flare, sun glare or a harsh blown-out backlight that hides the subject as a silhouette. Natural gentle background bokeh is ACCEPTABLE — reject background blur ONLY when it looks artificial, melted or smeared like an AI artifact (not natural optical bokeh), or when the main subject itself is not sharp. Be strict on text, logos, distortion and a soft main subject; be lenient on natural background blur and subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
           `Topic: "${topic}" · Mode: ${mode} · Slot ${t.index} subject: "${t.subject}"\n이 이미지를 검수해줘.`,
           { mime: "image/jpeg", data: b64 }
         );
@@ -1181,7 +1195,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `# 배제 규칙이 문장에 포함된 자연어 프롬프트입니다.\n` +
       `# GPT gpt-image / Firefly / Stable Diffusion / DALL·E 등에 그대로 붙여넣어 쓰세요.\n` +
       `# (Midjourney는 옆의 'Midjourney용' 버튼을 쓰세요 — --no/--ar 문법으로 변환됩니다)\n\n`;
-    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople)}`).join("\n\n");
+    const body = rows.map((s) => `[${s.index}] ${s.title_kr || s.title || ""}\n${s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople, wantKoreanCast())}`).join("\n\n");
     saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-min.txt`);
     addLog(`[백업] 프롬프트 TXT(일반) 저장 완료 — ${rows.length}슬롯`);
   };
@@ -1204,7 +1218,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     return head + rows.map((s) => [
       `[${s.index}] ${s.title_kr || ""} / ${s.title || ""}`,
       `status: ${s.status}`,
-      `final_prompt: ${s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople)}`,
+      `final_prompt: ${s.finalPrompt || buildSlotPrompt(s, mode, refTone, refPeople, wantKoreanCast())}`,
       `subject: ${s.subject || ""}`,
       `props: ${s.props || ""}`,
       `kind: ${s.kind || ""}`,
@@ -1354,7 +1368,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     if (phase === "generating") return;
     /* 거절/플래그 사유가 있으면 교정 지시로 주입 (같은 실수 반복 차단) — 프롬프트를 먼저 깔고 생성 */
     const note = t.qcNote || t.autoFlag || "";
-    const fp = buildSlotPrompt({ ...t, qcNote: note }, mode, refTone, refPeople);
+    const fp = buildSlotPrompt({ ...t, qcNote: note }, mode, refTone, refPeople, wantKoreanCast());
     setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating", finalPrompt: fp, dataUrl: "" } : s)));
     addLog(`[재생성 ${t.index}] ${CAMERA_ANGLES[t.angle]?.label || "자동"} · 시작`);
     try {
