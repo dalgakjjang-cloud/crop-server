@@ -19,6 +19,9 @@ import Pica from "pica";
 /* 항상 배제 (텍스트·로고·저작권·군중) — 상업용/배경화면 모두 공통.
    gpt-image가 박스·간판·벽에 엉터리 글자를 그리는 경향이 강해 억제를 명시적으로 강화 */
 const GUARD = "absolutely NO text, letters, words, numbers, captions, labels, printed writing or logos anywhere — on any surface, box, package, wall, sign, object, uniform, cap, badge or clothing (all packaging, boxes, uniforms and caps must be completely plain and blank); no watermarks, no brand names, no copyrighted characters, no crowd";
+/* 노텍스트 선두 잠금 — 이미지 모델은 앞 토큰에 가중치를 두므로 GUARD(후미)와 별도로 프롬프트 앞에도 박는다.
+   특히 한국 배경(교회·카페 등)에서 모델이 자발적으로 그려넣는 한글 서예·벽 액자·현수막·표어를 문자 단위로 명시 차단 */
+const NO_TEXT_LOCK = "zero written characters of ANY language or script anywhere in the image — no Korean Hangul, no English letters, no Chinese or Japanese characters, no numbers, no calligraphy: walls are plain and bare with no framed verses, hanging banners, posters, scrolls or wall lettering; every book, cover, spine and leather surface is completely blank with no embossed, engraved or printed title; screens, signs and labels are blank or purely pictorial";
 
 /* 상업용(non-wallpaper) 전용 배제 — 역광·보케·산만한 배경 (어도비 판매 킬러) · 짧게 */
 const COMMERCIAL_GUARD = "clean uncluttered background, even lighting, no backlit, no silhouette, no lens flare, no bokeh, no blurry background, no neon glow, no glowing sci-fi circuits or holograms, no dark moody tech scene, no noise, no film grain, no banding";
@@ -518,6 +521,7 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
   return [
     slot.subject,
     fixLine,
+    NO_TEXT_LOCK,
     propsLine,
     comp,
     `camera: ${camera}`,
@@ -554,7 +558,7 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
    그래서 MJ 내보내기에서는 (1) 긍정문 안의 모든 부정 표현을 제거하거나 '원하는 것만 말하는' 문장으로 치환,
    (2) 창문/샵프론트 조명 연출을 정면광으로 치환(역광·실루엣의 실제 원인 제거),
    (3) 금지어는 --no 파라미터로만 전달, (4) 한국인 캐스팅은 맨 앞으로(미드저니는 앞 토큰에 가중치). */
-const MJ_NEG_BASE = "text, letters, numbers, logo, watermark, brand name, signature, deformed hands, extra fingers, distorted anatomy, plastic AI look, oversmoothed skin";
+const MJ_NEG_BASE = "text, letters, numbers, logo, watermark, brand name, signature, korean text, hangul, chinese characters, japanese characters, calligraphy, wall lettering, framed verse, hanging banner, embossed title, book cover text, deformed hands, extra fingers, distorted anatomy, plastic AI look, oversmoothed skin";
 const MJ_NEG_COMMERCIAL = "backlit, backlight, silhouette, lens flare, bokeh, blurry background, out of focus background, cluttered background, crowd, window, glass storefront, street view, traffic, pedestrians, city lights, neon sign, signage";
 /* 어도비 기술 거절 3대장(노이즈·소프트포커스·아티팩트) 원천 차단 — 발광/글로우는 소프트포커스 판정, 어두운 배경은 노이즈·밴딩 온상 */
 const MJ_NEG_QUALITY = "noise, film grain, banding, chroma noise, glow, bloom, halo, soft focus, hazy";
@@ -591,7 +595,8 @@ const MJ_WINDOW_FIXES = [
 ];
 function toMidjourney(slot, mode, tone, people, aspect) {
   let pos = slot.finalPrompt || buildSlotPrompt(slot, mode, tone, people);
-  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(HEALTHCARE_GUARD, "").replace(GUARD, "")
+  /* NO_TEXT_LOCK도 반드시 제거 — 미드저니는 "no Hangul/calligraphy" 속 명사를 유인어로 읽고 오히려 그린다 (--no 네거티브로만 전달) */
+  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(HEALTHCARE_GUARD, "").replace(GUARD, "").replace(NO_TEXT_LOCK, "")
     .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
   /* 부정문 소독 — 미드저니가 부정 단어를 유인어로 읽는 사고 차단 */
   for (const [from, to] of MJ_POSITIVE_FIXES) pos = pos.split(from).join(to);
@@ -641,7 +646,7 @@ function buildMidjourneyPrompt(slot, { aspect = "16:9", tone = "realism", people
   ].filter(Boolean).join(", ");
   const params = [];
   if (!isIllust) params.push("--style raw");
-  params.push(`--no text, letters, numbers, logo, watermark, signature${banPeople ? ", people" : ""}`);
+  params.push(`--no text, letters, numbers, logo, watermark, signature, korean text, hangul, calligraphy, wall lettering, framed verse, hanging banner, book cover text${banPeople ? ", people" : ""}`);
   params.push(`--ar ${aspect}`);
   return `${core} ${params.join(" ")}`.replace(/\s+/g, " ").trim();
 }
@@ -714,11 +719,20 @@ export default function App() {
         if (typeof s.autoFallback === "boolean") setAutoFallback(s.autoFallback);
         if (s.refTone) setRefTone(s.refTone);
         if (s.refPeople) setRefPeople(s.refPeople);
-        /* priKw·handlingTip은 새로고침 시 의도적으로 비움 (주제마다 새로 입력) — localStorage에 저장하지 않음 */
       }
+      /* 작업 필드(주제·우선 키워드·팁)도 복원 — 에러·새로고침 후 "제목만 남고 키워드가 사라지는" 문제 방지.
+         비우고 싶으면 Start Fresh를 쓰면 됨 */
+      const w = JSON.parse(localStorage.getItem("freejjang_workfields") || "{}");
+      if (w.topic) onTopicChange(w.topic);
+      if (w.priKw) setPriKw(w.priKw);
+      if (w.handlingTip) setHandlingTip(w.handlingTip);
     } catch { /* 손상된 저장값 무시 */ }
     settingsLoaded.current = true;
   }, []);
+  useEffect(() => {
+    if (!settingsLoaded.current) return;
+    try { localStorage.setItem("freejjang_workfields", JSON.stringify({ topic, priKw, handlingTip })); } catch { /* 저장 불가 무시 */ }
+  }, [topic, priKw, handlingTip]);
   useEffect(() => {
     if (!settingsLoaded.current) return;
     try {
@@ -760,6 +774,13 @@ export default function App() {
   useEffect(() => {
     try { localStorage.setItem("freejjang_reco_history", JSON.stringify(recoHistory)); } catch { /* 저장 불가 무시 */ }
   }, [recoHistory]);
+  /* 직전 추천 3개(온전한 내용) — 에러로 버린 추천을 API 호출 없이 다시 불러와 재시도(토큰 절약)용 */
+  const [recentRecos, setRecentRecos] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("freejjang_recent_recos")) || []; } catch { return []; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem("freejjang_recent_recos", JSON.stringify(recentRecos)); } catch { /* 저장 불가 무시 */ }
+  }, [recentRecos]);
   const cancelRef = useRef(false);
 
   /* ── 기본 생성 / 분석 / 공용 ── */
@@ -957,7 +978,7 @@ If the topic matches one of these formulas, make several concepts embody its win
     let doneCnt = 0;
     const detailSystem = `You expand assigned scene concepts into professional stock image slots. Respond ONLY compact JSON:
 {"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC supporting props/styling unique to THIS scene, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth (photo) or medium/edges (illustration)","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words, descriptive and searchable","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords, comma-separated, SEO-ordered","keywords_kr":"EXACTLY 25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경), same SEO ordering as EN","category":11}]}
-RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. NO TEXT-BEARING ELEMENTS anywhere in subject or props (text in the image is auto-rejected): no slides/screens with words, no documents, handouts, printed pages, book covers, signs, labels, menus or writing of any kind — replace with wordless equivalents (abstract graphics, blank surfaces, shape-only charts). Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject, with subtle real surface texture (never a featureless void). Mode "emotional" (Korean MiriCanvas worship/seasonal text-overlay background): design a warm inspirational background — golden-hour or soft dramatic sky, gentle light rays through clouds, subjects like a cross, wheat field, autumn harvest bounty, open sky, praying hands; copy_space = a 45-60% low-detail area with a calm darker zone reserved for Korean text; here golden-hour backlight and gentle silhouette are DESIRED (do NOT flatten, do NOT force even frontal lighting); "keywords_kr" must include Korean emotional/worship/seasonal search terms (예배, 감사, 은혜, 배경, 감성 등). Mode "commercial": medium or wide framing, subject clearly DOMINATES at 50-70% of frame (never edge-to-edge, never a small subject lost in emptiness), 25-35% clean negative space with a HARD CAP of 40% empty area, rule-of-thirds, subject fully in frame; "lighting" must describe correct even exposure (detail kept in highlights and shadows) and "camera" must keep the whole main subject tack-sharp (f/4-f/5.6, no heavy shallow-DOF blur). CLEAN BACKGROUND (commercial default, critical for Midjourney which over-blurs busy scenes): design the setting as a clean, minimal, high-end interior or a simple tidy backdrop that stays SHARP and in focus — the "location" and background must NOT be a window facing a busy outdoor street, NOT passing traffic or a crowded café/shop exterior, NOT glowing bokeh city lights, NOT cluttered packed shelves behind the subject. Keep the space premium, uncluttered and distraction-free so nothing in the background needs to be blurred away. (Exceptions: topics explicitly about travel/landscape/outdoor/street-life may keep their real environment.) FRONT-LIT RULE (commercial default, prevents rejected backlit shots): "lighting" must light the subject from the FRONT or FRONT-SIDE — key light from the camera side or a 45° side. NEVER stage a window, glass storefront or any bright light source BEHIND the subject (that creates backlit silhouettes which fail QC). If daylight is used, it comes from an off-camera side source that is NOT visible in the frame; the wall directly behind the subject is always a simple clean interior wall. Do NOT write "window light", "by the window" or "shopfront light" in "lighting" — write "soft directional daylight from the left/right, off-camera" instead. DARK-NEON BAN (applies to commercial mode ONLY — NOT wallpaper/emotional/background assets): in COMMERCIAL product & people shots, NEVER design a scene as a dark room lit mainly by glowing neon circuits, holograms or sci-fi light effects — there the glowing edges read as soft focus and dark backgrounds carry noise/banding at Adobe's 100% zoom review. BUT for wallpaper/emotional/abstract-background assets this does NOT apply: atmospheric neon, dark ambient tech, glowing data waves and cosmic scenes are a DESIRED wallpaper aesthetic (Adobe approves these as backgrounds) — keep them when the mode is wallpaper. The REAL technical killer is not neon itself but (a) extreme close-ups where dense repetitive circuitry/chip pins fill the frame (AI garbles fine traces → artifact reject) and (b) softness/glow on a subject that is SUPPOSED to be tack-sharp. TECH HARDWARE RULE (semiconductor/chip/server/robot/AI topics, commercial mode): stage REAL physical hardware in a BRIGHT clean environment — bright cleanroom, white modern lab, or a seamless product-shot backdrop — with even studio-grade lighting, like premium B2B product photography. Avoid extreme close-ups where dense repetitive circuitry fills the whole frame; prefer the hardware at medium distance, held or handled by a person, or staged as a clean single-hero product shot. (For wallpaper mode, an atmospheric wide tech scene with subtle glow is fine.)
+RULES: one item per assigned concept, in the given order — KEEP each concept's location, action, angle and time exactly (they guarantee set diversity; do not merge or swap them). kind is "photo" or "illustration" by topic. No contradictory lens/angle/lighting mixes. Exclude text, logos, brands, copyrighted characters, unrequested people. NO TEXT-BEARING ELEMENTS anywhere in subject or props (text in the image is auto-rejected): no slides/screens with words, no documents, handouts, printed pages, book covers, signs, labels, menus or writing of any kind — replace with wordless equivalents (abstract graphics, blank surfaces, shape-only charts). This includes NON-ENGLISH scripts: Korean interiors (churches, cafés, shops, homes) must NEVER include Korean Hangul calligraphy, framed scripture/verses, hanging banners, wall lettering or hymn boards — describe such walls explicitly as plain and bare; Bibles and books are always closed with a completely plain unmarked cover (never write "with title" or a brand). All output field values must be ENGLISH ONLY (except title_kr and keywords_kr) — never copy Korean words from the topic or user notes into subject/props/camera/lighting. Cultural items must be factually correct. PHYSICAL PLAUSIBILITY: every object rests on a realistic surface — cups/drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric; nothing floating or oddly placed. SELLABILITY: usable beats pretty — prefer hands + device + partial person over posed full faces; keep backgrounds clean enough for ads and banners. Mode "wallpaper": copy_space = a 40-60% low-density area opposite the subject, with subtle real surface texture (never a featureless void). Mode "emotional" (Korean MiriCanvas worship/seasonal text-overlay background): design a warm inspirational background — golden-hour or soft dramatic sky, gentle light rays through clouds, subjects like a cross, wheat field, autumn harvest bounty, open sky, praying hands; copy_space = a 45-60% low-detail area with a calm darker zone reserved for Korean text; here golden-hour backlight and gentle silhouette are DESIRED (do NOT flatten, do NOT force even frontal lighting); "keywords_kr" must include Korean emotional/worship/seasonal search terms (예배, 감사, 은혜, 배경, 감성 등). Mode "commercial": medium or wide framing, subject clearly DOMINATES at 50-70% of frame (never edge-to-edge, never a small subject lost in emptiness), 25-35% clean negative space with a HARD CAP of 40% empty area, rule-of-thirds, subject fully in frame; "lighting" must describe correct even exposure (detail kept in highlights and shadows) and "camera" must keep the whole main subject tack-sharp (f/4-f/5.6, no heavy shallow-DOF blur). CLEAN BACKGROUND (commercial default, critical for Midjourney which over-blurs busy scenes): design the setting as a clean, minimal, high-end interior or a simple tidy backdrop that stays SHARP and in focus — the "location" and background must NOT be a window facing a busy outdoor street, NOT passing traffic or a crowded café/shop exterior, NOT glowing bokeh city lights, NOT cluttered packed shelves behind the subject. Keep the space premium, uncluttered and distraction-free so nothing in the background needs to be blurred away. (Exceptions: topics explicitly about travel/landscape/outdoor/street-life may keep their real environment.) FRONT-LIT RULE (commercial default, prevents rejected backlit shots): "lighting" must light the subject from the FRONT or FRONT-SIDE — key light from the camera side or a 45° side. NEVER stage a window, glass storefront or any bright light source BEHIND the subject (that creates backlit silhouettes which fail QC). If daylight is used, it comes from an off-camera side source that is NOT visible in the frame; the wall directly behind the subject is always a simple clean interior wall. Do NOT write "window light", "by the window" or "shopfront light" in "lighting" — write "soft directional daylight from the left/right, off-camera" instead. DARK-NEON BAN (applies to commercial mode ONLY — NOT wallpaper/emotional/background assets): in COMMERCIAL product & people shots, NEVER design a scene as a dark room lit mainly by glowing neon circuits, holograms or sci-fi light effects — there the glowing edges read as soft focus and dark backgrounds carry noise/banding at Adobe's 100% zoom review. BUT for wallpaper/emotional/abstract-background assets this does NOT apply: atmospheric neon, dark ambient tech, glowing data waves and cosmic scenes are a DESIRED wallpaper aesthetic (Adobe approves these as backgrounds) — keep them when the mode is wallpaper. The REAL technical killer is not neon itself but (a) extreme close-ups where dense repetitive circuitry/chip pins fill the frame (AI garbles fine traces → artifact reject) and (b) softness/glow on a subject that is SUPPOSED to be tack-sharp. TECH HARDWARE RULE (semiconductor/chip/server/robot/AI topics, commercial mode): stage REAL physical hardware in a BRIGHT clean environment — bright cleanroom, white modern lab, or a seamless product-shot backdrop — with even studio-grade lighting, like premium B2B product photography. Avoid extreme close-ups where dense repetitive circuitry fills the whole frame; prefer the hardware at medium distance, held or handled by a person, or staged as a clean single-hero product shot. (For wallpaper mode, an atmospheric wide tech scene with subtle glow is fine.)
 KEYWORDS (Adobe SEO, critical): EXACTLY 35 EN keywords, no duplicates, ordered by buyer importance (first ~10 weigh most): (1) main subject nouns, (2) descriptors/materials/actions, (3) concept/season/emotion, (4) color/lighting, (5) composition (copy space, background), (6) use-case (banner, marketing, web design). All lowercase, only terms literally describing what is visible. "keywords_kr" same ordering in Korean single nouns.
 CATEGORY: pick ONE best Adobe Stock category id: ${ADOBE_CAT_LIST}. Illustration/vector fallback: 8. Integer id only.
 PROPS & VARIETY: props must be SPECIFIC to each scene and DIFFERENT from every other slot in the whole set (set list provided) — never reuse generic filler across slots; tableware must match the dish culture; keep the copy-space area uncluttered; believable and unbranded.
@@ -1042,11 +1063,21 @@ When you pick a "top" bestseller topic, strongly consider one of the two proven 
       }
       if (!r) r = await askBrain(sys, user);
       if (!r.topic_kr) throw new Error("추천 응답이 비어 있습니다.");
-      onTopicChange(String(r.topic_kr).trim());
-      setPriKw(normKeywords(r.priority_keywords, 14));
-      setHandlingTip(String(r.handling_tip_kr || "").slice(0, 500));
-      lastRecoRef.current = String(r.topic_kr).trim();
-      lastRecoDetailRef.current = { topic: String(r.topic_kr).trim(), market: r.market || "", window: r.sell_window || "" };
+      const reco = {
+        t: String(r.topic_kr).trim(),
+        kw: normKeywords(r.priority_keywords, 14),
+        tip: String(r.handling_tip_kr || "").slice(0, 500),
+        r: String(r.rationale_kr || "").slice(0, 500),
+        w: r.sell_window || "",
+        m: r.market || "",
+      };
+      onTopicChange(reco.t);
+      setPriKw(reco.kw);
+      setHandlingTip(reco.tip);
+      lastRecoRef.current = reco.t;
+      lastRecoDetailRef.current = { topic: reco.t, market: reco.m, window: reco.w };
+      /* 직전 3개만 보관(중복 주제는 최신으로 갱신) */
+      setRecentRecos((p) => [reco, ...p.filter((x) => x.t !== reco.t)].slice(0, 3));
       const label = r.market === "niche" ? "틈새시장" : r.market === "news" ? "이슈·뉴스" : "베스트셀러";
       addLog(`[오늘의 추천] (${label}) ${r.topic_kr} — 판매 적기: ${r.sell_window || "향후 2개월"}`);
       setNotice(`🎯 오늘의 추천 (${label}): "${r.topic_kr}" — ${r.rationale_kr || ""} 판매 적기: ${r.sell_window || "향후 2개월"}. 주제·우선 키워드·팁이 자동으로 채워졌습니다. 마음에 들면 '초안 기획', 다른 주제를 원하면 추천을 한 번 더 누르세요.`);
@@ -1055,6 +1086,20 @@ When you pick a "top" bestseller topic, strongly consider one of the two proven 
       setNotice(`오늘의 추천 실패: ${err.message}`);
     }
     setDailyBusy(false);
+  };
+
+  /* 직전 추천 다시 불러오기 — 저장된 추천을 API 호출 없이 폼에 되채움(토큰 절약).
+     에러로 버린 직전 추천을 구도·소품만 바꿔 재시도할 때 사용 */
+  const applyReco = (reco) => {
+    if (phase === "drafting" || phase === "generating") return;
+    onTopicChange(reco.t);
+    setPriKw(reco.kw || "");
+    setHandlingTip(reco.tip || "");
+    lastRecoRef.current = reco.t;
+    lastRecoDetailRef.current = { topic: reco.t, market: reco.m, window: reco.w };
+    const label = reco.m === "niche" ? "틈새시장" : reco.m === "news" ? "이슈·뉴스" : "베스트셀러";
+    addLog(`[다시 불러옴] (${label}) ${reco.t} — 추천 API 미사용(토큰 절약)`);
+    setNotice(`↩️ 다시 불러옴 (${label}): "${reco.t}" — ${reco.r || ""} 판매 적기: ${reco.w || "향후 2개월"}. 구도·소품을 바꿔 '초안 기획'을 눌러 재시도하세요. (추천 API 미사용 · 토큰 절약)`);
   };
 
   /* 실패 슬롯 자동 복구: 두뇌가 장면을 규정(무텍스트·세이프티)에 맞게 다시 씀 — 장소·행동은 유지해 세트 다양성 보존 */
@@ -1195,7 +1240,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
         const r = await askBrain(
           `You are a strict stock-photo QC inspector. Respond ONLY JSON:
 {"pass":true|false,"issues":["short tags"],"reason":"one short Korean sentence explaining the main problem (empty if pass)"}
-Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind, (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode: the subject must clearly dominate (50-70%) and empty area must stay under ~40% — reject if the subject looks small and lost in a vast featureless background, (7) TECHNICAL QUALITY like an Adobe Stock reviewer: reject ONLY when the MAIN SUBJECT (the hero object/person) is itself soft, out of focus or missed focus; or visible noise/grain/banding; or obvious plastic over-smoothed AI skin/texture; or clear AI shape distortion; or over-sharpening halos; or blown-out white highlights or crushed muddy shadows; or a heavy filter/vignette/HDR look. IMPORTANT: a soft, gently blurred or bokeh BACKGROUND is NOT a defect by itself — natural shallow depth-of-field with a tack-sharp subject is normal and DESIRABLE in professional lifestyle and product stock, so do NOT reject for background blur alone, (8) COMMERCIAL-SALES KILLERS (commercial mode only — skip for wallpaper/emotional/faith modes): a busy, cluttered or visually noisy background that competes with the subject; a visible crowd or dense group of unintended people; strong lens flare, sun glare or a harsh blown-out backlight that hides the subject as a silhouette. Natural gentle background bokeh is ACCEPTABLE — reject background blur ONLY when it looks artificial, melted or smeared like an AI artifact (not natural optical bokeh), or when the main subject itself is not sharp. Be strict on text, logos, distortion and a soft main subject; be lenient on natural background blur and subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
+Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, or writing of any kind IN ANY LANGUAGE OR SCRIPT — including Korean Hangul, Chinese and Japanese characters, decorative calligraphy, wall-hung verses, banners, and embossed/engraved lettering on book covers or leather (this is the #1 stock rejection: inspect walls, frames, banners, book covers and screens closely), (2) logos, brands, watermarks, branded packaging, (3) distorted objects, anatomy (hands/faces), or architecture, (4) cultural inaccuracy (wrong flag, wrong food form, wrong ritual objects/counts), (5) clearly off-topic vs the stated topic, (6) composition violating the stated mode — wallpaper mode needs a 40-60% clean low-density copy area; commercial mode: the subject must clearly dominate (50-70%) and empty area must stay under ~40% — reject if the subject looks small and lost in a vast featureless background, (7) TECHNICAL QUALITY like an Adobe Stock reviewer: reject ONLY when the MAIN SUBJECT (the hero object/person) is itself soft, out of focus or missed focus; or visible noise/grain/banding; or obvious plastic over-smoothed AI skin/texture; or clear AI shape distortion; or over-sharpening halos; or blown-out white highlights or crushed muddy shadows; or a heavy filter/vignette/HDR look. IMPORTANT: a soft, gently blurred or bokeh BACKGROUND is NOT a defect by itself — natural shallow depth-of-field with a tack-sharp subject is normal and DESIRABLE in professional lifestyle and product stock, so do NOT reject for background blur alone, (8) COMMERCIAL-SALES KILLERS (commercial mode only — skip for wallpaper/emotional/faith modes): a busy, cluttered or visually noisy background that competes with the subject; a visible crowd or dense group of unintended people; strong lens flare, sun glare or a harsh blown-out backlight that hides the subject as a silhouette. Natural gentle background bokeh is ACCEPTABLE — reject background blur ONLY when it looks artificial, melted or smeared like an AI artifact (not natural optical bokeh), or when the main subject itself is not sharp. Be strict on text, logos, distortion and a soft main subject; be lenient on natural background blur and subjective style taste. File count being correct is irrelevant — judge the pixels only.`,
           `Topic: "${topic}" · Mode: ${mode} · Slot ${t.index} subject: "${t.subject}"\n이 이미지를 검수해줘.`,
           { mime: "image/jpeg", data: b64 }
         );
@@ -1466,6 +1511,49 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "failed", rejectReason: err.message } : s)));
       addLog(`[재생성 실패 ${t.index}] ${err.message}`);
     }
+  };
+
+  /* ═══ 자동 수정 — 검수 거절 슬롯을 두뇌가 장면부터 고쳐 쓰고 곧바로 재생성.
+     '재생성'은 교정 지시만 얹지만, 자동 수정은 텍스트/로고를 유발한 장면 요소 자체를 제거한다
+     (예: 벽 서예 → 맨 벽, 각인된 성경 커버 → 완전 무지 커버) ═══ */
+  const [autoFixBusy, setAutoFixBusy] = useState(false);
+  const autoFixSlot = async (t) => {
+    if (!imageKey()) { setNotice("이미지 API 키가 필요합니다."); return; }
+    if (phase === "generating" || t.status === "generating") return;
+    const note = t.autoFlag || t.qcNote || "";
+    let fixed = t;
+    if (note) {
+      addLog(`[자동 수정 ${t.index}] 두뇌가 거절 사유를 반영해 장면 수정 중… (${note})`);
+      try {
+        const r = await askBrain(
+          `You fix a stock-image slot that FAILED automated QC. Respond ONLY compact JSON: {"subject":"...","props":"...","camera":"...","lighting":"..."}
+Rewrite the scene fields so the flagged problem is IMPOSSIBLE in the next render — remove or replace the element that caused it: text/lettering in any language (incl. Korean Hangul, calligraphy, wall verses, banners, embossed book covers) → plain bare walls and completely blank unmarked covers/surfaces; logos/brands → plain unbranded generic items; distortion-prone elements (hands doing complex grips, dense repetitive patterns) → simpler poses and surfaces; composition problems → follow the stated correction. KEEP the same location, primary action and mood so the set stays diverse. All fields ENGLISH ONLY, professional stock photography style.`,
+          `Slot ${t.index} — subject: "${t.subject}" | props: "${t.props || ""}" | camera: "${t.camera || ""}" | lighting: "${t.lighting || ""}"\nQC rejection reason (Korean): "${note}". Mode: ${mode}.`
+        );
+        const out = {};
+        for (const k of ["subject", "props", "camera", "lighting"]) if (typeof r[k] === "string" && r[k].trim()) out[k] = r[k].trim();
+        if (Object.keys(out).length) {
+          fixed = { ...t, ...out };
+          setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, ...out, repaired: true } : s)));
+          addLog(`[자동 수정 ${t.index}] 장면 수정 완료 — 재생성 시작`);
+        }
+      } catch (err) {
+        addLog(`[자동 수정 ${t.index}] 장면 수정 실패(${err.message}) — 교정 지시만으로 재생성`);
+      }
+    }
+    await regenSlot(fixed);
+  };
+  /* 플래그된 슬롯 전부 자동 수정 (순차 — 레이트리밋·비용 안전) */
+  const autoFixFlagged = async () => {
+    if (autoFixBusy) return;
+    const targets = slots.filter((s) => s.autoFlag && s.status === "success");
+    if (!targets.length) { setNotice("자동 수정할 플래그 슬롯이 없습니다. 먼저 자동 검수를 돌리세요."); return; }
+    setAutoFixBusy(true);
+    addLog(`[자동 수정] 플래그 ${targets.length}건 일괄 수정 시작`);
+    for (const t of targets) await autoFixSlot(t);
+    setAutoFixBusy(false);
+    addLog(`[자동 수정] ${targets.length}건 완료 — 자동 검수를 한 번 더 돌려 확인하세요`);
+    setNotice(`자동 수정 ${targets.length}건 완료. 자동 검수를 다시 돌려 통과 여부를 확인하세요.`);
   };
 
   /* ── 슬롯 삭제 (번호 재정렬) ── */
@@ -1762,6 +1850,20 @@ Each block content = one short Korean sentence.`,
                     disabled={phase === "drafting" || phase === "generating"}
                     placeholder="예: 9월 가을 신학기 계절 배경화면 — 또는 '오늘의 추천' 클릭"
                     className={`${fieldCls} w-full disabled:opacity-60`} />
+                  {/* 직전 추천 다시 불러오기 — API 호출 없이 폼만 되채움(토큰 절약). 에러로 버린 추천 재시도용 */}
+                  {recentRecos.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                      <span className="text-[10px] text-neutral-500 shrink-0" title="추천 API를 다시 호출하지 않고 저장된 직전 추천을 그대로 불러옵니다(토큰 절약)">직전 추천 다시:</span>
+                      {recentRecos.map((reco, i) => (
+                        <button key={`${reco.t}-${i}`} onClick={() => applyReco(reco)}
+                          disabled={phase === "drafting" || phase === "generating"}
+                          title={`다시 불러오기 (추천 API 미사용 · 토큰 절약): ${reco.t}${reco.w ? ` · 판매적기 ${reco.w}` : ""}`}
+                          className="max-w-[150px] truncate text-[11px] px-2 py-0.5 rounded-full border border-sky-500/40 bg-sky-500/10 text-sky-300 hover:bg-sky-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                          ↩ {reco.t}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {/* 주제 선정 이력 (접이식) — 추천이 판매시기 겹침을 피하는 근거 */}
                   {recoHistory.length > 0 && (
                     <div className="mt-1.5 border border-neutral-700/60 rounded bg-neutral-950/40">
@@ -1994,6 +2096,14 @@ Each block content = one short Korean sentence.`,
                             ? `자동 검수 중 ${autoQcProg ? `${autoQcProg.done + 1}/${autoQcProg.total}` : ""}`
                             : `${brainName} 자동 검수`}
                         </button>
+                        {slots.some((s) => s.autoFlag && s.status === "success") && (
+                          <button onClick={autoFixFlagged} disabled={autoQcBusy || autoFixBusy}
+                            title="플래그된 모든 슬롯을 두뇌가 장면부터 고쳐 쓰고 순차 재생성합니다"
+                            className="bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/40 disabled:opacity-50 text-emerald-300 font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
+                            <RefreshCw className={`w-4 h-4 ${autoFixBusy ? "animate-spin" : ""}`} />
+                            {autoFixBusy ? "자동 수정 중…" : `플래그 ${slots.filter((s) => s.autoFlag && s.status === "success").length}건 자동 수정`}
+                          </button>
+                        )}
                         <button onClick={submitQC} disabled={autoQcBusy}
                           className="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-neutral-950 font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
                           <Check className="w-4 h-4" />
@@ -2122,9 +2232,16 @@ Each block content = one short Korean sentence.`,
                             {s.title_kr && <p className="text-xs text-sky-300 truncate">{s.title_kr}</p>}
                             <p className="text-xs text-neutral-500 font-mono truncate" title={`Adobe cat ${s.category} · EN ${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS).split(", ").filter(Boolean).length}/35 · KR ${normKeywords(s.keywords_kr, MIRI_MAX_KEYWORDS).split(", ").filter(Boolean).length}/25`}>{s.kind} · {s.focal_placement} · {ADOBE_CATEGORIES[s.category] || `cat ${s.category}`}{s.keywords ? ` · EN${normKeywords(s.keywords, ADOBE_MAX_KEYWORDS).split(", ").filter(Boolean).length}` : ""}{s.keywords_kr ? `/KR${normKeywords(s.keywords_kr, MIRI_MAX_KEYWORDS).split(", ").filter(Boolean).length}` : ""}{s.regenCount > 1 ? ` · 재생성 ${s.regenCount - 1}회` : ""}</p>
                             {s.autoFlag && (phase === "qc" || phase === "review") && (
-                              <p className="text-xs text-red-300 bg-red-500/10 border border-red-500/30 rounded px-2 py-1 leading-relaxed">
-                                자동 검수: {s.autoFlag}
-                              </p>
+                              <div className="text-xs text-red-300 bg-red-500/10 border border-red-500/30 rounded px-2 py-1 leading-relaxed space-y-1">
+                                <p>자동 검수: {s.autoFlag}</p>
+                                <button onClick={() => autoFixSlot(s)}
+                                  disabled={s.status === "generating" || autoFixBusy || !imageKey()}
+                                  title="두뇌가 거절 사유를 반영해 장면(피사체·소품)을 고쳐 쓴 뒤 이 슬롯을 자동으로 재생성합니다"
+                                  className="w-full bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/40 disabled:opacity-40 text-emerald-300 font-bold py-1 rounded flex items-center justify-center gap-1 transition">
+                                  <RefreshCw className={`w-3 h-3 ${s.status === "generating" ? "animate-spin" : ""}`} />
+                                  {s.status === "generating" ? "수정 생성 중…" : "자동 수정 (장면 고쳐서 재생성)"}
+                                </button>
+                              </div>
                             )}
 
                             {/* 구도/앵글 미세조정 — 초안·QC 단계 모두 편집 가능 */}
@@ -2252,6 +2369,14 @@ Each block content = one short Korean sentence.`,
                         {autoQcBusy ? <RefreshCw className="w-4 h-4 animate-spin" /> : <ScanSearch className="w-4 h-4" />}
                         {autoQcBusy ? `검수 중 ${autoQcProg ? `${autoQcProg.done + 1}/${autoQcProg.total}` : ""}` : `${brainName} 자동 검수`}
                       </button>
+                      {slots.some((s) => s.autoFlag && s.status === "success") && (
+                        <button onClick={autoFixFlagged} disabled={autoQcBusy || autoFixBusy}
+                          title="플래그된 모든 슬롯을 두뇌가 장면부터 고쳐 쓰고 순차 재생성합니다"
+                          className="w-full bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/40 disabled:opacity-50 text-emerald-300 font-bold text-sm py-2 rounded flex items-center justify-center gap-2 transition">
+                          <RefreshCw className={`w-4 h-4 ${autoFixBusy ? "animate-spin" : ""}`} />
+                          {autoFixBusy ? "자동 수정 중…" : `플래그 ${slots.filter((s) => s.autoFlag && s.status === "success").length}건 자동 수정`}
+                        </button>
+                      )}
                       <button onClick={submitQC} disabled={autoQcBusy}
                         style={!autoQcBusy ? attnPulse : undefined}
                         className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-neutral-950 font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
