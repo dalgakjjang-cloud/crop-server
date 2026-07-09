@@ -56,6 +56,11 @@ const BESTSELLER_REFERENCE = `PROVEN BESTSELLER FORMULAS — when the topic fits
 - Golf lifestyle (bright MiriCanvas leisure seller): golfer lining up a putt with tight focus on hands and club, a couple walking a fairway with a golf cart, a lesson swing at a green driving range — bright daylight, crisp green turf, blue sky, no crowd.
 - Healthcare (major Adobe Stock global seller): a warm interaction between a doctor and a patient in a modern clinic (doctor listening, gentle stethoscope moment), a nurse reassuring an elderly patient, a diverse care team reviewing a tablet chart, a laboratory researcher at a microscope, a therapist in a bright counseling office — modern clean facility, pale blue/white/warm wood palette, honest editorial realism, hopeful reassuring mood; diverse global casting (mixed ethnicities) unless the topic explicitly names Korea, then Korean casting.
 - Practical Korean home-life packages (sells on BOTH MiriCanvas AND Adobe Stock): themed sets of related useful lifestyle moments — travel packing (folding clothes into a suitcase on a white bed), pet-travel prep (packing a pet carrier while the dog waits), meal-prep (portioning banchan into glass containers on a bright kitchen counter, storing prepped meals in a fridge drawer), home organization (drawer sorting, closet folding, decluttering), receiving-delivery moments (accepting a chilled box at the apartment door). The helper is NOT limited to a woman — freely vary who is doing the task across the set: a Korean woman, a Korean man, a couple sharing the chore, a parent with a child pitching in, or the whole family helping together (dad packing, mom folding, kid carrying) — men and family members helping are strongly encouraged and sell just as well. Signature: bright airy white/beige Korean home, casual home wardrobe in warm neutrals, warm-neutral palette, natural hands-on action, tack-sharp product/prop hero, gentle window daylight. These package well because buyers use the whole set on a single blog/newsletter/marketing sequence.
+- Product-on-white isolation / PIW (proven Adobe BULK seller — thousands of approvals): a single product or themed arrangement shot on a seamless pure white background — chocolate cake from every angle (50+ variations), seasonal party supplies (Valentine hearts & chocolates, July 4th BBQ & flags, Christmas ornaments, Pride rainbow items, summer beach gear), food items, lifestyle objects. Even soft wrap-around studio lighting from all sides, no harsh shadows, product fills 60-80% of frame, tack-sharp front-to-back, true-to-life colors and texture. This style sells in VOLUME — batches of 30-100 variations of the same product/theme at different angles, with slightly different arrangements, different garnishes, different accessories. Each image in the batch must have a CLEARLY DIFFERENT composition (different angle, different arrangement, different crop, different garnish or accessory variation) to avoid Adobe similarity rejection. No people, pure object hero shots. Also works for MiriCanvas as clean cutout assets.
+- Trending Korean desserts (viral social-media sellers on BOTH Adobe & MiriCanvas): butter tteok (버터떡) with golden crispy exterior and soft chewy rice cross-section, chewy thick cookie (두쫀쿠) with gooey molten chocolate center pull-apart shot, modernized yakgwa (약과) with honey-sesame glaze, crookie (크루키) croissant-cookie hybrid with cream oozing, cream croissant, twisted donut (꽈배기) — impeccable cross-section hero shot or dramatic texture close-up, rich golden-brown indulgent detail, trendy minimalist plating. These sell on Instagram-appeal alone.
+- International brunch spread (strong Adobe global seller): culture-specific breakfast dishes — American pancakes with bacon, English full breakfast, French croissant & jam, Japanese morning set, Middle Eastern shakshuka, Mexican huevos rancheros, Korean doenjang-jjigae with banchan — each with authentic tableware from that cuisine, bright morning-cafe styling. One country per image, never mix cuisines.
+- Premium steak & grill (Adobe premium food category): thick-cut medium-rare steak with visible pink cross-section and juice beads, char-grilled marks, cast iron or wooden board, melting herb butter, rosemary garnish, warm steakhouse lighting with slight smoke wisps.
+- Cafe seasonal drinks (trendy Adobe + MiriCanvas lifestyle): strawberry latte gradient layers, matcha ade, taro frappé, einspänner with whipped cream cap, dirty espresso drip — glass hero with beautiful color layers visible, condensation droplets, fresh fruit garnish, bright airy cafe counter.
 UNIVERSAL MIRICANVAS SIGNATURE for the lifestyle categories above: bright airy, warm-neutral palette (cream/beige/soft wood), authentic Korean people with genuine natural smiles (never stiff Western stock look), soft window daylight, one gentle plant, tack-sharp subject with gently blurred background, and a clean low-detail area (~45-55% of frame) reserved for Korean text overlay.
 UNIVERSAL ADOBE STOCK SIGNATURE for the Adobe-first categories (healthcare, business, etc.): globally diverse casting (mix of ethnicities, ages, genders) UNLESS the topic explicitly names Korea/Korean cities — then Korean casting; strong subject-focused composition (rule of thirds, subject fills 50-70% of frame); editorial realism; less need for wide text-overlay areas; cinematic or moody lighting is welcome when the topic calls for it.`;
 
@@ -134,23 +139,31 @@ const REEDO_BG_PHRASE = {
 };
 /* 음식 장르 셀렉터 — 음식 주제일 때 장르별 스타일링 주입 (선택 안함이면 무시) */
 const REEDO_FOOD = {
-  "": "선택 안함", brunch: "브런치/카페", dessert: "디저트/베이커리", korean: "한식/집밥",
+  "": "선택 안함", brunch: "브런치/카페", world_brunch: "나라별 브런치",
+  dessert: "디저트/베이커리", trending: "트렌딩 디저트 (버터떡·두쫀쿠·약과)",
+  cafe_drink: "카페 신메뉴/시즌 드링크", korean: "한식/집밥", steak: "스테이크/그릴",
   beverage: "음료/커피", finedining: "파인다이닝/플레이팅", healthy: "건강식/샐러드",
   street: "분식/길거리", homecook: "홈쿠킹/재료", flatlay: "푸드 플랫레이(탑뷰)",
+  piw: "흰배경 제품컷 (푸드)",
 };
 const REEDO_FOOD_PHRASE = {
   brunch: "fresh brunch cafe food photography — avocado toast / eggs / greens vibe on a modern cafe table, appetizing natural styling",
-  dessert: "dessert & bakery photography — cakes, pastries, coffee, cozy patisserie styling with soft warm light",
+  world_brunch: "international brunch spread photography — culture-specific breakfast and brunch dishes from around the world: American (fluffy pancakes, crispy bacon, eggs, hash browns), English full breakfast (baked beans, toast, sausage, fried eggs, grilled tomato), French (butter croissant, jam, café au lait on marble surface), Japanese morning set (steamed rice, miso soup, grilled salmon, pickled vegetables), Middle Eastern (shakshuka in cast iron, hummus, warm pita, labneh), Mexican (huevos rancheros, chilaquiles, fresh salsa, avocado), Korean (doenjang-jjigae, banchan array, steamed rice) — each scene uses authentic tableware and garnishes specific to that cuisine, bright natural morning-cafe styling, one country per image",
+  dessert: "dessert & bakery photography — cakes, pastries, macarons, tarts, éclairs, cream puffs, coffee, cozy patisserie styling with soft warm light",
+  trending: "Korean trending viral dessert photography — hyped social-media-ready treats: butter tteok (버터떡) with golden crispy exterior and soft chewy glutinous rice interior visible in cross-section, chewy thick cookie (두쫀쿠) with gooey molten chocolate center in a dramatic pull-apart or cross-section hero shot, modernized yakgwa (약과) with glossy honey-sesame glaze dripping, crookie (크루키) hybrid croissant-cookie with cream oozing, cream croissant with overflowing custard filling, twisted Korean donut (꽈배기) with sugar coating, injeolmi latte with soybean powder dusting — impeccable cross-section or dramatic texture close-up, rich indulgent golden-brown detail, trendy minimalist plating on warm neutral or marble surface",
+  cafe_drink: "trendy cafe seasonal new-menu drink photography — specialty beverages: strawberry latte with pink-to-white gradient layers, matcha ade with vivid green and ice, taro frappé with purple swirl, fresh fruit smoothie with visible berry layers, sparkling citrus lemonade with bubbles and mint, einspänner with thick whipped cream cap, dirty espresso with dripping cream shot, ube latte, butterfly pea flower tea color-changing, dalgona coffee, cold brew float — the glass or cup as hero with beautiful layered colors visible through clear glass, fresh fruit garnish, condensation droplets on the glass, bright airy cafe counter or marble surface styling",
   korean: "authentic Korean home-food photography — correct Korean tableware (ceramic/stainless banchan bowls), steaming rice and side dishes",
+  steak: "premium steak and grill photography — thick-cut steak as hero with medium-rare pink cross-section clearly visible showing juice beads, perfect char-grilled grill marks on the crust, presented on cast iron skillet or rustic wooden board, melting herb butter pat, fresh rosemary sprig garnish, side of roasted vegetables or golden fries, rich warm steakhouse-amber lighting with slight smoke wisps rising, extreme close-up showing seared crust texture and juicy interior",
   beverage: "beverage & coffee photography — the drink as hero with condensation or gentle steam, clean cafe-counter styling",
   finedining: "fine-dining plated photography — elegant minimal plating on a large plate, upscale restaurant styling",
   healthy: "healthy & salad photography — vibrant crisp fresh vegetables, clean bright wellness styling",
   street: "Korean street & snack food photography — tteokbokki, gimbap, hotteok, casual vivid appetizing styling",
   homecook: "home-cooking ingredients & prep — fresh raw ingredients on a rustic wooden board, natural cooking-in-progress feel",
   flatlay: "top-down food flat lay — neatly arranged dishes and props shot straight down, balanced negative space",
+  piw: "food product isolation on seamless pure white background — the dessert, dish, or beverage as a clean commercial product hero shot, even shadow-free wrap-around studio lighting, product fills 60-80% of frame with pure white surroundings, tack-sharp front-to-back, no table surface or environment visible, premium e-commerce catalog aesthetic",
 };
 /* 음식 자동 감지 + 공통 식욕 자극 스타일링 (장르 미선택이어도 음식이면 자동 적용) */
-const FOOD_RE = /food|dish|meal|cuisine|dessert|bakery|brunch|coffee|drink|beverage|snack|breakfast|lunch|dinner|음식|요리|음료|커피|디저트|베이커리|브런치|한식|간식|분식|샐러드|빵|케이크|반찬|밥|국|찌개|면|과일|채소/i;
+const FOOD_RE = /food|dish|meal|cuisine|dessert|bakery|brunch|coffee|drink|beverage|snack|breakfast|lunch|dinner|steak|grill|burger|pasta|pizza|sushi|ramen|taco|waffle|pancake|pie|pastry|cookie|macaron|croissant|donut|chocolate|cheese|yogurt|smoothie|latte|espresso|음식|요리|음료|커피|디저트|베이커리|브런치|한식|간식|분식|샐러드|빵|케이크|반찬|밥|국|찌개|면|과일|채소|떡|버터떡|쿠키|두쫀쿠|약과|마카롱|크로와상|도넛|와플|스테이크|그릴|라떼|스무디|아이스크림|초콜릿|치즈|파이|타르트/i;
 /* 밝고 초근접 실사 인스타 느낌이 음식 판매의 기본 — 어두운 무드샷은 안 팔린다 */
 const FOOD_STYLING = "bright airy well-lit food photography, extreme close-up macro with the dish as hero filling almost the whole frame, mouth-watering Instagram appeal, fresh realistic textures you can almost taste, vibrant true-to-life color, tasteful garnish, visible steam on hot dishes and condensation on cold drinks, soft shallow depth of field, clean surface";
 /* 음식 전용 가드 — 상업 가드의 보케·얕은심도 금지를 뒤집는다(음식은 배경 흐림이 판매 포인트) */
@@ -168,6 +181,12 @@ const TECH_PRODUCT_STYLING = "real physical hardware as the hero, staged like pr
 /* 깨끗한 상업 배경 강제 — 미드저니가 배경을 날릴 거리가 없게, 미니멀·고급·선명한 세트처럼.
    ('스튜디오'라는 단어는 쓰지 않되 스튜디오처럼 깨끗·미니멀. 창밖 거리·차·조명 보케·산만한 진열 금지) */
 const CLEAN_STUDIO_BG = "background is a clean, minimal, high-end interior kept simple, tidy and uncluttered with plenty of calm empty space, rendered fully sharp and in focus front-to-back like a crisp commercial set; NO window view onto an outdoor street, NO passing traffic or pedestrians, NO glowing out-of-focus city lights or bokeh light spots, NO busy cluttered shelves, hanging signage or crowd behind the subject — the setting stays premium, simple and distraction-free";
+/* 흰배경 제품격리 (Product-on-White, PIW) — 어도비 대량 승인 공식: 시즌/테마별 오브젝트를 심리스 화이트 위에 격리 촬영.
+   초콜릿 케이크 50컷, 발렌타인 소품 1600+컷, 7월4일 BBQ·불꽃놀이 소품 등 대량 배치에 최적.
+   인물 없는 순수 오브젝트 중심 — 어도비 + 미캔 + e-commerce 동시 소화 */
+const PIW_RE = /제품\s*컷|제품\s*격리|흰\s*배경|화이트\s*배경|심리스|오브젝트\s*격리|정물|product\s*(?:isolation|shot|on[\s-]*white|cutout)|white\s*background|seamless\s*(?:white|background)|still[\s-]*life|e[\s-]*commerce|studio\s*product/i;
+const PIW_STYLING = "clean product isolation photography on a seamless pure white background: the product or arrangement as hero filling 60-80% of frame, shot from a natural slightly elevated angle or straight-on eye level, even soft wrap-around studio lighting from all sides eliminating harsh shadows, crisp tack-sharp focus across the entire product front-to-back, true-to-life color and realistic surface texture, premium commercial catalog aesthetic";
+const PIW_GUARD = "seamless pure white background only, even shadow-free wrap-around studio lighting, every product surface tack-sharp, no background scenery or environment, no floor line or horizon visible, no props outside the core arrangement, no people, no text";
 /* 인물 등장 조건 4단계 (People Selector) */
 const REEDO_PEOPLE = {
   auto: "선택 안함 (AI 자율)",
@@ -464,12 +483,14 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
      네온·어둠·글로우가 오히려 판매 미학(승인됨)이라 밝은 제품컷으로 뭉개지 않는다.
      (어도비 거절은 '선명해야 할 상업 제품/인물컷'이 소프트할 때 나지, 분위기용 배경화면에선 안 남) */
   const isTechProduct = !isIllust && mode !== "wallpaper" && !isEmotional && TECH_PRODUCT_RE.test(themeAll);
-  /* 음식은 밝은 초근접 실사 인스타 느낌이 기본 — 배경화면/감성 모드가 아니면 프레임을 꽉 채운다 (디지털 업무 장면은 제외) */
-  const isFood = !isIllust && !isWorkTech && FOOD_RE.test(themeAll);
-  /* 미캔 라이프스타일 — 부동산·가족·솔로 데일리·골프 등 밝은 홈 미학 (감성·음식·디지털업무 아닐 때만) */
-  const isMiriLifestyle = !isIllust && !isEmotional && !isFood && !isWorkTech && MIRI_LIFESTYLE_RE.test(themeAll);
-  /* 어도비 헬스케어 — 글로벌 다양성 상업 구도 (감성·음식·미캔라이프·디지털업무 아닐 때) */
-  const isHealthcare = !isIllust && !isEmotional && !isFood && !isMiriLifestyle && !isWorkTech && HEALTHCARE_RE.test(themeAll);
+  /* 흰배경 제품격리 (PIW) — 심리스 화이트 위 오브젝트 격리 촬영. 음식·라이프스타일보다 우선 (food close-up 구도 대신 PIW 구도) */
+  const isPIW = !isIllust && !isWorkTech && PIW_RE.test(themeAll);
+  /* 음식은 밝은 초근접 실사 인스타 느낌이 기본 — PIW가 잡히면 PIW 스타일 우선 (디지털 업무 장면도 제외) */
+  const isFood = !isIllust && !isWorkTech && !isPIW && FOOD_RE.test(themeAll);
+  /* 미캔 라이프스타일 — 부동산·가족·솔로 데일리·골프 등 밝은 홈 미학 (감성·음식·PIW·디지털업무 아닐 때만) */
+  const isMiriLifestyle = !isIllust && !isEmotional && !isFood && !isPIW && !isWorkTech && MIRI_LIFESTYLE_RE.test(themeAll);
+  /* 어도비 헬스케어 — 글로벌 다양성 상업 구도 (감성·음식·PIW·미캔라이프·디지털업무 아닐 때) */
+  const isHealthcare = !isIllust && !isEmotional && !isFood && !isPIW && !isMiriLifestyle && !isWorkTech && HEALTHCARE_RE.test(themeAll);
   /* 한국 명시 시 어도비 글로벌 다양성 규칙 억제 (Korean 캐스팅 유지)
      — 슬롯 영어 텍스트에 Korean이 없어도, 주제/지역이 한국이면(koreanCast) 강제 */
   const isKoreanExplicit = koreanCast || KOREAN_EXPLICIT_RE.test(themeAll);
@@ -478,13 +499,16 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
     ? `40-60% clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
     : isEmotional
       ? `wide emotional background for text overlay: subject off to one side, 45-60% low-detail copy space with a calm darker zone where Korean text will be placed (${slot.copy_space || "open sky or soft area"})`
-      : isFood
-        ? "extreme close-up macro food shot, the dish fills almost the entire frame, tight appetizing crop, shallow depth of field with the food tack-sharp"
-        : isMiriLifestyle
-          ? `subject placed to one side of the frame, 45-55% low-detail clean area on the opposite side reserved for Korean text overlay (${slot.copy_space || "soft wall or window light area"}), gentle background blur, natural relaxed pose`
-          : isTight
-            ? "tight detail shot, subject sharply focused"
-            : `subject fills 50-70% of frame with ~30% clean copy space (${slot.copy_space || "for text overlay"}), rule-of-thirds, subject fully in frame`;
+      : isPIW
+        ? "product or arrangement hero on seamless pure white background, filling 60-80% of frame, slightly elevated 30-degree angle or straight-on eye level, centered composition with pure white negative space"
+        : isFood
+          ? (isTight ? "extreme close-up macro food shot, the dish fills almost the entire frame, tight appetizing crop, shallow depth of field with the food tack-sharp"
+            : "appetizing food photography, the dish as hero filling most of the frame, natural appealing crop, shallow depth of field with the food tack-sharp")
+          : isMiriLifestyle
+            ? `subject placed to one side of the frame, 45-55% low-detail clean area on the opposite side reserved for Korean text overlay (${slot.copy_space || "soft wall or window light area"}), gentle background blur, natural relaxed pose`
+            : isTight
+              ? "tight detail shot, subject sharply focused"
+              : `subject fills 50-70% of frame with ~30% clean copy space (${slot.copy_space || "for text overlay"}), rule-of-thirds, subject fully in frame`;
   const camera = [anglePick, slot.camera].filter(Boolean).join(", ")
     || (isIllust ? "clean vector edges" : "natural depth of field");
   /* 감성 모드는 골든아워·빛내림 · 그 외 실내/사무 주제(밤 아님)는 중립 화이트밸런스 */
@@ -515,9 +539,9 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
     : "professional stock photo, tack-sharp focus, even exposure, clean and noise-free, natural texture, no plastic AI look";
   /* 신앙·워십 장르면 backlit 금지 대신 골든아워 역광·십자가 실루엣을 허용 (판매 포인트) */
   const isFaith = !isIllust && FAITH_RE.test(themeText);
-  /* 순수 상업(디지털 업무 포함) — 감성/신앙/음식/미캔라이프/헬스케어/배경화면이 아닌 슬롯.
+  /* 순수 상업(디지털 업무 포함) — 감성/신앙/음식/PIW/미캔라이프/헬스케어/배경화면이 아닌 슬롯.
      이때 배경을 깨끗·미니멀·선명하게 강제해서 미드저니의 과한 배경 아웃포커싱을 차단 */
-  const isCleanCommercial = !isIllust && mode !== "wallpaper" && !isEmotional && !isFaith && !isFood && !isMiriLifestyle && !isHealthcare;
+  const isCleanCommercial = !isIllust && mode !== "wallpaper" && !isEmotional && !isFaith && !isFood && !isPIW && !isMiriLifestyle && !isHealthcare;
   return [
     slot.subject,
     fixLine,
@@ -533,6 +557,8 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
     koreanCastLine,
     `palette: ${slot.palette || "bright commercial tones"}`,
     !isIllust ? "objects rest naturally on real surfaces, nothing floating" : "",
+    /* 흰배경 제품격리 시그니처 — 심리스 화이트·균일광·탁샤프·카탈로그 미학 */
+    isPIW ? PIW_STYLING : "",
     /* 음식이면 밝은 초근접 실사 인스타 스타일링을 최종 프롬프트에 직접 주입 */
     isFood ? FOOD_STYLING : "",
     /* 미캔 라이프스타일 시그니처 — 부동산·가족·솔로 데일리 등 밝은 홈 미학 */
@@ -547,8 +573,8 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
     isCleanCommercial ? CLEAN_STUDIO_BG : "",
     quality,
     GUARD,
-    /* 배경화면=제외 · 감성=텍스트여백 · 신앙=골든아워 · 음식=밝은근접 · 미캔라이프=밝은홈 · 헬스케어=클리닉리얼 · 그 외=상업 배제 */
-    mode === "wallpaper" ? "" : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : isFood ? FOOD_GUARD : isMiriLifestyle ? MIRI_LIFESTYLE_GUARD : isHealthcare ? HEALTHCARE_GUARD : COMMERCIAL_GUARD,
+    /* 배경화면=제외 · PIW=흰배경격리 · 감성=텍스트여백 · 신앙=골든아워 · 음식=밝은근접 · 미캔라이프=밝은홈 · 헬스케어=클리닉리얼 · 그 외=상업 배제 */
+    mode === "wallpaper" ? "" : isPIW ? PIW_GUARD : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : isFood ? FOOD_GUARD : isMiriLifestyle ? MIRI_LIFESTYLE_GUARD : isHealthcare ? HEALTHCARE_GUARD : COMMERCIAL_GUARD,
   ].filter(Boolean).join(". ");
 }
 
@@ -563,6 +589,7 @@ const MJ_NEG_COMMERCIAL = "backlit, backlight, silhouette, lens flare, bokeh, bl
 /* 어도비 기술 거절 3대장(노이즈·소프트포커스·아티팩트) 원천 차단 — 발광/글로우는 소프트포커스 판정, 어두운 배경은 노이즈·밴딩 온상 */
 const MJ_NEG_QUALITY = "noise, film grain, banding, chroma noise, glow, bloom, halo, soft focus, hazy";
 const MJ_NEG_NEON = "neon, hologram, sci-fi glow, glowing circuits, dark room, cinematic dark lighting";
+const MJ_NEG_PIW = "background scenery, floor line, horizon, environment, table cloth, harsh shadow, gradient background, surface texture";
 /* CLEAN_STUDIO_BG의 MJ 안전판 — 부정문 없이 원하는 배경만 서술 */
 const MJ_CLEAN_BG = "backdrop is a simple tidy plain interior wall of a premium minimal space with calm empty space directly behind the subject, everything sharp and in focus front-to-back like a crisp commercial set, distraction-free";
 const MJ_FRONT_LIGHT = "subject evenly lit from the front-side, key light from the camera side, bright open illumination on the subject, ";
@@ -596,24 +623,30 @@ const MJ_WINDOW_FIXES = [
 function toMidjourney(slot, mode, tone, people, aspect) {
   let pos = slot.finalPrompt || buildSlotPrompt(slot, mode, tone, people);
   /* NO_TEXT_LOCK도 반드시 제거 — 미드저니는 "no Hangul/calligraphy" 속 명사를 유인어로 읽고 오히려 그린다 (--no 네거티브로만 전달) */
-  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(HEALTHCARE_GUARD, "").replace(GUARD, "").replace(NO_TEXT_LOCK, "")
+  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(PIW_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(HEALTHCARE_GUARD, "").replace(GUARD, "").replace(NO_TEXT_LOCK, "")
     .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
   /* 부정문 소독 — 미드저니가 부정 단어를 유인어로 읽는 사고 차단 */
   for (const [from, to] of MJ_POSITIVE_FIXES) pos = pos.split(from).join(to);
   const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`;
   /* 디지털 업무(POS·태블릿·재고·온라인)가 주인공이면 음식/라이프스타일 예외를 무시하고 선명 강제 */
   const isWorkTech = WORK_TECH_RE.test(themeText);
-  /* 역광·보케 배제 = 순수 상업 + 디지털 업무 슬롯. 신앙(역광)·음식·미캔라이프(얕은 심도)는 판매 포인트라 제외하되, 디지털 업무면 선명 우선 */
-  const commercialNeg = mode === "commercial" && (isWorkTech || (!FAITH_RE.test(themeText) && !FOOD_RE.test(themeText) && !MIRI_LIFESTYLE_RE.test(themeText)));
+  /* 흰배경 제품격리 — PIW는 별도 네거티브 체계 (창문·역광 치환 불필요) */
+  const isPIW = PIW_RE.test(themeText);
+  /* 역광·보케 배제 = 순수 상업 + 디지털 업무 슬롯 (PIW는 자체 처리). 신앙(역광)·음식·미캔라이프(얕은 심도)는 판매 포인트라 제외하되, 디지털 업무면 선명 우선 */
+  const commercialNeg = !isPIW && mode === "commercial" && (isWorkTech || (!FAITH_RE.test(themeText) && !FOOD_RE.test(themeText) && !MIRI_LIFESTYLE_RE.test(themeText)));
   if (commercialNeg) {
     for (const [re, to] of MJ_WINDOW_FIXES) pos = pos.replace(re, to);
     pos = pos.replace("lighting: ", `lighting: ${MJ_FRONT_LIGHT}`);
   }
   /* 한국인 캐스팅은 앞 토큰 가중치를 받도록 프롬프트 선두로 복제 */
   if (pos.includes("authentically Korean")) pos = `Korean East Asian people, ${pos}`;
-  let neg = commercialNeg ? `${MJ_NEG_BASE}, ${MJ_NEG_COMMERCIAL}, ${MJ_NEG_QUALITY}` : MJ_NEG_BASE;
-  /* 다크네온 SF 차단 — 단 concept 톤을 일부러 고른 경우엔 톤과 충돌하지 않게 제외 */
-  if (commercialNeg && tone !== "concept") neg += `, ${MJ_NEG_NEON}`;
+  let neg;
+  if (isPIW) {
+    neg = `${MJ_NEG_BASE}, ${MJ_NEG_PIW}, ${MJ_NEG_QUALITY}`;
+  } else {
+    neg = commercialNeg ? `${MJ_NEG_BASE}, ${MJ_NEG_COMMERCIAL}, ${MJ_NEG_QUALITY}` : MJ_NEG_BASE;
+    if (commercialNeg && tone !== "concept") neg += `, ${MJ_NEG_NEON}`;
+  }
   if (people === "none") neg += ", people, person, human figure";
   const style = slot.kind === "illustration" ? "" : " --style raw";
   return `${pos} --ar ${aspect || "16:9"}${style} --no ${neg}`;
@@ -823,8 +856,10 @@ export default function App() {
     else if (wantKoreanCast()) parts.push(`Casting (CRITICAL): every scene featuring people must depict authentically Korean people with natural East Asian Korean features — never Western/Caucasian models. Korean setting and styling.`);
     if (REEDO_BG_PHRASE[refBg]) parts.push(`Background: ${REEDO_BG_PHRASE[refBg]}`);
     if (REEDO_FOOD_PHRASE[refFood]) parts.push(`Food genre: ${REEDO_FOOD_PHRASE[refFood]}`);
-    /* 발전: 장르를 안 골라도 주제/키워드가 음식이면 식욕 자극 스타일링 자동 주입 */
-    if (refFood || FOOD_RE.test(`${topic} ${priKw}`)) parts.push(`Food photography quality: ${FOOD_STYLING}`);
+    /* PIW 음식 장르면 PIW 스타일 주입 (FOOD_STYLING의 extreme close-up과 충돌 방지) */
+    if (refFood === "piw") parts.push(`Product isolation style: ${PIW_STYLING}`);
+    /* 발전: PIW가 아닌 음식 장르를 골랐거나 주제/키워드가 음식이면 식욕 자극 스타일링 자동 주입 */
+    else if (refFood || FOOD_RE.test(`${topic} ${priKw}`)) parts.push(`Food photography quality: ${FOOD_STYLING}`);
     if (REEDO_PEOPLE_PHRASE[refPeople]) parts.push(`People: ${REEDO_PEOPLE_PHRASE[refPeople]}`);
     if (CAMERA_ANGLES[refAngle]?.phrase) parts.push(`Camera baseline: ${CAMERA_ANGLES[refAngle].phrase}`);
     return parts.length ? `\nApply these refinements to EVERY slot: ${parts.join("; ")}.` : "";
@@ -956,7 +991,7 @@ ${BESTSELLER_REFERENCE}
 Treat this topic as a "practical Korean home-life package" if it fits — that formula is exactly what package mode is best at.`
             : `You design a maximally DIVERSE professional stock image set — each image must be clearly a SEPARATE asset to a buyer (no near-duplicates; marketplaces reject similar images). Respond ONLY compact JSON:
 {"concepts":[{"scene":"1 short sentence: main subject doing what, where","location":"the place — must be unique in the set","action":"primary action","angle":"camera angle/framing","time":"time of day + light"}]}
-HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). CLEAN SETTINGS (commercial/business/product topics): make each distinct "location" a clean, minimal, high-end interior or a simple tidy setting — the background must stay uncluttered and premium; do NOT place the subject in front of a window facing a busy street, passing traffic, glowing city lights or a crowded shop/café exterior, and do NOT pack the backdrop with cluttered shelves or signage. The subject is always FRONT-LIT: "time" light comes from the camera side or a 45° off-camera side — never stage a window or bright light source behind the subject (backlit silhouettes fail QC), so the backdrop behind the subject is a plain clean interior wall. DARK-NEON BAN (commercial mode only, NOT wallpaper): in commercial product/people shots avoid a dark room lit by glowing neon circuits or sci-fi effects (Adobe rejects those for noise + soft focus on shots that must be sharp), and tech/semiconductor/AI topics get BRIGHT clean locations with real physical hardware. For wallpaper/background assets, atmospheric neon and dark ambient tech are an approved desired aesthetic — do not flatten them. (Only topics explicitly about travel/landscape/outdoor/street-life keep their real environment.) PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. NO TEXT-BEARING SCENES (critical — text in the image is auto-rejected): never design a scene whose subject involves readable written content — no presentation slides with titles, no lecturers pointing at worded screens, no documents/handouts/newspapers, no books with visible covers, no signs/labels/menus/whiteboards with writing; use imagery-only equivalents (wordless abstract visuals on screens, blank paper, shape-only charts). If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.
+HARD DIVERSITY RULES: return EXACTLY the requested number of concepts. Every "location" must be DIFFERENT — never two concepts in the same place. No primary action repeated more than twice. Vary camera angle/framing and time/light across the set. When people are allowed, vary person treatment across concepts (hands-only close work / over-shoulder / partial figure from behind / no person at all). PRODUCT-ON-WHITE (PIW) MODE: when the topic or background mentions white background, 흰배경, 제품컷, product isolation, seamless white, e-commerce, or still life — set "location" to "seamless pure white studio background" for ALL concepts, "time" to "even wrap-around studio lighting, no shadows" for ALL concepts, and vary only the product arrangement, angle and props. Each concept must show a CLEARLY DIFFERENT angle/arrangement/garnish/accessory to avoid Adobe similarity rejection (e.g. straight-on → 45° elevated → top-down → close-up detail → with garnish → without garnish → full product → sliced cross-section). No people in PIW mode. FOOD DIVERSITY: for food topics, vary the camera approach across concepts — do NOT default every concept to "extreme close-up macro"; instead mix overhead flat-lay, 45° hero angle, side-on cross-section, hands pulling/cutting/pouring, and full-plate establishing shots. For trending Korean desserts (butter tteok, chewy cookie, yakgwa, crookie), cross-section hero shots and texture close-ups sell best. For international brunch, one country per concept with authentic tableware. For steak, show the medium-rare cross-section. For cafe drinks, show the layered colors through clear glass. CLEAN SETTINGS (commercial/business/product topics): make each distinct "location" a clean, minimal, high-end interior or a simple tidy setting — the background must stay uncluttered and premium; do NOT place the subject in front of a window facing a busy street, passing traffic, glowing city lights or a crowded shop/café exterior, and do NOT pack the backdrop with cluttered shelves or signage. The subject is always FRONT-LIT: "time" light comes from the camera side or a 45° off-camera side — never stage a window or bright light source behind the subject (backlit silhouettes fail QC), so the backdrop behind the subject is a plain clean interior wall. DARK-NEON BAN (commercial mode only, NOT wallpaper): in commercial product/people shots avoid a dark room lit by glowing neon circuits or sci-fi effects (Adobe rejects those for noise + soft focus on shots that must be sharp), and tech/semiconductor/AI topics get BRIGHT clean locations with real physical hardware. For wallpaper/background assets, atmospheric neon and dark ambient tech are an approved desired aesthetic — do not flatten them. (Only topics explicitly about travel/landscape/outdoor/street-life keep their real environment.) PHYSICAL PLAUSIBILITY: stage objects only where they realistically belong — cups and drinks on a table, tray, desk or ledge, NEVER directly on a sofa, bed or fabric. NO TEXT-BEARING SCENES (critical — text in the image is auto-rejected): never design a scene whose subject involves readable written content — no presentation slides with titles, no lecturers pointing at worded screens, no documents/handouts/newspapers, no books with visible covers, no signs/labels/menus/whiteboards with writing; use imagery-only equivalents (wordless abstract visuals on screens, blank paper, shape-only charts). If user notes suggest scene ideas, distribute DIFFERENT ideas to DIFFERENT concepts — never apply the same idea to every concept.
 ${BESTSELLER_REFERENCE}
 If the topic matches one of these formulas, make several concepts embody its winning composition (for faith topics, golden-hour cross silhouettes and warm sanctuary scenes are wanted, not to be avoided).`,
           `Topic: "${topic}". Mode: ${mode}. Design exactly ${count} distinct scene concepts.${refinementLine()}${handlingTip.trim() ? `\nUser handling notes (apply thoughtfully WITHOUT reducing diversity): ${handlingTip.trim()}` : ""}${priKw.trim() ? `\nBuyer search terms for context (use as inspiration for DIFFERENT scenes — do NOT put every term into every scene): ${priKw.trim()}` : ""}`
@@ -982,7 +1017,9 @@ RULES: one item per assigned concept, in the given order — KEEP each concept's
 KEYWORDS (Adobe SEO, critical): EXACTLY 35 EN keywords, no duplicates, ordered by buyer importance (first ~10 weigh most): (1) main subject nouns, (2) descriptors/materials/actions, (3) concept/season/emotion, (4) color/lighting, (5) composition (copy space, background), (6) use-case (banner, marketing, web design). All lowercase, only terms literally describing what is visible. "keywords_kr" same ordering in Korean single nouns.
 CATEGORY: pick ONE best Adobe Stock category id: ${ADOBE_CAT_LIST}. Illustration/vector fallback: 8. Integer id only.
 PROPS & VARIETY: props must be SPECIFIC to each scene and DIFFERENT from every other slot in the whole set (set list provided) — never reuse generic filler across slots; tableware must match the dish culture; keep the copy-space area uncluttered; believable and unbranded.
-BRIGHTNESS RULE (Adobe Stock + MiriCanvas commercial default): the "lighting" and "time" fields must describe BRIGHT well-lit daytime scenarios (bright natural window light, soft ambient daylight, high-key studio lighting) for the vast majority of slots. NEVER default to "early morning fog", "evening dusk", "misty dawn", "dim ambient", "moody underexposure" — those are NICHE looks that only sell for topics explicitly about: landscape, travel, nature (mountain/ocean/forest/desert), sunrise/sunset scenery, holiday-evening (Christmas eve etc.), cinematic tone, or worship/emotional backgrounds. If the topic is not one of those niches, dim/foggy/dusk lighting is a REJECTED aesthetic — pick bright daytime instead.`;
+BRIGHTNESS RULE (Adobe Stock + MiriCanvas commercial default): the "lighting" and "time" fields must describe BRIGHT well-lit daytime scenarios (bright natural window light, soft ambient daylight, high-key studio lighting) for the vast majority of slots. NEVER default to "early morning fog", "evening dusk", "misty dawn", "dim ambient", "moody underexposure" — those are NICHE looks that only sell for topics explicitly about: landscape, travel, nature (mountain/ocean/forest/desert), sunrise/sunset scenery, holiday-evening (Christmas eve etc.), cinematic tone, or worship/emotional backgrounds. If the topic is not one of those niches, dim/foggy/dusk lighting is a REJECTED aesthetic — pick bright daytime instead.
+PRODUCT-ON-WHITE (PIW) RULE (when topic/background mentions white background, product isolation, 흰배경, 제품컷, seamless white, still life, e-commerce): design a clean product-isolation shot on seamless PURE WHITE background — the product or small themed arrangement fills 60-80% of frame, shot from a slightly elevated 30° angle or straight-on eye level, "lighting" = even soft wrap-around studio lighting from all sides eliminating all harsh shadows, "camera" = tack-sharp f/8-f/11 across the entire product. NO floor line, NO horizon, NO environment or surface texture visible — just the product floating on infinite white. This is the Adobe BULK approval formula (chocolate cakes 50+ cuts, Valentine's items 1600+ cuts, July 4th BBQ/flag sets). Each variation must have a CLEARLY DIFFERENT composition — different angle, different arrangement, different garnish/accessory — to avoid Adobe similarity rejection.
+FOOD DIVERSITY RULE (when topic is food): match the food genre to its best composition — trending Korean desserts (butter tteok 버터떡, chewy cookie 두쫀쿠, yakgwa 약과, crookie) want cross-section hero or texture close-up; international brunch wants one-country-per-image with authentic tableware; steak wants medium-rare cross-section with char marks and juice beads; cafe drinks want glass-hero with visible layered colors and condensation. Never default every food slot to the same extreme close-up — vary between overhead flat-lay, 45° hero angle, side-on cross-section, and hands-interacting depending on the dish.`;
     const expandPair = async (pairIdx) => {
       const pair = pairIdx.map((i) => concepts[i]);
       for (let attempt = 0; attempt < 3 && !cancelRef.current && !timeUp(); attempt++) {
