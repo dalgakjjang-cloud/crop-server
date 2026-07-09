@@ -760,6 +760,13 @@ export default function App() {
   useEffect(() => {
     try { localStorage.setItem("freejjang_reco_history", JSON.stringify(recoHistory)); } catch { /* 저장 불가 무시 */ }
   }, [recoHistory]);
+  /* 직전 추천 3개(온전한 내용) — 에러로 버린 추천을 API 호출 없이 다시 불러와 재시도(토큰 절약)용 */
+  const [recentRecos, setRecentRecos] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("freejjang_recent_recos")) || []; } catch { return []; }
+  });
+  useEffect(() => {
+    try { localStorage.setItem("freejjang_recent_recos", JSON.stringify(recentRecos)); } catch { /* 저장 불가 무시 */ }
+  }, [recentRecos]);
   const cancelRef = useRef(false);
 
   /* ── 기본 생성 / 분석 / 공용 ── */
@@ -1042,11 +1049,21 @@ When you pick a "top" bestseller topic, strongly consider one of the two proven 
       }
       if (!r) r = await askBrain(sys, user);
       if (!r.topic_kr) throw new Error("추천 응답이 비어 있습니다.");
-      onTopicChange(String(r.topic_kr).trim());
-      setPriKw(normKeywords(r.priority_keywords, 14));
-      setHandlingTip(String(r.handling_tip_kr || "").slice(0, 500));
-      lastRecoRef.current = String(r.topic_kr).trim();
-      lastRecoDetailRef.current = { topic: String(r.topic_kr).trim(), market: r.market || "", window: r.sell_window || "" };
+      const reco = {
+        t: String(r.topic_kr).trim(),
+        kw: normKeywords(r.priority_keywords, 14),
+        tip: String(r.handling_tip_kr || "").slice(0, 500),
+        r: String(r.rationale_kr || "").slice(0, 500),
+        w: r.sell_window || "",
+        m: r.market || "",
+      };
+      onTopicChange(reco.t);
+      setPriKw(reco.kw);
+      setHandlingTip(reco.tip);
+      lastRecoRef.current = reco.t;
+      lastRecoDetailRef.current = { topic: reco.t, market: reco.m, window: reco.w };
+      /* 직전 3개만 보관(중복 주제는 최신으로 갱신) */
+      setRecentRecos((p) => [reco, ...p.filter((x) => x.t !== reco.t)].slice(0, 3));
       const label = r.market === "niche" ? "틈새시장" : r.market === "news" ? "이슈·뉴스" : "베스트셀러";
       addLog(`[오늘의 추천] (${label}) ${r.topic_kr} — 판매 적기: ${r.sell_window || "향후 2개월"}`);
       setNotice(`🎯 오늘의 추천 (${label}): "${r.topic_kr}" — ${r.rationale_kr || ""} 판매 적기: ${r.sell_window || "향후 2개월"}. 주제·우선 키워드·팁이 자동으로 채워졌습니다. 마음에 들면 '초안 기획', 다른 주제를 원하면 추천을 한 번 더 누르세요.`);
@@ -1055,6 +1072,20 @@ When you pick a "top" bestseller topic, strongly consider one of the two proven 
       setNotice(`오늘의 추천 실패: ${err.message}`);
     }
     setDailyBusy(false);
+  };
+
+  /* 직전 추천 다시 불러오기 — 저장된 추천을 API 호출 없이 폼에 되채움(토큰 절약).
+     에러로 버린 직전 추천을 구도·소품만 바꿔 재시도할 때 사용 */
+  const applyReco = (reco) => {
+    if (phase === "drafting" || phase === "generating") return;
+    onTopicChange(reco.t);
+    setPriKw(reco.kw || "");
+    setHandlingTip(reco.tip || "");
+    lastRecoRef.current = reco.t;
+    lastRecoDetailRef.current = { topic: reco.t, market: reco.m, window: reco.w };
+    const label = reco.m === "niche" ? "틈새시장" : reco.m === "news" ? "이슈·뉴스" : "베스트셀러";
+    addLog(`[다시 불러옴] (${label}) ${reco.t} — 추천 API 미사용(토큰 절약)`);
+    setNotice(`↩️ 다시 불러옴 (${label}): "${reco.t}" — ${reco.r || ""} 판매 적기: ${reco.w || "향후 2개월"}. 구도·소품을 바꿔 '초안 기획'을 눌러 재시도하세요. (추천 API 미사용 · 토큰 절약)`);
   };
 
   /* 실패 슬롯 자동 복구: 두뇌가 장면을 규정(무텍스트·세이프티)에 맞게 다시 씀 — 장소·행동은 유지해 세트 다양성 보존 */
@@ -1762,6 +1793,20 @@ Each block content = one short Korean sentence.`,
                     disabled={phase === "drafting" || phase === "generating"}
                     placeholder="예: 9월 가을 신학기 계절 배경화면 — 또는 '오늘의 추천' 클릭"
                     className={`${fieldCls} w-full disabled:opacity-60`} />
+                  {/* 직전 추천 다시 불러오기 — API 호출 없이 폼만 되채움(토큰 절약). 에러로 버린 추천 재시도용 */}
+                  {recentRecos.length > 0 && (
+                    <div className="mt-1.5 flex flex-wrap items-center gap-1">
+                      <span className="text-[10px] text-neutral-500 shrink-0" title="추천 API를 다시 호출하지 않고 저장된 직전 추천을 그대로 불러옵니다(토큰 절약)">직전 추천 다시:</span>
+                      {recentRecos.map((reco, i) => (
+                        <button key={`${reco.t}-${i}`} onClick={() => applyReco(reco)}
+                          disabled={phase === "drafting" || phase === "generating"}
+                          title={`다시 불러오기 (추천 API 미사용 · 토큰 절약): ${reco.t}${reco.w ? ` · 판매적기 ${reco.w}` : ""}`}
+                          className="max-w-[150px] truncate text-[11px] px-2 py-0.5 rounded-full border border-sky-500/40 bg-sky-500/10 text-sky-300 hover:bg-sky-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                          ↩ {reco.t}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {/* 주제 선정 이력 (접이식) — 추천이 판매시기 겹침을 피하는 근거 */}
                   {recoHistory.length > 0 && (
                     <div className="mt-1.5 border border-neutral-700/60 rounded bg-neutral-950/40">
