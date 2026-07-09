@@ -1075,6 +1075,8 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
   };
 
   /* ═══ 오늘의 추천 — 날짜 기준 판매 리드타임(4~8주) 계산 + 베스트셀러/틈새/이슈 랜덤 로테이션.
+     주제칸에 이미 주제가 있으면(시드 모드) 그 주제 '안에서' 베스트셀러·틈새 각도를 검토해 구체화한다.
+     항상 트렌드 소품 팔레트(8-12개, 톤앤매너 큐레이션)까지 함께 조사해 팁에 채운다.
      구글 키가 있으면 구글 검색 그라운딩으로 실시간 트렌드·뉴스까지 반영, 실패 시 두뇌 지식으로 폴백 ═══ */
   const recommendToday = async () => {
     if (dailyBusy || phase === "drafting" || phase === "generating") return;
@@ -1082,10 +1084,17 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
     const now = new Date();
     const dateStr = `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
     const seed = Math.floor(Math.random() * 100000);
-    addLog(`[오늘의 추천] ${dateStr} 기준 — 판매 리드타임 4~8주 반영해 주제 선정 중…`);
+    const seedTopic = topic.trim();
+    addLog(seedTopic
+      ? `[오늘의 추천] "${seedTopic}" 주제 기반 — 이 주제 안의 베스트셀러·틈새 각도와 트렌드 소품 조사 중…`
+      : `[오늘의 추천] ${dateStr} 기준 — 판매 리드타임 4~8주 반영해 주제 선정 중…`);
+    const marketRule = seedTopic
+      ? `SEED-TOPIC MODE: the user already chose the topic domain "${seedTopic}". Do NOT switch to an unrelated topic. Act as a market analyst WITHIN that domain: survey its current bestseller angles AND its undersupplied niches (sub-genres, seasonal twists, newly trending variants actually selling right now), weigh demand vs competition, then propose the single strongest SPECIFIC production angle inside the domain. "topic_kr" must clearly remain within "${seedTopic}" but sharpened into that winning angle (e.g. "브런치" → a specific trending brunch sub-genre). Set "market" to whichever the chosen angle is (top or niche).`
+      : `Rotate the market type pseudo-randomly using the seed — top(베스트셀러 수요) ~40%, niche(수요 대비 공급 부족한 틈새: e.g. 시니어 디지털 라이프, 지속가능 포장, 재택 재활운동, 소상공인 디지털 전환) ~40%, news/issue ~20%.`;
     const sys = `You are a top stock-image market strategist for Adobe Stock (global) and MiriCanvas (Korea). Given today's date, propose exactly ONE production topic optimized to SELL within the next 2 months — stock buyers purchase visuals 4-8 weeks before they need them, so target upcoming seasons, holidays, campaigns and business cycles, or a timely news/issue angle (economy, AI, climate, health, lifestyle shifts). Respond ONLY compact JSON:
-{"topic_kr":"프리짱 주제 입력용 한국어 주제 (10-20자, 명확한 촬영 소재)","market":"top|niche|news","priority_keywords":"10-14 lowercase EN buyer search terms, comma-separated, SEO order (most-searched first)","handling_tip_kr":"구도·소품·인물 처리 팁 1-2문장 (한국어)","rationale_kr":"왜 지금 이 주제인지 + 수요 근거 1-2문장 (한국어)","sell_window":"판매 적기 e.g. 9월 초~10월 말"}
-RULES: rotate the market type pseudo-randomly using the seed — top(베스트셀러 수요) ~40%, niche(수요 대비 공급 부족한 틈새: e.g. 시니어 디지털 라이프, 지속가능 포장, 재택 재활운동, 소상공인 디지털 전환) ~40%, news/issue ~20%. The topic must be shootable as AI stock images: NO celebrities, NO brands, NO text-heavy scenes, prefer scenes not requiring identifiable faces. Never repeat the avoided topic. Seed: ${seed}.
+{"topic_kr":"프리짱 주제 입력용 한국어 주제 (10-20자, 명확한 촬영 소재)","market":"top|niche|news","priority_keywords":"10-14 lowercase EN buyer search terms, comma-separated, SEO order (most-searched first)","trend_props_kr":"트렌드 소품 팔레트 8-12개, 쉼표 구분 (한국어)","handling_tip_kr":"구도·인물 처리 팁 1-2문장 (한국어)","rationale_kr":"왜 지금 이 주제인지 + 수요 근거 1-2문장 (한국어)","sell_window":"판매 적기 e.g. 9월 초~10월 말"}
+RULES: ${marketRule} The topic must be shootable as AI stock images: NO celebrities, NO brands, NO text-heavy scenes, prefer scenes not requiring identifiable faces. Never repeat the avoided topic. Seed: ${seed}.
+TREND PROPS (critical, "trend_props_kr"): research which props & styling items are CURRENTLY selling well in this topic's genre and curate 8-12 of them into ONE coherent tone-and-manner palette that matches the proposed angle. Each item must be specific (material/color/shape — e.g. "유광 세라믹 딤플 접시", "스테인리스 프렌치프레스", "체크 패턴 왁스페이퍼"). HARD BAN on tired default filler: 린넨 천, 머그컵, 커피/커피잔, 화분/식물 같은 뻔한 조합은 금지 — 지금 트렌드에 맞는 신선한 대안을 고를 것. The palette is distributed across a whole image set, so include a MIX of surface/base items, hero-adjacent props, and small accent pieces that all share the same aesthetic register.
 ${BESTSELLER_REFERENCE}
 When you pick a "top" bestseller topic, strongly consider one of the two proven formulas above (faith/worship for the Korean market, or business-growth/finance for both markets) — they are reliable sellers.`;
     const histLines = recoHistory.slice(0, 20).map((h) => `- ${h.d} | ${h.t}${h.w ? ` | 판매적기 ${h.w}` : ""}`).join("\n");
@@ -1094,16 +1103,20 @@ When you pick a "top" bestseller topic, strongly consider one of the two proven 
       let r = null;
       if (googleKey.trim()) {
         try {
-          r = await askGeminiGrounded(googleKey.trim(), geminiModel.trim(), sys, `${user}\nFirst, search the web for current stock photography trends, seasonal demand and this week's notable commerce/news topics, then decide.`);
+          r = await askGeminiGrounded(googleKey.trim(), geminiModel.trim(), sys, `${user}\nFirst, search the web for current stock photography trends, seasonal demand and this week's notable commerce/news topics${seedTopic ? `, plus which "${seedTopic}" sub-genres and styling props are trending right now` : ", plus which styling props are trending for the genre you pick"}, then decide.`);
           addLog(`[오늘의 추천] 구글 실시간 검색 반영 완료`);
         } catch (e) { addLog(`[오늘의 추천] 실시간 검색 불가(${e.message}) — 두뇌 지식으로 진행`); }
       }
       if (!r) r = await askBrain(sys, user);
       if (!r.topic_kr) throw new Error("추천 응답이 비어 있습니다.");
+      const props = String(r.trend_props_kr || "").trim();
+      const tipBase = String(r.handling_tip_kr || "").slice(0, 400);
       const reco = {
         t: String(r.topic_kr).trim(),
         kw: normKeywords(r.priority_keywords, 14),
-        tip: String(r.handling_tip_kr || "").slice(0, 500),
+        tip: props
+          ? `${tipBase}${tipBase ? "\n" : ""}트렌드 소품 팔레트(장면마다 2-4개씩 서로 다르게 분배, 전 장면 동일 소품 반복 금지): ${props}`.slice(0, 900)
+          : tipBase,
         r: String(r.rationale_kr || "").slice(0, 500),
         w: r.sell_window || "",
         m: r.market || "",
@@ -1116,8 +1129,8 @@ When you pick a "top" bestseller topic, strongly consider one of the two proven 
       /* 직전 3개만 보관(중복 주제는 최신으로 갱신) */
       setRecentRecos((p) => [reco, ...p.filter((x) => x.t !== reco.t)].slice(0, 3));
       const label = r.market === "niche" ? "틈새시장" : r.market === "news" ? "이슈·뉴스" : "베스트셀러";
-      addLog(`[오늘의 추천] (${label}) ${r.topic_kr} — 판매 적기: ${r.sell_window || "향후 2개월"}`);
-      setNotice(`🎯 오늘의 추천 (${label}): "${r.topic_kr}" — ${r.rationale_kr || ""} 판매 적기: ${r.sell_window || "향후 2개월"}. 주제·우선 키워드·팁이 자동으로 채워졌습니다. 마음에 들면 '초안 기획', 다른 주제를 원하면 추천을 한 번 더 누르세요.`);
+      addLog(`[오늘의 추천] (${label}${seedTopic ? ` · "${seedTopic}" 기반` : ""}) ${r.topic_kr} — 판매 적기: ${r.sell_window || "향후 2개월"}${props ? ` · 트렌드 소품 ${props.split(",").length}종` : ""}`);
+      setNotice(`🎯 오늘의 추천 (${label}${seedTopic ? ` · "${seedTopic}" 안에서 선정` : ""}): "${r.topic_kr}" — ${r.rationale_kr || ""} 판매 적기: ${r.sell_window || "향후 2개월"}. 주제·우선 키워드·트렌드 소품 팔레트·팁이 자동으로 채워졌습니다. 마음에 들면 '초안 기획', 다른 각도를 원하면 추천을 한 번 더 누르세요.`);
     } catch (err) {
       addLog(`[오류] 오늘의 추천 실패: ${err.message}`);
       setNotice(`오늘의 추천 실패: ${err.message}`);
@@ -1943,7 +1956,7 @@ Each block content = one short Korean sentence.`,
                   <div className="flex items-center justify-between mb-1">
                     <label className="text-xs font-semibold text-neutral-400">주제</label>
                     <button onClick={recommendToday} disabled={dailyBusy || phase === "drafting" || phase === "generating"}
-                      title="오늘 날짜 기준 판매 리드타임(4~8주)을 계산해 베스트셀러·틈새시장·이슈 주제를 랜덤 추천하고 주제·키워드·팁을 자동으로 채웁니다. 구글 키가 있으면 실시간 검색 트렌드까지 반영"
+                      title="오늘 날짜 기준 판매 리드타임(4~8주)을 계산해 베스트셀러·틈새시장·이슈 주제를 추천하고 주제·키워드·트렌드 소품 팔레트·팁을 자동으로 채웁니다. 주제칸에 주제를 미리 적어두면(예: 브런치) 그 주제 안에서 잘나가는 각도·틈새를 검토해 구체화합니다. 구글 키가 있으면 실시간 검색 트렌드까지 반영"
                       className="text-xs font-bold px-2 py-1 rounded border border-amber-500/40 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1 transition">
                       {dailyBusy ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                       {dailyBusy ? "선정 중…" : "오늘의 추천"}
@@ -1951,7 +1964,7 @@ Each block content = one short Korean sentence.`,
                   </div>
                   <input value={topic} onChange={(e) => onTopicChange(e.target.value)}
                     disabled={phase === "drafting" || phase === "generating"}
-                    placeholder="예: 9월 가을 신학기 계절 배경화면 — 또는 '오늘의 추천' 클릭"
+                    placeholder="예: 브런치 — 적고 '오늘의 추천'을 누르면 그 주제 안의 잘나가는 각도·트렌드 소품까지 채워줍니다"
                     className={`${fieldCls} w-full disabled:opacity-60`} />
                   {/* 직전 추천 다시 불러오기 — API 호출 없이 폼만 되채움(토큰 절약). 에러로 버린 추천 재시도용 */}
                   {recentRecos.length > 0 && (
@@ -2006,9 +2019,9 @@ Each block content = one short Korean sentence.`,
                   <label className="block text-xs font-semibold text-neutral-400 mb-1">
                     구도·소품·인물 팁 <span className="text-neutral-600 font-normal">(선택 — 전 슬롯 적용하되 장면 다양성은 유지)</span>
                   </label>
-                  <textarea value={handlingTip} onChange={(e) => setHandlingTip(e.target.value.slice(0, 500))}
+                  <textarea value={handlingTip} onChange={(e) => setHandlingTip(e.target.value.slice(0, 900))}
                     disabled={phase === "drafting" || phase === "generating"}
-                    rows={2} maxLength={500}
+                    rows={2} maxLength={900}
                     placeholder="예: 손+기기 위주, 얼굴 정면 금지 / 배경 깔끔하게 / 소품 최소화"
                     className={`${fieldCls} w-full disabled:opacity-60 resize-y leading-relaxed`} />
                 </div>
