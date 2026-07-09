@@ -2271,7 +2271,7 @@ Each block content = one short Korean sentence.`,
                         )}
                         <button onClick={() => exportMiriPack()} disabled={autoQcBusy}
                           title="미리캔버스 전용 ZIP만 저장 — 승인율 높은 미캔용으로만 구성(어도비 규격 제외). 이미지↔XLSX 누락 이중 체크"
-                          className="bg-teal-500/15 hover:bg-teal-500/30 border border-teal-500/40 disabled:opacity-50 text-teal-200 font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
+                          className="bg-teal-600/20 hover:bg-teal-500/30 border border-teal-500/50 disabled:opacity-50 text-teal-400 font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
                           <Download className="w-4 h-4" /> 미리캔버스만 ZIP
                         </button>
                         <button onClick={submitQC} disabled={autoQcBusy}
@@ -2342,7 +2342,7 @@ Each block content = one short Korean sentence.`,
                       </button>
                       <button onClick={() => exportMiriPack()}
                         title="미리캔버스 전용 ZIP — 승인율 높은 미캔용으로만 구성(고해상 이미지 + 미캔 XLSX). 어도비 규격 제외. 이미지↔XLSX 누락 이중 체크"
-                        className="bg-teal-600/20 hover:bg-teal-600/30 border border-teal-500/40 text-teal-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
+                        className="bg-teal-600/20 hover:bg-teal-600/30 border border-teal-500/50 text-teal-400 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
                         <Download className="w-3.5 h-3.5" /> 미리캔버스 전용 ZIP
                       </button>
                     </div>
@@ -2554,7 +2554,7 @@ Each block content = one short Korean sentence.`,
                       )}
                       <button onClick={() => exportMiriPack()} disabled={autoQcBusy}
                         title="미리캔버스 전용 ZIP만 저장 — 승인율 높은 미캔용으로만 구성(어도비 규격 제외). 이미지↔XLSX 누락 이중 체크"
-                        className="w-full bg-teal-500/15 hover:bg-teal-500/30 border border-teal-500/40 disabled:opacity-50 text-teal-200 font-bold text-sm py-2 rounded flex items-center justify-center gap-2 transition">
+                        className="w-full bg-teal-600/20 hover:bg-teal-500/30 border border-teal-500/50 disabled:opacity-50 text-teal-400 font-bold text-sm py-2 rounded flex items-center justify-center gap-2 transition">
                         <Download className="w-4 h-4" /> 미리캔버스만 ZIP
                       </button>
                       <button onClick={submitQC} disabled={autoQcBusy}
@@ -2577,7 +2577,7 @@ Each block content = one short Korean sentence.`,
                       </button>
                       <button onClick={() => exportMiriPack()}
                         title="미리캔버스 전용 ZIP만 저장 — 어도비 규격 제외, 이미지↔XLSX 누락 이중 체크"
-                        className="w-full bg-teal-500/15 hover:bg-teal-500/30 border border-teal-500/40 text-teal-200 font-bold text-sm py-2 rounded flex items-center justify-center gap-2 transition">
+                        className="w-full bg-teal-600/20 hover:bg-teal-500/30 border border-teal-500/50 text-teal-400 font-bold text-sm py-2 rounded flex items-center justify-center gap-2 transition">
                         <Download className="w-4 h-4" /> 미리캔버스 전용 ZIP
                       </button>
                       <button onClick={backToEdit}
