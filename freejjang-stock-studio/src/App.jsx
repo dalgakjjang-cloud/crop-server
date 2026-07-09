@@ -211,7 +211,7 @@ const BRAIN_LABELS = { gpt: "GPT(Codex 계열)", gemini: "Gemini" };
 const GPT_MODEL_DEFAULT = "gpt-5-mini";
 const GEMINI_MODEL_DEFAULT = "gemini-3.1-flash";
 /* 선택 가능한 모델 프리셋 (직접 입력도 가능) */
-const GPT_MODEL_PRESETS = ["gpt-5-mini", "gpt-5", "gpt-4.1-mini", "gpt-4o"];
+const GPT_MODEL_PRESETS = ["gpt-5-mini", "gpt-5-4-mini", "gpt-5", "gpt-4.1-mini", "gpt-4o"];
 const GEMINI_MODEL_PRESETS = ["gemini-3.1-flash", "gemini-3.1-flash-lite", "gemini-3.1-pro", "gemini-2.5-flash", "gemini-2.5-pro"];
 
 const pad2 = (n) => String(n).padStart(2, "0");
