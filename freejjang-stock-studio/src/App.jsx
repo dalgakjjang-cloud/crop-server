@@ -1414,6 +1414,86 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     return out;
   };
 
+  /* ── 미캔·어도비 공용 파일명 베이스 (한 곳에서만 만들어 팩 간 어긋남 방지) ── */
+  const assetBaseName = (s) => `${s.index}-${cleanName(topic, 15)}-${s.slug}`;
+  /* ── 미리캔버스 업로드 XLSX 생성 (통합 팩·미캔 전용 팩 공용 단일 소스) ──
+     반환: { buf, rows } — rows[i].fileName 은 확장자 없는 파일명(이미지와 1:1로 대조 가능) */
+  const buildMiriXlsx = (ok) => {
+    const rows = ok.map((s) => ({
+      fileName: `${assetBaseName(s)}_miri`,
+      elementName: [(s.title_kr || "").substring(0, 8), s.title].filter(Boolean).join(" "),
+      keywords: normKeywords(s.keywords_kr, MIRI_MAX_KEYWORDS),
+      tier: "Premium", contentType: "Photo",
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows, { header: ["fileName", "elementName", "keywords", "tier", "contentType"], cellFormats: true });
+    /* 한글 셀을 명시적으로 텍스트 타입으로 고정 (UTF-16 인코딩 오류 방지) */
+    for (let i = 1; i <= rows.length; i++) {
+      if (ws[`B${i}`]) ws[`B${i}`].t = "s"; // elementName (한글)
+      if (ws[`C${i}`]) ws[`C${i}`].t = "s"; // keywords (한글)
+    }
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    return { buf: XLSX.write(wb, { bookType: "xlsx", type: "array" }), rows };
+  };
+
+  /* ═══ 미리캔버스 전용 제출 팩 — 미캔은 승인율이 높아 어도비 규격을 빼고 미캔 파일만 구성.
+     이미지(4MP+ 고해상 JPG) + 미캔 XLSX + 프롬프트 백업. 누락 방지를 위해 이중 체크(이미지↔XLSX 1:1). ═══ */
+  const exportMiriPack = async (list) => {
+    let src = Array.isArray(list) ? list : slots;
+    if (ecoTwoPass && provider === "openai" && src.some((s) => s.status === "success" && s.dataUrl && !s.finalized)) {
+      src = await finalizeSlots(src);
+    }
+    const ok = src.filter((s) => s.status === "success" && s.dataUrl);
+    if (ok.length === 0) { setNotice("미리캔버스로 내보낼 성공 이미지가 없습니다."); return; }
+    const base = cleanName(topic, 20) || "freejjang";
+    addLog(`[미캔 팩] 미리캔버스 전용 ZIP 생성 시작 — 성공 이미지 ${ok.length}장 (어도비 규격 제외)`);
+    const zip = new JSZip();
+    const imgNames = new Set(); // 실제 ZIP에 담긴 이미지 파일명(확장자 제외) — XLSX와 대조용
+    for (let i = 0; i < ok.length; i++) {
+      const s = ok[i];
+      const nameBase = `${assetBaseName(s)}_miri`;
+      setProg({ done: i, total: ok.length, stage: `미캔 슬롯 ${s.index} 고해상 변환` });
+      try {
+        const up = await upscaleForAdobe(s.dataUrl); // 미캔도 고해상일수록 승인·품질 유리
+        zip.file(`images/${nameBase}.jpg`, dataUrlToU8(up.jpeg));
+        imgNames.add(nameBase);
+        if (up.factor > 1) addLog(`[미캔 업스케일 ${s.index}] ${s.px ? `${s.px.w}×${s.px.h}` : "원본"} → ${up.w}×${up.h}`);
+      } catch (e) {
+        zip.file(`images/${nameBase}.png`, dataUrlToU8(s.dataUrl));
+        imgNames.add(nameBase);
+        addLog(`[미캔 업스케일 실패 ${s.index}] 원본 PNG 동봉 — ${e.message}`);
+      }
+    }
+    setProg(null);
+    /* 미캔 XLSX (이미지와 동일 소스로 생성) */
+    const { buf, rows } = buildMiriXlsx(ok);
+    zip.file(`${base}-miricanvas.xlsx`, buf);
+    zip.file(`${base}-prompts-full.txt`, buildPromptsFullText(ok));
+    /* ── 이중 체크: 이미지 ↔ XLSX ↔ 성공 슬롯이 1:1로 정확히 맞는지 누락 검증 ── */
+    const issues = [];
+    if (imgNames.size !== ok.length) issues.push(`이미지 ${imgNames.size}장 ≠ 성공 ${ok.length}장`);
+    if (rows.length !== ok.length) issues.push(`XLSX 행 ${rows.length} ≠ 성공 ${ok.length}장`);
+    const missingImg = rows.filter((r) => !imgNames.has(r.fileName)).map((r) => r.fileName);
+    const missingRow = [...imgNames].filter((n) => !rows.some((r) => r.fileName === n));
+    if (missingImg.length) issues.push(`XLSX엔 있으나 이미지 없음: ${missingImg.join(", ")}`);
+    if (missingRow.length) issues.push(`이미지엔 있으나 XLSX 없음: ${missingRow.join(", ")}`);
+    const noKw = rows.filter((r) => !r.keywords.trim()).map((r) => r.fileName);
+    if (noKw.length) issues.push(`한글 키워드 비어있음(미캔 검색 노출 불리): ${noKw.join(", ")}`);
+    if (issues.length) {
+      addLog(`[미캔 팩 ⚠ 검증] ${issues.length}건 — ${issues.join(" · ")}`);
+    } else {
+      addLog(`[미캔 팩 ✓ 검증] 이미지 ${imgNames.size} = XLSX ${rows.length} = 성공 ${ok.length} — 누락 없음`);
+    }
+    const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
+    await saveBlob(blob, `${base}-miricanvas-pack.zip`);
+    addLog(`[미캔 팩] ZIP 저장 완료 — 이미지 ${ok.length}장 + 미캔 XLSX + 프롬프트 TXT`);
+    setNotice(
+      issues.length
+        ? `⚠ 미리캔버스 팩 저장됨 (이미지 ${ok.length}장) — 검증에서 ${issues.length}건 발견: ${issues.join(" · ")}. 실행 로그를 확인하세요.`
+        : `✅ 미리캔버스 전용 팩 저장 완료: 이미지 ${ok.length}장 · 미캔 XLSX · 프롬프트 백업${saveDir ? ` → "${saveDir.name}" 폴더` : ""}. 이중 체크 통과(이미지=XLSX=${ok.length}, 누락 없음). 어도비 규격은 제외했습니다.`
+    );
+  };
+
   /* ═══ 제출 팩 — ZIP 하나로 묶어 저장 (이미지 + Adobe CSV + 미캔 XLSX + 프롬프트 백업) ═══ */
   const exportSubmitPack = async (list) => {
     let src = Array.isArray(list) ? list : slots;
@@ -1430,7 +1510,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     addLog(`[제출 팩] 어도비 규격(4MP+) 자동 업스케일 중…`);
     for (let i = 0; i < ok.length; i++) {
       const s = ok[i];
-      const name = `${s.index}-${cleanName(topic, 15)}-${s.slug}`;
+      const name = assetBaseName(s);
       setProg({ done: i, total: ok.length, stage: `슬롯 ${s.index} 업스케일·압축` });
       try {
         const up = await upscaleForAdobe(s.dataUrl);
@@ -1452,22 +1532,8 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const rows = ok.map((s) =>
       [`${s.index}-${cleanName(topic, 15)}-${s.slug}_adobe.jpg`, s.title, normKeywords(s.keywords, ADOBE_MAX_KEYWORDS), s.category, "", "Yes"].map(esc).join(","));
     zip.file(`${base}-adobe-metadata.csv`, "﻿" + [header.map(esc).join(","), ...rows].join("\r\n"));
-    /* MiriCanvas XLSX — 한글 인코딩 정확성을 위해 셀 타입 명시 + BOM 추가 */
-    const miriRows = ok.map((s) => ({
-      fileName: `${s.index}-${cleanName(topic, 15)}-${s.slug}_miri`,
-      elementName: [(s.title_kr || "").substring(0, 8), s.title].filter(Boolean).join(" "),
-      keywords: normKeywords(s.keywords_kr, MIRI_MAX_KEYWORDS),
-      tier: "Premium", contentType: "Photo",
-    }));
-    const ws = XLSX.utils.json_to_sheet(miriRows, { header: ["fileName", "elementName", "keywords", "tier", "contentType"], cellFormats: true });
-    /* 한글 셀을 명시적으로 텍스트 타입으로 고정 (UTF-16 인코딩 오류 방지) */
-    for (let i = 1; i <= miriRows.length; i++) {
-      if (ws[`B${i}`]) ws[`B${i}`].t = "s"; // elementName (한글)
-      if (ws[`C${i}`]) ws[`C${i}`].t = "s"; // keywords (한글)
-    }
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
-    const buf = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+    /* MiriCanvas XLSX — 미캔 전용 팩과 동일 소스(buildMiriXlsx)로 생성해 팩 간 어긋남 방지 */
+    const { buf } = buildMiriXlsx(ok);
     zip.file(`${base}-miricanvas.xlsx`, buf);
     /* 프롬프트 전체 백업도 동봉 */
     zip.file(`${base}-prompts-full.txt`, buildPromptsFullText(ok));
@@ -2104,6 +2170,11 @@ Each block content = one short Korean sentence.`,
                             {autoFixBusy ? "자동 수정 중…" : `플래그 ${slots.filter((s) => s.autoFlag && s.status === "success").length}건 자동 수정`}
                           </button>
                         )}
+                        <button onClick={() => exportMiriPack()} disabled={autoQcBusy}
+                          title="미리캔버스 전용 ZIP만 저장 — 승인율 높은 미캔용으로만 구성(어도비 규격 제외). 이미지↔XLSX 누락 이중 체크"
+                          className="bg-teal-500/15 hover:bg-teal-500/30 border border-teal-500/40 disabled:opacity-50 text-teal-200 font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
+                          <Download className="w-4 h-4" /> 미리캔버스만 ZIP
+                        </button>
                         <button onClick={submitQC} disabled={autoQcBusy}
                           className="bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-neutral-950 font-bold text-sm py-2.5 px-5 rounded flex items-center gap-2 transition">
                           <Check className="w-4 h-4" />
@@ -2169,6 +2240,11 @@ Each block content = one short Korean sentence.`,
                         title="Midjourney 배치 자동화(mj_batch.py)용 TXT — 각 슬롯을 MJ 문법(--ar/--style/--no)으로 변환해 한 줄씩 저장"
                         className="bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
                         <Cpu className="w-3.5 h-3.5" /> 미드저니 배치 TXT
+                      </button>
+                      <button onClick={() => exportMiriPack()}
+                        title="미리캔버스 전용 ZIP — 승인율 높은 미캔용으로만 구성(고해상 이미지 + 미캔 XLSX). 어도비 규격 제외. 이미지↔XLSX 누락 이중 체크"
+                        className="bg-teal-600/20 hover:bg-teal-600/30 border border-teal-500/40 text-teal-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
+                        <Download className="w-3.5 h-3.5" /> 미리캔버스 전용 ZIP
                       </button>
                     </div>
                   </section>
@@ -2377,13 +2453,18 @@ Each block content = one short Korean sentence.`,
                           {autoFixBusy ? "자동 수정 중…" : `플래그 ${slots.filter((s) => s.autoFlag && s.status === "success").length}건 자동 수정`}
                         </button>
                       )}
+                      <button onClick={() => exportMiriPack()} disabled={autoQcBusy}
+                        title="미리캔버스 전용 ZIP만 저장 — 승인율 높은 미캔용으로만 구성(어도비 규격 제외). 이미지↔XLSX 누락 이중 체크"
+                        className="w-full bg-teal-500/15 hover:bg-teal-500/30 border border-teal-500/40 disabled:opacity-50 text-teal-200 font-bold text-sm py-2 rounded flex items-center justify-center gap-2 transition">
+                        <Download className="w-4 h-4" /> 미리캔버스만 ZIP
+                      </button>
                       <button onClick={submitQC} disabled={autoQcBusy}
                         style={!autoQcBusy ? attnPulse : undefined}
                         className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-neutral-950 font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
                         <Check className="w-4 h-4" />
                         {Object.values(qcRejects).some(Boolean)
                           ? `거절 ${Object.values(qcRejects).filter(Boolean).length}건 격리·재생성`
-                          : "전량 승인 · 제출 팩 저장"}
+                          : "전량 승인 · 제출 팩 저장(어도비+미캔)"}
                       </button>
                     </>
                   )}
@@ -2393,7 +2474,12 @@ Each block content = one short Korean sentence.`,
                       <p className="text-xs text-emerald-300 leading-relaxed">제작 완료 — 유효 {successCount}장.</p>
                       <button onClick={exportSubmitPack}
                         className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm py-2.5 rounded flex items-center justify-center gap-2 transition">
-                        <Download className="w-4 h-4" /> 저장 및 다운로드 (ZIP)
+                        <Download className="w-4 h-4" /> 어도비+미캔 통합 ZIP
+                      </button>
+                      <button onClick={() => exportMiriPack()}
+                        title="미리캔버스 전용 ZIP만 저장 — 어도비 규격 제외, 이미지↔XLSX 누락 이중 체크"
+                        className="w-full bg-teal-500/15 hover:bg-teal-500/30 border border-teal-500/40 text-teal-200 font-bold text-sm py-2 rounded flex items-center justify-center gap-2 transition">
+                        <Download className="w-4 h-4" /> 미리캔버스 전용 ZIP
                       </button>
                       <button onClick={backToEdit}
                         title="수정 모드로 전환: 슬롯 편집·개별 재생성·삭제 가능"
