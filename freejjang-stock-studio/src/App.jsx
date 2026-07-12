@@ -2809,19 +2809,47 @@ Each block content = one short Korean sentence.`,
         )}
       </div>
 
-      {/* 이미지 확대 프리뷰 */}
-      {previewSlot && (
-        <div onClick={() => setPreviewSlot(null)}
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-6 cursor-zoom-out">
-          <div className="max-w-3xl w-full" onClick={(e) => e.stopPropagation()}>
-            <img src={previewSlot.dataUrl} alt={previewSlot.title} className="w-full rounded-lg" />
-            <div className="text-center mt-2">
-              <p className="text-sm font-bold text-white">{previewSlot.index} · {previewSlot.title_kr || previewSlot.title}</p>
-              <button onClick={() => setPreviewSlot(null)} className="mt-2 text-xs text-white bg-neutral-800 border border-neutral-600 px-3 py-1.5 rounded">닫기</button>
+      {/* 이미지 확대 프리뷰 + 미드저니 프롬프트 */}
+      {previewSlot && (() => {
+        const mjPrompt = toMidjourney(previewSlot, mode, refTone, refPeople, aspect, refHands);
+        const mjBatch = buildMidjourneyPrompt(previewSlot, { aspect, tone: refTone, people: refPeople });
+        return (
+          <div onClick={() => setPreviewSlot(null)}
+            className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-6 cursor-zoom-out overflow-y-auto">
+            <div className="max-w-3xl w-full my-auto" onClick={(e) => e.stopPropagation()}>
+              <img src={previewSlot.dataUrl} alt={previewSlot.title} className="w-full rounded-lg" />
+              <div className="text-center mt-2">
+                <p className="text-sm font-bold text-white">{previewSlot.index} · {previewSlot.title_kr || previewSlot.title}</p>
+              </div>
+              <div className="mt-3 space-y-2">
+                <div className="bg-neutral-900 border border-sky-700/40 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-mono text-sky-400 uppercase">Midjourney 프롬프트</span>
+                    <button onClick={() => { navigator.clipboard.writeText(mjPrompt); setNotice("MJ 프롬프트를 복사했습니다."); }}
+                      className="text-[10px] text-sky-300 hover:text-sky-100 bg-sky-600/20 hover:bg-sky-600/40 border border-sky-500/30 px-2 py-0.5 rounded flex items-center gap-1 transition">
+                      <Copy className="w-3 h-3" /> 복사
+                    </button>
+                  </div>
+                  <p className="text-[10px] leading-relaxed text-neutral-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto">{mjPrompt}</p>
+                </div>
+                <div className="bg-neutral-900 border border-indigo-500/30 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[10px] font-mono text-indigo-400 uppercase">MJ 배치 (mj_batch.py)</span>
+                    <button onClick={() => { navigator.clipboard.writeText(mjBatch); setNotice("MJ 배치 프롬프트를 복사했습니다."); }}
+                      className="text-[10px] text-indigo-300 hover:text-indigo-100 bg-indigo-600/20 hover:bg-indigo-600/40 border border-indigo-500/30 px-2 py-0.5 rounded flex items-center gap-1 transition">
+                      <Copy className="w-3 h-3" /> 복사
+                    </button>
+                  </div>
+                  <p className="text-[10px] leading-relaxed text-neutral-300 whitespace-pre-wrap break-words max-h-32 overflow-y-auto">{mjBatch}</p>
+                </div>
+              </div>
+              <div className="text-center mt-3">
+                <button onClick={() => setPreviewSlot(null)} className="text-xs text-white bg-neutral-800 border border-neutral-600 px-3 py-1.5 rounded">닫기</button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* 토스트 */}
       {notice && (
