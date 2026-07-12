@@ -32,7 +32,11 @@
     background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 6px 20px rgba(91,140,255,.4);font-size:22px}
   .title h1{font-size:19px;margin:0;letter-spacing:-.2px}
   .title p{margin:2px 0 0;color:var(--mut);font-size:12.5px}
-  .badge{margin-left:auto;font-size:11.5px;color:var(--dim);border:1px solid var(--line);padding:5px 10px;border-radius:99px;background:var(--panel)}
+  .hdright{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .badge{font-size:11.5px;color:var(--dim);border:1px solid var(--line);padding:5px 10px;border-radius:99px;background:var(--panel)}
+  .skillmap{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--txt);
+    border:1px solid var(--line2);background:var(--panel2);padding:7px 13px;border-radius:99px;transition:.15s;white-space:nowrap}
+  .skillmap:hover{border-color:var(--acc);color:#fff;background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 4px 14px rgba(91,140,255,.35)}
 
   .grid{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
   @media(max-width:960px){.grid{grid-template-columns:1fr}}
@@ -174,7 +178,10 @@
       <h1>미리캔버스 요소 크롭 스튜디오</h1>
       <p>어떤 이미지든 배경 제거 · 타이트 크롭 · 규격 맞춤 · 300 DPI · 업로드 패키지까지 — 브라우저에서 바로</p>
     </div>
-    <span class="badge">서버 불필요 · 100% 로컬 처리</span>
+    <div class="hdright">
+      <a class="skillmap" href="https://claude.ai/code/artifact/a205bc88-865c-4f70-b06a-cf666604c98d" target="_blank" rel="noopener noreferrer" title="FreeJJang 총 스킬 맵으로 이동">← 스킬 맵</a>
+      <span class="badge">서버 불필요 · 100% 로컬 처리</span>
+    </div>
   </header>
 
   <div class="grid">
