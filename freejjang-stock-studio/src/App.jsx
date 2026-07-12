@@ -1048,6 +1048,7 @@ export default function App() {
   const [importOpen, setImportOpen] = useState(false);
   const [importText, setImportText] = useState("");
   const promptFileRef = useRef(null);
+  const mjImgRef = useRef(null);
   useEffect(() => {
     try { localStorage.setItem("freejjang_reco_history", JSON.stringify(recoHistory)); } catch { /* 저장 불가 무시 */ }
   }, [recoHistory]);
@@ -1769,6 +1770,40 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const body = rows.map((s) => buildMidjourneyPrompt(s, { aspect, tone: refTone, people: refPeople })).join("\n");
     saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-midjourney.txt`);
     addLog(`[미드저니] 배치 TXT 저장 — ${rows.length}슬롯 (mj_batch.py 파이프라인용)`);
+  };
+
+  /* ── MJ 배치 이미지 불러오기 — mj_batch.py 결과물을 슬롯에 다시 연결 ── */
+  const onMjBatchImages = async (e) => {
+    const files = Array.from(e.target.files || []);
+    if (e.target) e.target.value = "";
+    if (!files.length) return;
+    const rows = slots.filter((s) => s.subject);
+    if (!rows.length) { setNotice("슬롯이 없습니다. 먼저 시리즈를 생성하세요."); return; }
+    const sorted = files
+      .filter((f) => /^image\/(png|jpe?g|webp)$/.test(f.type))
+      .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    if (!sorted.length) { setNotice("이미지 파일을 찾을 수 없습니다 (PNG/JPG/WebP만 지원)."); return; }
+    const limit = Math.min(sorted.length, rows.length);
+    let linked = 0;
+    for (let i = 0; i < limit; i++) {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = () => reject(new Error("파일 읽기 실패"));
+        reader.readAsDataURL(sorted[i]);
+      });
+      const img = new window.Image();
+      await new Promise((res) => { img.onload = res; img.onerror = res; img.src = dataUrl; });
+      const px = img.naturalWidth ? { w: img.naturalWidth, h: img.naturalHeight } : undefined;
+      updateSlot(rows[i].index, "dataUrl", dataUrl);
+      if (px) updateSlot(rows[i].index, "px", px);
+      updateSlot(rows[i].index, "status", "success");
+      updateSlot(rows[i].index, "engine", "midjourney");
+      linked++;
+    }
+    addLog(`[미드저니] 배치 이미지 ${linked}장 → 슬롯 연결 완료${sorted.length > rows.length ? ` (초과 ${sorted.length - rows.length}장 무시)` : ""}${rows.length > sorted.length ? ` (미매칭 슬롯 ${rows.length - sorted.length}개)` : ""}`);
+    setNotice(`MJ 배치 이미지 ${linked}장이 슬롯에 연결되었습니다.${sorted.length !== rows.length ? ` 파일 ${sorted.length}개 / 슬롯 ${rows.length}개` : ""}`);
+    if (phase === "idle" || phase === "review") setPhase("review");
   };
 
   /* ═══ 이코노미 2패스 마감 — 승인된 low 드래프트만 편집 API로 고품질(medium/high) 리렌더 (구도 유지) ═══ */
@@ -2686,6 +2721,12 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
                         title="Midjourney 배치 자동화(mj_batch.py)용 TXT — 각 슬롯을 MJ 문법(--ar/--style/--no)으로 변환해 한 줄씩 저장"
                         className="bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
                         <Cpu className="w-3.5 h-3.5" /> 미드저니 배치 TXT
+                      </button>
+                      <input ref={mjImgRef} type="file" accept="image/png,image/jpeg,image/webp" multiple onChange={onMjBatchImages} className="hidden" />
+                      <button onClick={() => mjImgRef.current?.click()}
+                        title="mj_batch.py로 생성한 이미지를 슬롯 순서대로 연결 — 파일명 정렬 순으로 매칭"
+                        className="bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/40 text-indigo-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
+                        <Upload className="w-3.5 h-3.5" /> MJ 이미지 불러오기
                       </button>
                       <button onClick={() => exportMiriPack()}
                         title="미리캔버스 전용 ZIP — 승인율 높은 미캔용으로만 구성(고해상 이미지 + 미캔 XLSX). 어도비 규격 제외. 이미지↔XLSX 누락 이중 체크"
