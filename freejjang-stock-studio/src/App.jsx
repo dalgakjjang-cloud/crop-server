@@ -110,7 +110,12 @@ const ASPECTS = ["1:1", "16:9", "4:3", "3:4", "9:16"];
 const OPENAI_SIZE = { "1:1": "1024x1024", "16:9": "1536x1024", "4:3": "1536x1024", "3:4": "1024x1536", "9:16": "1024x1536" };
 /* gpt-image 1536×1024 기준 근사 단가 (실제 청구액은 상이할 수 있음) */
 const OPENAI_COST = { low: 0.005, medium: 0.041, high: 0.165 };
-const GEMINI_IMG_COST = 0.039; // gemini-2.5-flash-image 1장 근사 단가
+/* Gemini 이미지(Nano Banana) 모델 — 3.1 = Nano Banana 2 세대가 최신 (이미지 모델은 3.5 없음 · 2.5는 레거시) */
+const GEMINI_IMG_DEFAULT = "gemini-3.1-flash-image";
+const GEMINI_IMG_PRESETS = ["gemini-3.1-flash-image", "gemini-3.1-flash-lite-image", "gemini-2.5-flash-image"];
+/* 1장 근사 단가 (1K 해상도 기준, 실제 청구액은 상이할 수 있음) */
+const GEMINI_IMG_COSTS = { "gemini-3.1-flash-image": 0.039, "gemini-3.1-flash-lite-image": 0.034, "gemini-2.5-flash-image": 0.039 };
+const geminiImgCost = (m) => GEMINI_IMG_COSTS[m] ?? 0.039;
 /* 일시적(재시도 가능) 오류 패턴 — 요금/키 오류는 제외 */
 const TRANSIENT_RE = /429|rate.?limit|overloaded|timeout|temporarily|unavailable|failed to fetch|network|internal|50[023]/i;
 
@@ -468,9 +473,9 @@ async function askGeminiGrounded(key, model, system, user) {
 }
 
 /* ── 이미지 생성 (사용자 키 · 메모리에만 유지) ── */
-async function genGemini(key, prompt, aspect) {
+async function genGemini(key, prompt, aspect, model) {
   if (!key) throw new Error("Gemini: Google API 키가 없습니다.");
-  const res = await fetch(geminiUrl("gemini-2.5-flash-image"), {
+  const res = await fetch(geminiUrl(model || GEMINI_IMG_DEFAULT), {
     method: "POST",
     headers: geminiHeaders(key),
     body: JSON.stringify({
@@ -916,6 +921,7 @@ export default function App() {
 
   /* ── 이미지 엔진 설정 ── */
   const [provider, setProvider] = useState("openai"); // openai | gemini (손)
+  const [geminiImgModel, setGeminiImgModel] = useState(GEMINI_IMG_DEFAULT); // Nano Banana 세대 선택
   const [quality, setQuality] = useState("medium");
   const [ecoTwoPass, setEcoTwoPass] = useState(true); // 이코노미 2패스: low 초안 → 승인분만 고품질 마감 (GPT 엔진 전용)
   const [finalQuality, setFinalQuality] = useState("medium"); // 2패스 마감 품질: medium | high
@@ -974,6 +980,7 @@ export default function App() {
         if (s.gptModel) setGptModel(s.gptModel);
         /* 옛 기본값(3.1-flash)으로 저장돼 있으면 무료 API가 풀린 3.5-flash로 자동 승급 (직접 고른 다른 모델은 유지) */
         if (s.geminiModel) setGeminiModel(s.geminiModel === "gemini-3.1-flash" ? GEMINI_MODEL_DEFAULT : s.geminiModel);
+        if (s.geminiImgModel) setGeminiImgModel(s.geminiImgModel);
         if (typeof s.autoFallback === "boolean") setAutoFallback(s.autoFallback);
         if (s.refTone) setRefTone(s.refTone);
         if (s.refPeople) setRefPeople(s.refPeople);
@@ -995,10 +1002,10 @@ export default function App() {
     if (!settingsLoaded.current) return;
     try {
       localStorage.setItem("freejjang_settings", JSON.stringify({
-        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality,
+        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, geminiImgModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality,
       }));
     } catch { /* 저장 불가 환경 무시 */ }
-  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality]);
+  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, geminiImgModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality]);
 
   /* ── Start Fresh: 파이프라인만 초기화 (키·설정은 유지) ── */
   const startFresh = () => {
@@ -1112,7 +1119,7 @@ export default function App() {
   /* 엔진 1개 호출 (재시도 없음) */
   const genWithEngine = (eng, prompt, q) => {
     if (eng === "pollinations") return genPollinations(prompt, aspect);
-    if (eng === "gemini") return genGemini(googleKey.trim(), prompt, aspect);
+    if (eng === "gemini") return genGemini(googleKey.trim(), prompt, aspect, geminiImgModel.trim());
     return genOpenAI(openaiKey.trim(), prompt, aspect, q);
   };
   /* 3중 안전망: 선택 엔진 → (Gemini 키 있으면) Gemini → Pollinations(무료·무제한).
@@ -1131,7 +1138,7 @@ export default function App() {
       for (let attempt = 0; attempt <= 2; attempt++) {
         try {
           const out = await genWithEngine(eng, finalPrompt, q);
-          const unit = eng === "pollinations" ? 0 : eng === "gemini" ? GEMINI_IMG_COST : (OPENAI_COST[q] || 0.041);
+          const unit = eng === "pollinations" ? 0 : eng === "gemini" ? geminiImgCost(geminiImgModel.trim()) : (OPENAI_COST[q] || 0.041);
           setSpent((p) => ({ img: p.img + 1, cost: p.cost + unit }));
           engineUsedRef.current = eng;
           if (e > 0) addLog(`[엔진 폴백] ${IMG_LABEL[order[0]]} 실패 → ${IMG_LABEL[eng]}로 생성 완료`);
@@ -2209,13 +2216,23 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
                 <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">이미지 엔진 (손)</label>
                 <select value={provider} onChange={(e) => setProvider(e.target.value)} className={fieldCls}>
                   <option value="openai">GPT (gpt-image · 기본)</option>
-                  <option value="gemini">Gemini (2.5-flash-image)</option>
+                  <option value="gemini">Gemini (Nano Banana)</option>
                   <option value="pollinations">Pollinations (무료 · 키 불필요)</option>
                 </select>
                 {provider === "pollinations" && (
                   <p className="text-[9px] text-amber-300/90 mt-0.5 leading-snug max-w-52">⚠ 저해상도 — 기획·구도 확인용</p>
                 )}
               </div>
+              {provider === "gemini" && (
+                <div>
+                  <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">Nano Banana 모델</label>
+                  <input list="geminiImgModels" value={geminiImgModel} onChange={(e) => setGeminiImgModel(e.target.value)} placeholder={GEMINI_IMG_DEFAULT}
+                    title="이미지 모델은 3.1 계열(Nano Banana 2)이 최신 — 3.5는 텍스트(두뇌) 전용. 2.5-flash-image는 레거시"
+                    className={`${fieldCls} font-mono w-52`} />
+                  <datalist id="geminiImgModels">{GEMINI_IMG_PRESETS.map((m) => <option key={m} value={m} />)}</datalist>
+                  <p className="text-[9px] text-neutral-500 mt-0.5 leading-snug max-w-52">~${geminiImgCost(geminiImgModel.trim()).toFixed(3)}/장 · lite = 최속·최저가</p>
+                </div>
+              )}
               {provider === "openai" && (
                 <div>
                   <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">이코노미 2패스</label>
