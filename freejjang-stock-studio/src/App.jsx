@@ -3,7 +3,7 @@ import {
   Sparkles, Download, Trash2, RefreshCw, Copy, Check, Cpu, AlertTriangle,
   FileSpreadsheet, Wand2, X, Play, Square, Image as ImageIcon, ScanSearch,
   Layers, Key, Settings2, CornerDownLeft, FileText, ClipboardCheck,
-  ShieldAlert, CircleDollarSign, ChevronRight, Ban, FolderOpen, Sun, Moon
+  ShieldAlert, CircleDollarSign, ChevronRight, Ban, FolderOpen, Sun, Moon, Upload
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import JSZip from "jszip";
@@ -810,6 +810,42 @@ function buildMidjourneyPrompt(slot, { aspect = "16:9", tone = "realism", people
   return `${core} ${params.join(" ")}`.replace(/\s+/g, " ").trim();
 }
 
+/* ── 외부 프롬프트 TXT 불러오기: 개떡같이 넣어도 슬롯 단위로 자동 분할 ──
+   구분 우선순위: (1) 명시 구분선(---,===,***) → (2) 빈 줄 블록 → (3) 한 줄=한 프롬프트.
+   자체 내보내기 헤더(# 주석)와 번호·불릿 머리표는 제거. 3자 미만 조각은 버림 */
+function splitRawPrompts(raw) {
+  const text = (raw || "").replace(/\r\n?/g, "\n").trim();
+  if (!text) return [];
+  const body = text.split("\n").filter((l) => !/^\s*#/.test(l)).join("\n").trim();
+  if (!body) return [];
+  let blocks;
+  if (/\n\s*[-=*_~]{3,}\s*\n/.test(body)) blocks = body.split(/\n\s*[-=*_~]{3,}\s*\n/);
+  else if (/\n[ \t]*\n/.test(body)) blocks = body.split(/\n[ \t]*\n/);
+  else blocks = body.split(/\n/);
+  return blocks
+    .map((b) => b.replace(/^\s*(?:\d+[.)\]]|[-*•·])\s+/, "").trim())
+    .filter((b) => b.length >= 3);
+}
+
+/* 외부(개떡) 프롬프트 → 어도비·미캔용 정제 슬롯 변환 두뇌 지시.
+   핵심: 사용자 의도(피사체·플레이팅·앵글·무드)는 보존하되 모델 문법·노이즈는 벗겨내고
+   판매용 상업 구도로 업그레이드 + 메타데이터(제목·35/25 키워드·카테고리) 완비.
+   음식·골프·PIW 등 장르별 조명/구도는 생성 시 buildSlotPrompt가 자동 재주입하므로 여기선 앵글·카테고리만 정확히 잡으면 됨 */
+const IMPORT_SYSTEM = `You convert RAW, messy user-written image prompts into clean, sellable Adobe Stock + Korean MiriCanvas image slots. The raw prompts come from anywhere — any language, any format, often sloppy and stuffed with model syntax. For EACH raw prompt, understand its core visual INTENT and REWRITE it into ONE clean professional stock slot. Respond ONLY compact JSON:
+{"items":[{"slug":"en-hyphen","kind":"photo","subject":"1 sentence main subject+scene","props":"2-4 SPECIFIC props/styling, comma-sep","focal_placement":"e.g. center-left","copy_space":"short","camera":"lens/angle/depth","lighting":"direction+texture","palette":"colors","title":"EN stock title 6-12 words","title_kr":"KR title","keywords":"EXACTLY 35 EN keywords comma-sep SEO-ordered","keywords_kr":"EXACTLY 25 KR single-noun keywords comma-sep (write 가을,풍경 never 가을풍경)","category":7}]}
+ORDER: exactly one item per raw prompt, in the SAME order — never merge, split, drop or reorder items.
+PRESERVE INTENT: keep the user's real subject, product/dish, plating, arrangement, camera angle and mood. Upgrade wording to a clean professional commercial composition; fix only what would get rejected.
+STRIP NOISE: capture ONLY real visual content. Remove all model syntax and filler — aspect ratios ("16:9", "--ar 16:9"), "--no ...", "--v", "--style", "photorealistic", "8k/4k", "hyperdetailed", "ultra realistic", "masterpiece", "trending on artstation", render-engine names, and negation spam ("no text", "no logo", "no watermark", "no clutter"). Those are handled by the app itself, NOT written into the fields. BUT if the raw prompt says "no people"/"without people", respect it by keeping the scene people-free; if it names an angle (45-degree, eye-level, top-view, overhead, close-up), put that in "camera".
+kind = "photo" unless the raw prompt clearly asks for illustration / vector / 3d / watercolor / anime (then "illustration").
+NO TEXT: never write any readable text, letters, numbers, logos, labels, signs, menus or writing into "subject"/"props" (text in the image is auto-rejected) — describe surfaces as plain and blank.
+SINGLE FRAME: every slot is ONE continuous scene in ONE frame — never a split-screen, diptych, collage, grid or before/after layout.
+ENGLISH ONLY fields except title_kr and keywords_kr — never copy foreign words into subject/props/camera/lighting/palette.
+BRIGHTNESS: default to bright, well-exposed, appetizing commercial lighting unless the prompt's genre is explicitly moody/landscape/night.
+GENRE AWARENESS (this only needs to set camera + category correctly; the app re-applies genre lighting/styling at render): food → category 7 (or 4 Drinks for beverages), keep the whole dish and its plate/container fully in frame and uncropped with clean margin; flat or composed dishes → top-down, tall or layered → 45°, drinks/soup → eye-level. Product-on-white / seamless white / 흰배경 / 제품컷 → category matches the product, seamless pure white background, product fills most of the frame. Golf → deep depth of field, whole scene sharp, bright daylight. People max 3 unless the prompt clearly needs a crowd.
+KEYWORDS (Adobe SEO, critical): "keywords" = EXACTLY 35 English keywords, no duplicates, ordered by buyer importance (main subject nouns first, then descriptors/materials/actions, then concept/emotion, then color/lighting, then composition, then use-case). "keywords_kr" = EXACTLY 25 Korean SINGLE nouns, same ordering. All lowercase, only terms literally describing what is visible.
+CATEGORY: pick ONE best Adobe Stock category id: ${ADOBE_CAT_LIST}. Illustration/vector fallback: 8. Integer id only.
+MODE: the user's current mode is provided — "commercial" = clean subject-dominant sellable composition; "emotional" = warm golden-hour MiriCanvas text-overlay background; "wallpaper" = leave a 40-60% clean copy-space area.`;
+
 export default function App() {
   /* ── 두뇌(에이전트) 설정 ── */
   const [brain, setBrain] = useState("gpt"); // gpt | gemini
@@ -931,6 +967,11 @@ export default function App() {
     try { return JSON.parse(localStorage.getItem("freejjang_reco_history")) || []; } catch { return []; }
   });
   const [histOpen, setHistOpen] = useState(false);
+  /* 외부 프롬프트 불러오기 — TXT 업로드/붙여넣기 → 어도비·미캔용 슬롯 자동 정제 */
+  const [importBusy, setImportBusy] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importText, setImportText] = useState("");
+  const promptFileRef = useRef(null);
   useEffect(() => {
     try { localStorage.setItem("freejjang_reco_history", JSON.stringify(recoHistory)); } catch { /* 저장 불가 무시 */ }
   }, [recoHistory]);
@@ -1203,6 +1244,93 @@ ${pair.map((c, j) => `${j + 1}. scene: ${c.scene} | location: ${c.location} | ac
       setNotice("이미지 API 키가 없어 초안에서 멈췄습니다. 상단 설정에서 키를 입력한 뒤 승인하세요.");
       addLog(`[멈춤 1] 이미지 키 없음 — 키 입력 후 승인 시 생성`);
     }
+  };
+
+  /* ═══ 외부 프롬프트 불러오기 — 다른 곳에서 만든 개떡같은 프롬프트 TXT/붙여넣기를
+     슬롯 단위로 자동 분할하고 어도비·미캔용으로 정제(제목·35/25 키워드·카테고리·구도 완비).
+     장르별 조명/구도는 생성 시 buildSlotPrompt가 자동 재주입 → 여기선 의도 보존 + 메타데이터에 집중 ═══ */
+  const importPrompts = async (rawText) => {
+    const raws = splitRawPrompts(rawText);
+    if (raws.length === 0) { setNotice("불러온 프롬프트가 없습니다. 프롬프트를 빈 줄·구분선(---)·줄바꿈으로 나눠서 넣어주세요."); return; }
+    const capped = raws.slice(0, 50);
+    cancelRef.current = false;
+    setPhase("drafting");
+    setSlots([]); setQcRejects({});
+    deadlineRef.current = Infinity; // 불러오기는 시간 예산 없음
+    setImportBusy(true);
+    addLog(`[프롬프트 불러오기] ${capped.length}개 감지${raws.length > 50 ? ` (50개 초과분 ${raws.length - 50}개 생략)` : ""} — 어도비·미캔용으로 자동 정제 · 두뇌=${brainName}`);
+    setProg({ done: 0, total: capped.length, stage: `${brainName} 프롬프트 정제 (병렬)` });
+    const made = new Array(capped.length).fill(null);
+    let doneCnt = 0;
+    const BATCH = 3;
+    const doBatch = async (idxs) => {
+      for (let attempt = 0; attempt < 3 && !cancelRef.current; attempt++) {
+        try {
+          const r = await askBrain(
+            IMPORT_SYSTEM,
+            `Mode: ${mode}. Rewrite these ${idxs.length} raw prompts into clean sellable stock slots, ONE item each, IN ORDER:\n${idxs.map((gi, j) => `${j + 1}. ${capped[gi]}`).join("\n")}${priKw.trim() ? `\nPRIORITY KEYWORDS (metadata ordering only — front-load only those literally visible in that slot; never add unseen ones, never change the scene): ${priKw.trim()}` : ""}${handlingTip.trim() ? `\nUser handling notes — apply where sensible: ${handlingTip.trim()}` : ""}`
+          );
+          (r.items || []).slice(0, idxs.length).forEach((item, j) => {
+            made[idxs[j]] = {
+              ...item,
+              status: "pending", regenCount: 0, dataUrl: "", rejectReason: "", qcNote: "", angle: refAngle, finalPrompt: "",
+              keywords: padKeywordsEN(item, ADOBE_MAX_KEYWORDS),
+              keywords_kr: padKeywordsKR(item, MIRI_MAX_KEYWORDS),
+              slug: cleanName(item.slug, 24) || `import-${idxs[j] + 1}`,
+            };
+          });
+          doneCnt += idxs.length;
+          setProg({ done: Math.min(doneCnt, capped.length), total: capped.length, stage: `${brainName} 프롬프트 정제 (병렬)` });
+          setSlots(made.filter(Boolean).map((s, i) => ({ ...s, index: pad2(i + 1) })));
+          return;
+        } catch (err) {
+          addLog(`[오류] 정제 실패(${idxs.map((i) => i + 1).join(",")}): ${err.message} — 재시도 ${attempt + 1}/3`);
+          await new Promise((r2) => setTimeout(r2, 2000));
+        }
+      }
+    };
+    const idxBatches = [];
+    for (let i = 0; i < capped.length; i += BATCH) idxBatches.push(Array.from({ length: Math.min(BATCH, capped.length - i) }, (_, k) => i + k));
+    const queue = [...idxBatches];
+    await Promise.all(Array.from({ length: Math.min(3, queue.length) }, async () => {
+      while (queue.length > 0 && !cancelRef.current) await doBatch(queue.shift());
+    }));
+    setProg(null);
+    setImportBusy(false);
+    if (cancelRef.current) { setPhase("idle"); addLog("[불러오기] 사용자 중단"); return; }
+    const ok = made.filter(Boolean);
+    const indexed = ok.map((s, i) => ({ ...s, index: pad2(i + 1) }));
+    setSlots(indexed);
+    if (ok.length === 0) { setPhase("idle"); setNotice("프롬프트 정제에 실패했습니다. 두뇌 API 키를 확인하고 다시 시도하세요."); return; }
+    setCount(Math.max(1, Math.min(50, ok.length))); // 불러온 개수에 목표 장수 맞춤
+    setPhase("review");
+    addLog(`[불러오기 완료] ${ok.length}개 슬롯 생성 — 어도비/미캔 프롬프트·메타데이터 준비됨`);
+    setNotice(`✅ ${ok.length}개 프롬프트를 어도비·미캔용 슬롯으로 정제했습니다. 카드에서 확인·편집한 뒤 이미지를 생성하거나 프롬프트/ZIP으로 내보내세요.`);
+  };
+
+  /* 파일 선택 → 텍스트 읽어 정제 */
+  const onPromptFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (e.target) e.target.value = ""; // 같은 파일 재선택 허용
+    if (!file) return;
+    if (phase === "drafting" || phase === "generating") { setNotice("생성/작성 중에는 불러올 수 없습니다."); return; }
+    if (slots.length > 0 && !window.confirm("현재 슬롯을 지우고 이 파일의 프롬프트로 새로 채울까요?")) return;
+    try {
+      const text = await file.text();
+      await importPrompts(text);
+    } catch (err) {
+      setNotice(`파일을 읽지 못했습니다: ${err.message}`);
+    }
+  };
+
+  /* 붙여넣기 텍스트 → 정제 */
+  const onImportPaste = async () => {
+    if (phase === "drafting" || phase === "generating") { setNotice("생성/작성 중에는 불러올 수 없습니다."); return; }
+    if (!importText.trim()) { setNotice("붙여넣은 프롬프트가 없습니다."); return; }
+    if (slots.length > 0 && !window.confirm("현재 슬롯을 지우고 붙여넣은 프롬프트로 새로 채울까요?")) return;
+    const text = importText;
+    setImportText(""); setImportOpen(false);
+    await importPrompts(text);
   };
 
   /* ═══ 오늘의 추천 — 날짜 기준 판매 리드타임(4~8주) 계산 + 베스트셀러/틈새/이슈 랜덤 로테이션.
@@ -2134,6 +2262,45 @@ Each block content = one short Korean sentence.`,
                             className="text-[10px] text-neutral-600 hover:text-red-400 transition">전체 비우기</button>
                         </div>
                       )}
+                    </div>
+                  )}
+                </div>
+                {/* 외부 프롬프트 불러오기 — 개떡같은 TXT/붙여넣기 → 어도비·미캔용 슬롯 자동 정제 */}
+                <div className="border border-dashed border-indigo-500/40 rounded-lg bg-indigo-500/5 p-2.5 space-y-2">
+                  <div className="flex items-center gap-1.5 text-[11px] font-bold text-indigo-300">
+                    <Upload className="w-3.5 h-3.5" /> 외부 프롬프트 불러오기
+                    <span className="font-normal text-neutral-500">(다른 곳에서 만든 프롬프트를 자동 정제)</span>
+                  </div>
+                  <p className="text-[10px] text-neutral-500 leading-snug">
+                    개떡같이 넣어도 됩니다 — 빈 줄·구분선·줄바꿈으로 나뉜 프롬프트를 슬롯마다 자동 분할하고, 모델 문법(16:9·--no·no text 등)을 벗겨 어도비(EN)·미캔(KR) 제목·키워드·카테고리까지 채웁니다.
+                  </p>
+                  <input ref={promptFileRef} type="file" accept=".txt,.text,text/plain" onChange={onPromptFile} className="hidden" />
+                  <div className="flex gap-1.5">
+                    <button onClick={() => promptFileRef.current?.click()}
+                      disabled={importBusy || phase === "drafting" || phase === "generating"}
+                      className="flex-1 text-xs font-bold py-2 rounded border border-indigo-500/50 bg-indigo-600/20 text-indigo-200 hover:bg-indigo-600/40 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-1.5 transition">
+                      {importBusy ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+                      {importBusy ? "정제 중…" : "TXT 파일 올리기"}
+                    </button>
+                    <button onClick={() => setImportOpen((v) => !v)}
+                      disabled={importBusy || phase === "drafting" || phase === "generating"}
+                      title="파일 대신 프롬프트를 직접 붙여넣기"
+                      className={`text-xs font-bold py-2 px-2.5 rounded border transition disabled:opacity-40 ${importOpen ? "bg-indigo-600 text-white border-indigo-600" : "bg-neutral-950 border-neutral-700 text-neutral-400 hover:text-neutral-200"}`}>
+                      붙여넣기
+                    </button>
+                  </div>
+                  {importOpen && (
+                    <div className="space-y-1.5">
+                      <textarea value={importText} onChange={(e) => setImportText(e.target.value)}
+                        rows={5} placeholder={"여기에 프롬프트를 붙여넣으세요 (빈 줄 또는 줄바꿈으로 구분)\n예:\npremium grilled ribeye steak, ..., 16:9, no text\n\nmedium-rare wagyu steak, ..., 45-degree angle, no logo"}
+                        className={`${fieldCls} w-full resize-y leading-relaxed font-mono text-[11px]`} />
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] text-neutral-500">{importText.trim() ? `${splitRawPrompts(importText).length}개 프롬프트 감지` : "구분: 빈 줄 · 구분선(---) · 줄바꿈"}</span>
+                        <button onClick={onImportPaste} disabled={importBusy || !importText.trim()}
+                          className="text-xs font-bold py-1.5 px-3 rounded border border-indigo-500/50 bg-indigo-600/20 text-indigo-200 hover:bg-indigo-600/40 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 transition">
+                          <Wand2 className="w-3.5 h-3.5" /> 정제해서 슬롯 채우기
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>
