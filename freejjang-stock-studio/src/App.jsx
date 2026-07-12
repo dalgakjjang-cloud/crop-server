@@ -78,10 +78,10 @@ const MIRI_LIFESTYLE_STYLING = "authentic bright airy Korean home aesthetic: war
 const MIRI_LIFESTYLE_GUARD = "bright and appetizing with soft natural window light, subject tack-sharp, background clean and fully in focus, no background blur, no bokeh, generous low-detail area reserved for Korean text overlay, no dark or moody underexposure, no crowd";
 
 /* 어도비 헬스케어 — 글로벌 스톡 톱셀러 (의료·환자 케어·연구·웰니스) */
-const HEALTHCARE_RE = /의사|의료|병원|간호|간호사|환자|진료|처방|약사|약국|치료|재활|물리치료|건강\s*검진|헬스케어|의학|웰니스|정신건강|상담|심리치료|healthcare|hospital|clinic|doctor|\bnurse\b|patient|medical|medicine|therapy|wellness|mental\s*health|pharmacist|pharmacy/i;
+const HEALTHCARE_RE = /의사|의료|병원|간호|간호사|환자|진료|처방|약사|약국|치료|재활|물리치료|건강\s*검진|헬스케어|의학|웰니스|정신건강|상담|심리치료|돌봄|간병|요양|어르신|노인\s*케어|실버\s*케어|시니어\s*케어|healthcare|hospital|clinic|doctor|\bnurse\b|patient|medical|medicine|therapy|wellness|mental\s*health|pharmacist|pharmacy|caregiv(?:er|ing)|elder\s*care|eldercare|\belderly\b|senior\s*care|nursing\s*home/i;
 /* 한국 명시 주제 감지 — 어도비 글로벌 다양성 규칙을 이때만 억제 */
 const KOREAN_EXPLICIT_RE = /한국|서울|부산|대구|인천|광주|대전|울산|세종|경기|강원|충청|전라|경상|제주|한국인|korean|seoul|busan/i;
-const HEALTHCARE_STYLING = "professional healthcare stock photography for Adobe Stock: authentic diverse medical professionals interacting warmly with a patient, tack-sharp clinical detail, modern hospital or clinic setting with pale blue-white palette, natural but flattering lighting, hopeful reassuring mood — never sterile-cold, never sensationalized";
+const HEALTHCARE_STYLING = "professional healthcare stock photography for Adobe Stock: authentic diverse medical professionals or caregivers interacting warmly with a patient or elder, tack-sharp clinical detail, a modern clinic with pale blue-white palette OR a bright tidy home-care room with warm-neutral palette (matching the scene), the wall behind the subjects plain and bare, natural but flattering lighting, hopeful reassuring mood — never sterile-cold, never sensationalized";
 const HEALTHCARE_GUARD = "clean modern medical setting, honest editorial realism, no fake plastic AI smiles, no branded logos on scrubs or devices, no identifying patient records visible, no unsafe or gory imagery, no crowd";
 
 /* 검증된 판매 공식 — 두뇌(추천·초안)가 주제에 맞을 때 이 구도로 기울이도록 참고 주입 */
