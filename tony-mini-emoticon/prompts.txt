@@ -1,0 +1,82 @@
+# 토니(Tony) 카카오 움직이는 미니 이모티콘 35종 — 키포즈 생성 프롬프트
+# 스타일: 소프트 크레용 라인 + 플랫 파스텔 (와다다형 미니 문법, 줄무늬 단순화 3~4개로 호랑이 정체성 유지)
+# 사용법: midjourney-batch/mj_batch.py 에 바로 투입
+#   python mj_batch.py --prompts ../tony-mini-emoticon/prompts.txt --cookies cookies.txt
+# 캐릭터 시트를 MJ에 업로드했다면 각 줄 끝에 --cref <시트URL> --cw 100 추가 (v7은 --oref).
+# 한글 문구는 프롬프트에 넣지 않음(깨짐) — 후작업 벡터 타이포로 얹기.
+
+# --- A. 얼굴 클로즈업 리액션 (16종) ---
+# 01 넵!
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, big sparkling amber eyes, cream muzzle, rosy cheek blush, energetic salute with one tiny paw at forehead, eager expression, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 02 ㅇㅋ
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, big amber eyes, cream muzzle, rosy cheek blush, playful wink with one tiny thumbs-up paw below chin, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 03 ㅋㅋㅋㅋ
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, rosy cheek blush, laughing so hard with squeezed shut eyes wide open mouth and joy tears flying, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 04 ㄹㅇ
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, big amber eyes, cream muzzle, serious deeply-agreeing face nodding, firm closed mouth, small motion lines above head, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 05 헐
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, shocked frozen face with tiny shrunken trembling pupils and small dropped open mouth, vertical gloom shading on forehead, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 06 엥?
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, big amber eyes, cream muzzle, puzzled face with one raised eyebrow and tilted head, small confused mouth, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 07 흠…
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, skeptical narrowed half-closed eyes, tiny paw on chin thinking, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 08 어쩔~
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, rosy cheek blush, sassy pouting face turned away to the side with closed eyes and puffed huff of air from nose, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 09 킹받네
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, furious trembling face with puffed round red cheeks, popping cross-shaped anger vein on forehead, gritted tiny fangs, shaking motion lines, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 10 이왜진
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, dumbfounded blank stare with tiny dot eyes and flat mouth, three small floating question marks around head, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 11 완전 럭키비키잖아~
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, rosy cheek blush, blissful smile with giant sparkling starry eyes, both tiny paws on cheeks, small stars and four-leaf clovers floating around, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 12 폼 미쳤다
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, amazed admiring face with wide open sparkling eyes and open mouth, two tiny clapping paws below chin, sparkle effects, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 13 중꺾마
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, fierce determined face with small flames burning in amber eyes, tightly clenched mouth, one tiny fist raised, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 14 흑흑
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, crying dramatically with waterfall tears streaming from both eyes, wobbly sad mouth, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 15 두근
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, deep rosy blush, love-struck face with big pink heart-shaped eyes and small happy open mouth, tiny hearts floating, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 16 히히
+cute baby tiger cub face close-up sticker, big round head filling the frame, soft flat orange fur with a few bold simplified black stripes, cream muzzle, rosy cheek blush, shy giggling face with curved happy closed eyes, tiny paw covering mouth, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+
+# --- B. 포즈 컷 (10종) — 흰 셔츠 + 파란 사원증 명시 ---
+# 17 ㄱㄱ
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, wearing white office shirt with blue lanyard ID badge, side view running forward at full speed with round little legs blurred and small dust cloud behind, excited face, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 18 꾸벅
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, wearing white office shirt with blue lanyard ID badge, bowing politely at 90 degrees with paws together, grateful humble expression, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 19 최고최고
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, wearing white office shirt with blue lanyard ID badge, double thumbs up with both paws and huge beaming smile, sparkles around, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 20 사랑해
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, wearing white office shirt with blue lanyard ID badge, making a big heart shape with both arms above head, blushing happy face, small pink hearts popping around, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 21 파이팅!
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, wearing white office shirt with blue lanyard ID badge, jumping up cheerfully with one fist raised high, energetic cheering face, motion lines under feet, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 22 어흥!!
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, wearing white office shirt with blue lanyard ID badge, fierce roaring pose with both paws raised showing tiny pink paw pads and small fangs, trying to look scary but adorable, dramatic red action lines, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 23 열일중
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, wearing white office shirt with blue lanyard ID badge, typing furiously on a tiny laptop with paw motion blur, focused serious face, small papers flying, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 24 커피 수혈
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, wearing white office shirt with blue lanyard ID badge, hugging a giant iced americano cup and sipping from straw, tired half-closed eyes turning sparkly, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 25 월급루팡 중
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, wearing white office shirt with blue lanyard ID badge, sneaking on tiptoe sideways with mischievous grin holding a snack behind back, looking around nervously, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 26 잘자
+cute tiny chibi baby tiger cub sticker, soft flat orange fur with bold simplified black stripes, sleeping curled up peacefully wearing a striped nightcap on a tiny pillow, floating Zzz bubbles, cozy expression, soft crayon-like thick outline, flat pastel colors, kawaii minimal messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+
+# --- C. 오브젝트·심볼 컷 (9종) — 기호처럼 쓰이는 컷 ---
+# 27 !!!
+three bold yellow exclamation marks side by side, each dot at the bottom is a tiny cute orange tiger cub face with black stripes and rosy cheeks, minimal icon-like sticker, soft crayon-like thick outline, flat pastel colors, kawaii messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 28 ?
+one big soft brown question mark with a tiny cute orange tiger cub with black stripes hanging onto its curve looking puzzled, minimal icon-like sticker, soft crayon-like thick outline, flat pastel colors, kawaii messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 29 경고
+tiny cute orange tiger cub with black stripes in white office shirt holding up a big yellow warning sign card with both paws, stern puffed face, minimal icon-like sticker, soft crayon-like thick outline, flat pastel colors, kawaii messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 30 퇴근
+back view of a tiny cute orange tiger cub with black stripes and a small backpack walking away happily, back of round striped head, waving one paw goodbye, minimal icon-like sticker, soft crayon-like thick outline, flat pastel colors, kawaii messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 31 전화줘
+a smartphone with a cute orange tiger cub face with black stripes on the ringing screen waving paw, small vibration lines around phone, green call icon, minimal icon-like sticker, soft crayon-like thick outline, flat pastel colors, kawaii messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 32 추카추카
+tiny cute orange tiger cub face with black stripes wearing a party cone hat surrounded by bursting party poppers and colorful confetti, joyful open-mouth smile, minimal icon-like sticker, soft crayon-like thick outline, flat pastel colors, kawaii messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 33 갓생
+one big shining yellow star with a proud cute orange tiger cub face with black stripes in the center, radiant sparkle rays, accomplished smile, minimal icon-like sticker, soft crayon-like thick outline, flat pastel colors, kawaii messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 34 밥?
+a white rice bowl with a cute orange tiger cub face with black stripes peeking out from inside holding a spoon, steam rising, hungry hopeful eyes, minimal icon-like sticker, soft crayon-like thick outline, flat pastel colors, kawaii messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
+# 35 현타
+cute orange tiger cub face with black stripes with blank white empty eyes, a tiny translucent droplet-shaped ghost soul floating up out of its mouth, slumped gloomy mood with blue shading, minimal icon-like sticker, soft crayon-like thick outline, flat pastel colors, kawaii messenger emoticon, plain white background, no text --niji 6 --ar 1:1 --s 100
