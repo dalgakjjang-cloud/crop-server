@@ -169,12 +169,15 @@ no text --niji 6 --ar 1:1 --s 120
 
 ### 컷별 프롬프트 35종
 
-`prompts.txt`에 **midjourney-batch 즉시 투입 형식**으로 정리:
+`prompts.txt`에 **midjourney-batch 즉시 투입 형식**으로 정리했고, 같은 내용이
+`midjourney-batch/tony35.txt`로 복사되어 있어 **run.bat에서 바로 선택** 가능:
 
-```bash
-cd midjourney-batch
-python mj_batch.py --prompts ../tony-mini-emoticon/prompts.txt --cookies cookies.txt
-```
+1. (윈도우) `midjourney-batch/run.bat` 더블클릭
+2. 파일명 물어보면 `tony35.txt` 입력 — 폴더에 `cookies.txt`가 있어야 함
+3. 35개 프롬프트가 휴먼 페이싱으로 순차 제출됨 (프롬프트당 4장 = 총 140장 후보)
+
+수동 실행은 `python mj_batch.py --prompts tony35.txt --cookies cookies.txt`.
+컷당 4장 중 베스트 1장을 고르고, 모자란 컷만 프롬프트를 살짝 바꿔 재생성.
 
 ---
 
