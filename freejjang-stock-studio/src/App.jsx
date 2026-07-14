@@ -161,15 +161,15 @@ const ADOBE_MAX_KEYWORDS = 35; // Adobe SEO 키워드 상한
 /* 정밀 카메라 구도 프리셋 — 선택 시 하이퍼리얼 카메라 묘사 문장으로 변환되어 프롬프트에 주입 */
 const CAMERA_ANGLES = {
   auto: { label: "자동 (초안 카메라 그대로)", phrase: "" },
-  eye_level: { label: "Eye Level (정면)", phrase: "eye-level straight-on shot, balanced calm perspective, 50mm lens, orderly composition" },
-  low_angle: { label: "Low Angle (올려다보기)", phrase: "dynamic low-angle shot, looking slightly upward, powerful perspective, majestic presence" },
-  high_angle: { label: "High Angle (내려다보기)", phrase: "clean high-angle shot looking down, comprehensive organized top-down view" },
-  top_down: { label: "Top-Down (탑다운/항공뷰)", phrase: "straight-down 90-degree top-down flat lay, bird's-eye aerial view shot directly overhead, neatly arranged composition with balanced negative space, everything evenly in focus" },
-  wide: { label: "Wide (와이드)", phrase: "wide establishing shot, 24mm lens, generous environmental context and abundant negative space" },
-  angle_45: { label: "Angle 45 (사선 45도)", phrase: "45-degree three-quarter angle shot, natural depth and dimensionality" },
-  over_shoulder: { label: "Over Shoulder (어깨 너머)", phrase: "over-the-shoulder shot, natural candid framing looking past the subject" },
-  closeup: { label: "Closeup (클로즈업)", phrase: "close-up shot, tack-sharp focus across the entire key subject and its setting at f/8, deep depth of field, no soft-focus haze" },
-  macro: { label: "Macro (초근접 접사)", phrase: "extreme macro photography with focus-stacked front-to-back sharpness on the whole subject, hyper-detailed crisp texture, clean simple background also in focus" },
+  eye_level: { label: "Eye Level (정면)", phrase: "eye-level shot, 50mm, balanced composition" },
+  low_angle: { label: "Low Angle (올려다보기)", phrase: "low-angle shot, upward, powerful perspective" },
+  high_angle: { label: "High Angle (내려다보기)", phrase: "high-angle looking down, organized view" },
+  top_down: { label: "Top-Down (탑다운/항공뷰)", phrase: "90° top-down flat lay, overhead, balanced negative space, even focus" },
+  wide: { label: "Wide (와이드)", phrase: "wide shot, 24mm, generous negative space" },
+  angle_45: { label: "Angle 45 (사선 45도)", phrase: "45° three-quarter angle, natural depth" },
+  over_shoulder: { label: "Over Shoulder (어깨 너머)", phrase: "over-shoulder, candid framing" },
+  closeup: { label: "Closeup (클로즈업)", phrase: "close-up, f/8, tack-sharp, deep DOF" },
+  macro: { label: "Macro (초근접 접사)", phrase: "extreme macro, focus-stacked sharpness, hyper-detailed texture" },
 };
 
 /* 지능형 분위기 필터 — 실내/사무 주제 감지 시 중립 화이트밸런스(노란끼 배제) 적용 */
@@ -258,10 +258,10 @@ const FOOD_TOPVIEW_RE = /샐러드|밀프랩|밀프렙|도시락|런치박스|�
 const FOOD_EYELEVEL_RE = /음료|커피|라떼|스무디|에이드|레모네이드|주스|국물|찌개|전골|설렁탕|곰탕|육개장|스프|수프|라면|쌀국수|칵테일|와인|맥주|beverage|drink|coffee|latte|cappuccino|smoothie|milkshake|\bade\b|lemonade|juice|\btea\b|soup|broth|stew|ramen|\bpho\b|noodle\s*soup|einspanner|frappe|cocktail|\bwine\b|\bbeer\b/i;
 const FOOD_ANGLE45_RE = /버거|햄버거|샌드위치|파스타|케이크|스테이크|오므라이스|리조또|리조토|팬케이크|와플|크로와상|디저트|타르트|파이|마카롱|토스트|파르페|도넛|꽈배기|브라우니|burger|sandwich|pasta|cake|steak|omurice|risotto|pancake|waffle|croissant|dessert|tart|\bpie\b|macaron|toast|parfait|donut|brownie|hotdog/i;
 function pickFoodAnglePhrase(themeAll) {
-  if (FOOD_TOPVIEW_RE.test(themeAll)) return "shot straight down as a 90-degree top-down flat lay so every component reads at a glance, evenly focused with balanced negative space";
-  if (FOOD_EYELEVEL_RE.test(themeAll)) return "shot at eye level straight-on so the height of the glass or bowl and the layers, steam or broth depth are fully visible";
-  if (FOOD_ANGLE45_RE.test(themeAll)) return "shot at a 45-degree three-quarter angle so both the height and layers and the top surface are visible with natural depth";
-  return "shot at a natural 45-degree three-quarter angle for versatile depth and dimensionality";
+  if (FOOD_TOPVIEW_RE.test(themeAll)) return "90° top-down flat lay, every component visible, even focus";
+  if (FOOD_EYELEVEL_RE.test(themeAll)) return "eye-level, height and layers fully visible";
+  if (FOOD_ANGLE45_RE.test(themeAll)) return "45° angle, height and top surface visible";
+  return "45° angle, natural depth";
 }
 /* 음식 단독 주제 풀프레임 전달 규칙 — 어도비는 크롭을 구매자 몫으로 두므로, 전달 이미지에는 음식과 모든
    접시·그릇·트레이·뚜껑·포장 용기가 가장자리 짤림 0으로 온전히 들어와야 한다.
@@ -346,11 +346,11 @@ const REEDO_TONE = {
 /* concept 톤 주의: 기존 '네온 SF 렌더'는 어도비가 노이즈·소프트포커스·아티팩트로 대량 거절
    → 밝은 클린테크 컨셉(잘 팔리는 B2B 미래 이미지)으로 구조 변경 */
 const TONE_PHRASE = {
-  realism: "believable real-world commercial photo, natural lighting, realistic materials and true color — no sci-fi, no neon, no CGI perfection",
-  bright: "bright airy minimal look, soft daylight, clean neutral palette",
-  lifestyle: "warm lifestyle photo, natural golden light, cozy real space",
-  cinematic: "cinematic moody lighting, rich atmosphere, still a believable real scene",
-  concept: "clean bright futuristic concept look, high-tech atmosphere in a bright well-lit environment, subtle cool accent tones, believable realistic materials",
+  realism: "believable commercial photo, natural light, realistic materials",
+  bright: "bright airy minimal, soft daylight, neutral palette",
+  lifestyle: "warm lifestyle photo, golden light, cozy real space",
+  cinematic: "cinematic moody lighting, rich atmosphere, believable scene",
+  concept: "bright futuristic concept, clean high-tech atmosphere, cool accent tones",
 };
 
 /* 두뇌(에이전트) 라벨 · 기본 모델
@@ -637,47 +637,42 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
   const isFoodAny = (isFood || isMealprep) && !isPIW && !isJpkrCafe && !isTight;
   /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
   const comp = mode === "wallpaper"
-    ? `40-60% clean copy space opposite the subject (${slot.copy_space || "clean margin"})`
+    ? `40-60% copy space (${slot.copy_space || "clean margin"})`
     : isEmotional
-      ? `wide emotional background for text overlay: subject off to one side, 45-60% low-detail copy space with a calm darker zone where Korean text will be placed (${slot.copy_space || "open sky or soft area"})`
+      ? `subject to one side, 45-60% copy space for text (${slot.copy_space || "sky or soft area"})`
       : isPIW
-        ? "product or arrangement hero on seamless pure white background, filling 60-80% of frame, slightly elevated 30-degree angle or straight-on eye level, centered composition with pure white negative space"
+        ? "product on white, 60-80% frame fill, centered"
         : isJpkrCafe
-          ? "cute cafe comfort food as hero filling 70-85% of frame on a gingham check fabric background (pink or blue gingham), pastel ceramic plate, overhead or 45-degree angle, warm cozy kawaii cafe aesthetic, food sharply focused with fabric and props as soft context"
+          ? "food hero 70-85%, gingham fabric bg, overhead or 45°"
           : isMealprep
-          ? "neatly organized divided meal-prep containers as hero on a bright white counter, shot overhead or at a 45-degree angle, tidy parallel arrangement, everything crisply in focus, airy white-dominant frame"
+          ? "containers on white counter, overhead or 45°, tidy rows"
           : isFood
-            ? (isTight ? "extreme close-up macro food shot, the dish fills almost the entire frame, tight appetizing crop, deep depth of field with the food and setting tack-sharp"
+            ? (isTight ? "macro food close-up, dish fills frame, tack-sharp"
               : isFoodTopview
-                ? ["appetizing top-down food photography, the whole dish and its container fully composed within the frame with clean margin on every side", foodAuto ? pickFoodAnglePhrase(themeAll) : "", "everything evenly sharp and fully in focus"].filter(Boolean).join(", ")
-                : ["appetizing food photography, the dish as hero filling most of the frame", foodAuto ? pickFoodAnglePhrase(themeAll) : "", "natural appealing crop, deep depth of field with the food and background fully in focus"].filter(Boolean).join(", "))
+                ? ["top-down food, whole dish in frame with margin", foodAuto ? pickFoodAnglePhrase(themeAll) : "", "even focus"].filter(Boolean).join(", ")
+                : ["food hero filling frame", foodAuto ? pickFoodAnglePhrase(themeAll) : "", "deep DOF"].filter(Boolean).join(", "))
           : isMiriLifestyle
-            ? `subject placed to one side of the frame, 45-55% low-detail clean area on the opposite side reserved for Korean text overlay (${slot.copy_space || "soft wall or window light area"}), background clean and in focus, natural relaxed pose`
+            ? `subject to one side, 45-55% copy space (${slot.copy_space || "wall or window area"}), bg in focus`
             : isTight
-              ? "tight detail shot, subject sharply focused"
-              : `subject fills 50-70% of frame with ~30% clean copy space (${slot.copy_space || "for text overlay"}), rule-of-thirds, subject fully in frame`;
+              ? "tight detail, subject sharp"
+              : `subject 50-70% of frame, ~30% copy space (${slot.copy_space || "for text"}), rule-of-thirds`;
   const camera = [anglePick, slot.camera].filter(Boolean).join(", ")
-    || (isIllust ? "clean vector edges" : "natural depth of field");
-  /* 감성 모드는 골든아워·빛내림 · 그 외 실내/사무 주제(밤 아님)는 중립 화이트밸런스 */
+    || (isIllust ? "clean vector edges" : "natural depth");
   const themeText = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""}`;
   const atmosphere = isEmotional
-    ? EMOTIONAL_ATMOS
+    ? "golden-hour glow, light rays through clouds, serene mood"
     : !isIllust && INDOOR_RE.test(themeText) && !NIGHT_RE.test(themeText)
       ? "neutral daylight white balance, no yellow cast"
       : "";
-  /* 밝기 강제: 감성/무디풍경/시네마틱 톤/밤·일몰 명시 아닐 때만 적용 (상업 슬롯 기본 판매 규칙) */
   const moodyOk = isEmotional || tone === "cinematic" || MOODY_ALLOWED_RE.test(themeText) || NIGHT_RE.test(themeText);
-  const brightLine = !isIllust && !moodyOk ? BRIGHT_ENFORCEMENT : "";
+  const brightLine = !isIllust && !moodyOk ? "bright high-key, well-exposed" : "";
   const toneLine = isIllust ? "" : TONE_PHRASE[tone] || TONE_PHRASE.realism;
   const peopleLine = PEOPLE_FINAL[people] || "";
-  /* 손 포함/미포함 사용자 선택 — auto면 초안(두뇌)이 정한 대로 둔다 */
   const handsLine = HANDS_FINAL[hands] || "";
-  /* 한국 주제/지역이면 인물을 반드시 한국인으로 캐스팅 (인물 없음 모드는 제외) */
   const koreanCastLine = !isIllust && isKoreanExplicit && people !== "none"
-    ? "all people shown are authentically Korean with natural East Asian Korean facial features, hair and styling (NOT Western or Caucasian, NOT Southeast Asian)"
+    ? "all people authentically Korean with Korean features and styling (NOT Western or Caucasian, NOT Southeast Asian)"
     : "";
   const propsLine = slot.props ? `props: ${slot.props}` : "";
-  /* 재생성 피드백 루프: 직전 거절 사유를 교정 지시로 주입 → 같은 실수 반복 차단 */
   const fixLine = slot.qcNote
     ? `FIX (was rejected): ${slot.qcNote}`
     : slot.regenCount > 0
@@ -685,21 +680,14 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
       : "";
   const quality = isIllust
     ? "professional stock illustration"
-    : `professional stock photo, tack-sharp focus, ${NO_BLUR_LINE}, even exposure, clean and noise-free, natural texture, no plastic AI look`;
-  /* 신앙·워십 장르면 backlit 금지 대신 골든아워 역광·십자가 실루엣을 허용 (판매 포인트) */
+    : "stock photo, tack-sharp, deep DOF, even exposure, natural texture";
   const isFaith = !isIllust && FAITH_RE.test(themeText);
-  /* 순수 상업(디지털 업무 포함) — 감성/신앙/음식/PIW/미캔라이프/헬스케어/배경화면이 아닌 슬롯.
-     이때 배경을 깨끗·미니멀·선명하게 강제해서 미드저니의 과한 배경 아웃포커싱을 차단 */
   const isCleanCommercial = !isIllust && mode !== "wallpaper" && !isEmotional && !isFaith && !isFood && !isPIW && !isGolf && !isMiriLifestyle && !isHealthcare;
-  /* 승인 표본 배경 공식 적용 대상 — 라이프·음식·밀프랩·헬스케어 실내 인물/소품 장르
-     (PIW=흰배경 자체, 깅엄카페=패브릭 공식, 골프=야외, 순수상업=CLEAN_STUDIO_BG 중복 방지) */
   const isCleanBackdrop = !isIllust && mode !== "wallpaper" && !isEmotional && !isFaith && !isPIW && !isJpkrCafe && !isGolf && !isCleanCommercial
     && (isFood || isMealprep || isMiriLifestyle || isHealthcare);
   return [
     slot.subject,
     fixLine,
-    NO_TEXT_LOCK,
-    propsLine,
     comp,
     `camera: ${camera}`,
     `lighting: ${slot.lighting || "soft natural light"}`,
@@ -710,38 +698,22 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
     handsLine,
     koreanCastLine,
     `palette: ${slot.palette || "bright commercial tones"}`,
-    !isIllust ? "objects rest naturally on real surfaces, nothing floating" : "",
-    /* 흰배경 제품격리 시그니처 — 심리스 화이트·균일광·탁샤프·카탈로그 미학 */
-    isPIW ? PIW_STYLING : "",
-    /* 일본·한국 카페 컴포트 시그니처 — 깅엄+파스텔 카와이 스타일링 (어도비 승인 검증) */
-    isJpkrCafe ? REEDO_FOOD_PHRASE.jpkr_cafe : "",
-    /* 밀프랩·도시락 시그니처 — 칸막이 분리·화이트 하이키 (음식 접사 스타일링 대신) */
-    isMealprep && !isJpkrCafe ? REEDO_FOOD_PHRASE.mealprep : "",
-    /* 음식이면 밝은 초근접 실사 인스타 스타일링 + 상업 음식 조명 세트업(뒤쪽 45도 주광·반사판·배경 분리)을 직접 주입.
-       탑뷰면 접사·얕은심도 표현을 뺀 변형 사용(포장 용기 전체 노출·전 영역 초점 원칙과 충돌 방지) */
-    isFood && !isMealprep && !isJpkrCafe ? `${isFoodTopview ? FOOD_STYLING_TOPVIEW : FOOD_STYLING}. ${FOOD_LIGHT}` : "",
-    /* 음식 단독 — 전 앵글 포장 용기 짤림 0. 탑뷰는 추가로 전 영역 딥DOF(블러 불가) */
-    isFoodTopview ? FOOD_TOPVIEW_FULLFRAME : isFoodAny ? FOOD_FULLFRAME : "",
-    /* 골프 시그니처 — 잔디·하늘 딥DOF 선명, 밝은 자연광, 컨트리클럽 미학 */
-    isGolf ? GOLF_STYLING : "",
-    /* 미캔 라이프스타일 시그니처 — 부동산·가족·솔로 데일리 등 밝은 홈 미학 */
-    isMiriLifestyle ? MIRI_LIFESTYLE_STYLING : "",
-    /* 어도비 헬스케어 시그니처 — 글로벌 다양성(한국 명시면 한국인 캐스팅) */
-    isHealthcare ? (isKoreanExplicit ? HEALTHCARE_STYLING.replace("authentic diverse medical professionals", "authentic Korean medical professionals") : HEALTHCARE_STYLING) : "",
-    /* 디지털 업무 시그니처 — 기기·화면·배경 모두 선명(과한 아웃포커싱 차단) */
-    isWorkTech ? WORK_TECH_STYLING : "",
-    /* 테크 하드웨어 시그니처 — 밝은 제품컷/클린룸 강제 (다크네온 SF = 어도비 노이즈·소프트포커스 거절) */
-    isTechProduct ? TECH_PRODUCT_STYLING : "",
-    /* 순수 상업 배경 강제 — 창밖 거리·보케 조명 없이 미니멀·고급·선명한 배경 */
-    isCleanCommercial ? CLEAN_STUDIO_BG : "",
-    /* 승인 표본 배경 공식 — 피사체 뒤 빈 무지 벽 + 가장자리 소품 1-2개 + 톤 분리 (라이프·음식·헬스케어) */
-    isCleanBackdrop ? CLEAN_BACKDROP : "",
+    propsLine,
+    isPIW ? "seamless white, even wrap-around light, tack-sharp, catalog aesthetic" : "",
+    isJpkrCafe ? "gingham check fabric, pastel ceramics, warm kawaii cafe aesthetic" : "",
+    isMealprep && !isJpkrCafe ? "divided containers, bright white-dominant, high-key daylight" : "",
+    isFood && !isMealprep && !isJpkrCafe ? `bright airy food photo, ${isFoodTopview ? "even focus corner-to-corner" : "back-side key light with bounce, appetizing texture"}` : "",
+    isFoodTopview ? "whole dish and containers in frame, tack-sharp corner-to-corner, uncropped" : isFoodAny ? "whole dish and containers fully in frame with margin, uncropped" : "",
+    isGolf ? "vivid green turf and blue sky, deep DOF f/8-f/11, bright sunlight, country-club aesthetic" : "",
+    isMiriLifestyle ? "bright Korean home, warm neutrals, window daylight, plain bare wall, genuine smiles" : "",
+    isHealthcare ? (isKoreanExplicit ? "Korean healthcare, warm caregiver-patient interaction, modern clinic, hopeful mood" : "diverse healthcare, warm caregiver-patient interaction, modern clinic, hopeful mood") : "",
+    isWorkTech ? "device and screen tack-sharp, deep DOF, bright commercial" : "",
+    isTechProduct ? "premium product photo, bright studio, even lighting, realistic materials" : "",
+    isCleanCommercial ? "clean minimal backdrop, sharp front-to-back" : "",
+    isCleanBackdrop ? "plain bare wall behind subject, accent at edge, tone-and-light separation" : "",
     quality,
-    /* 분할 컷 절대 금지 — 전 장르 공통 (비교샷 명시 요청이 아니면 한 이미지는 한 장면) */
-    SINGLE_FRAME_GUARD,
-    GUARD,
-    /* 배경화면=제외 · PIW=흰배경격리 · 감성=텍스트여백 · 신앙=골든아워 · 음식=밝은근접 · 골프=딥DOF · 미캔라이프=밝은홈 · 헬스케어=클리닉리얼 · 그 외=상업 배제 */
-    mode === "wallpaper" ? "" : isPIW ? PIW_GUARD : isEmotional ? EMOTIONAL_GUARD : isFaith ? FAITH_GUARD : isFood ? FOOD_GUARD : isGolf ? GOLF_GUARD : isMiriLifestyle ? MIRI_LIFESTYLE_GUARD : isHealthcare ? HEALTHCARE_GUARD : COMMERCIAL_GUARD,
+    isIllust ? "" : "plain unlettered unbranded surfaces, one continuous scene",
+    mode === "wallpaper" ? "" : isPIW ? "white bg only, even light" : isEmotional ? "calm area for text overlay" : isFaith ? "reverent, golden light welcome" : isFood ? "bright appetizing, bg in focus" : isGolf ? "deep DOF to sky, bright" : isMiriLifestyle ? "bg in focus, text overlay area" : isHealthcare ? "clean setting, editorial realism" : "clean bg, even light",
   ].filter(Boolean).join(". ");
 }
 
@@ -869,7 +841,7 @@ function buildMidjourneyPrompt(slot, { aspect = "16:9", tone = "realism", people
     slot.subject,
     slot.props ? `featuring ${slot.props}` : "",
     anglePhrase,
-    isFoodMJ ? FOOD_LIGHT : slot.lighting,
+    isFoodMJ ? "back-side key light at 45°, front bounce card, raking side light, bg a touch deeper" : slot.lighting,
     slot.palette,
     foodTopviewMJ
       ? "the whole dish and all containers fully inside the frame with clean margin on every side, everything evenly sharp with deep depth of field"
