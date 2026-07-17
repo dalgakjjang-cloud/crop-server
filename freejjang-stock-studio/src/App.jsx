@@ -177,6 +177,22 @@ const INDOOR_RE = /office|desk|workspace|indoor|meeting|remote\s*work|home\s*off
 const NIGHT_RE = /night|evening|dusk|midnight|sunset|밤|저녁|야간|새벽|노을|야경|일몰/i;
 /* 어두운·안개 라이팅이 판매 포인트인 니치 (풍경·여행·자연·홀리데이 야경). 이 외 상업 슬롯은 밝게 강제 */
 const MOODY_ALLOWED_RE = /풍경|여행|자연|산|바다|호수|숲|사막|폭포|일출|일몰|노을|안개|눈보라|은하수|밤하늘|야경|크리스마스\s*이브|landscape|travel|scenery|mountain|ocean|forest|desert|waterfall|sunrise|sunset|fog|mist|aurora|milkyway|night\s*sky/i;
+
+/* ── 플랫폼 라우팅: 어도비(기술심사 엄격) vs 미리캔버스(관대 · 실측 ~98% 승인) ──
+   핵심: 어도비 거절 ≠ 미캔 거절. 다크·글로우·야간·컨셉 렌더는 어도비 3대 기술거절(노이즈·소프트포커스·아티팩트)
+   대상이지만, 미캔에서는 배경·배너 소재로 잘 팔린다. 억지로 어도비에 밀어넣으면 계정 승인율만 깎이므로
+   제출 팩에서 자동 분리한다: 밝은·선명한 상업컷 → 어도비+미캔 / 다크·글로우·야간·컨셉 → 미캔 전용. */
+/* 어도비 3대 기술거절 유발 마커 — (1)어두운곳 과도한 네온·발광 (2)소프트/크리미 블러·보케 (3)다크·야간·컨셉.
+   프롬프트/메타에 이 중 하나라도 있으면 어도비 부적격(미캔 전용)으로 라우팅. */
+const DARK_GLOW_RE = /\b(dark|darkness|night|nocturnal|moon\s*lit|moonlight|midnight|dusk|neon|glow|glowing|bioluminescent|luminescent|luminous|backlit|backlight|silhouette|candle\s*lit|candlelight|moody|deep navy|deep dark|soft\s*focus|soft\s*blur|creamy|bokeh|dreamy|hazy|shallow\s*depth|blurred|blurry)\b|발광|글로우|야간|어두운|다크|네온|달빛|실루엣|역광|촛불|소프트\s*블러|크리미|보케|몽환|흐릿/i;
+/* 슬롯 하나가 어도비 기술심사에 적격인지 판정 (false = 미캔 전용으로 라우팅) */
+function isAdobeEligible(slot, mode, tone) {
+  if (mode === "wallpaper" || mode === "emotional") return false; // 여백·골든아워 배경 = 미캔 소재
+  if (tone === "concept" || tone === "cinematic") return false;   // 컨셉·시네마틱 렌더 = 어도비 대량거절 패턴
+  const txt = `${slot.finalPrompt || ""} ${slot.title || ""} ${slot.subject || ""} ${slot.keywords || ""}`;
+  if (DARK_GLOW_RE.test(txt)) return false;                        // 다크·글로우·야간 마커 = 소프트포커스·노이즈 판정 위험
+  return true;
+}
 /* 밝기 강제 문구 — 상업 슬롯에 강하게 주입해 어두운 언더익스포저·안개 우연 발생 차단 */
 const BRIGHT_ENFORCEMENT = "brightly lit high-key commercial photography with plenty of ambient light, cheerful daytime feel, clean well-exposed image (never dim, never underexposed, never foggy or misty unless the topic is explicitly landscape/travel/nature)";
 
@@ -1915,15 +1931,22 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     }
     const ok = src.filter((s) => s.status === "success" && s.dataUrl);
     if (ok.length === 0) { setNotice("성공한 이미지가 없습니다."); return; }
+    /* 플랫폼 라우팅: 어도비 적격(밝은 상업컷)만 adobe/·CSV로, 다크·글로우·야간·컨셉은 미캔 전용.
+       미캔은 전부(ok) 담는다 — 어도비 거절 ≠ 미캔 거절(실측 ~98% 승인), 억지 제출로 승인율 깎지 않기 위함. */
+    const adobeOk = ok.filter((s) => isAdobeEligible(s, mode, refTone));
+    const miriOnly = ok.filter((s) => !isAdobeEligible(s, mode, refTone));
     const base = cleanName(topic, 20) || "freejjang";
-    addLog(`[제출 팩] ZIP 생성 중 — 이미지 ${ok.length}장…`);
+    addLog(`[제출 팩] ZIP 생성 중 — 총 ${ok.length}장 · 어도비 적격 ${adobeOk.length} · 미캔 전용 ${miriOnly.length}`);
+    if (miriOnly.length) addLog(`[라우팅] 다크·글로우·야간·컨셉 ${miriOnly.length}장은 어도비 CSV에서 제외 → 미캔 전용(승인율 보호). 슬롯: ${miriOnly.map((s) => s.index).join(", ")}`);
     const zip = new JSZip();
-    /* 이미지: adobe/ = 4MP+ 자동 업스케일 JPEG (CSV 파일명과 일치 → 바로 업로드), miri/ = 원본 PNG */
-    addLog(`[제출 팩] 어도비 규격(4MP+) 자동 업스케일 중…`);
+    /* 이미지: adobe/ = 어도비 적격만 4MP+ 자동 업스케일 JPEG (CSV 파일명과 일치), miri/ = 전량 원본 PNG */
+    addLog(`[제출 팩] 어도비 적격 ${adobeOk.length}장 규격(4MP+) 업스케일 중…`);
     for (let i = 0; i < ok.length; i++) {
       const s = ok[i];
       const name = assetBaseName(s);
       setProg({ done: i, total: ok.length, stage: `슬롯 ${s.index} 업스케일·압축` });
+      zip.file(`images/miri/${name}_miri.png`, dataUrlToU8(s.dataUrl)); // 미캔: 전량
+      if (!isAdobeEligible(s, mode, refTone)) continue;                 // 어도비 부적격은 adobe/에 넣지 않음
       try {
         const up = await upscaleForAdobe(s.dataUrl);
         zip.file(`images/adobe/${name}_adobe.jpg`, dataUrlToU8(up.jpeg));
@@ -1935,25 +1958,33 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
         zip.file(`images/adobe/${name}_adobe.png`, dataUrlToU8(s.dataUrl));
         addLog(`[업스케일 실패 ${s.index}] 원본 그대로 동봉 — ${e.message}`);
       }
-      zip.file(`images/miri/${name}_miri.png`, dataUrlToU8(s.dataUrl));
     }
     setProg(null);
-    /* Adobe CSV */
+    /* Adobe CSV — 어도비 적격 슬롯만 (부적격을 넣으면 파일명↔이미지 불일치 + 승인율 하락) */
     const esc = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
     const header = ["Filename", "Title", "Keywords", "Category", "Releases", "is_ai_generated"];
-    const rows = ok.map((s) =>
+    const rows = adobeOk.map((s) =>
       [`${s.index}-${cleanName(topic, 15)}-${s.slug}_adobe.jpg`, s.title, normKeywords(s.keywords, ADOBE_MAX_KEYWORDS), s.category, "", "Yes"].map(esc).join(","));
     zip.file(`${base}-adobe-metadata.csv`, "﻿" + [header.map(esc).join(","), ...rows].join("\r\n"));
-    /* MiriCanvas XLSX — 미캔 전용 팩과 동일 소스(buildMiriXlsx)로 생성해 팩 간 어긋남 방지 */
+    /* MiriCanvas XLSX — 전량(ok). 미캔 전용 팩과 동일 소스(buildMiriXlsx)로 생성해 팩 간 어긋남 방지 */
     const { buf } = buildMiriXlsx(ok);
     zip.file(`${base}-miricanvas.xlsx`, buf);
+    /* 라우팅 요약 — 어느 컷이 어디로 갔는지 (제출 워크플로 추적용) */
+    const routing =
+      `플랫폼 라우팅 요약 (어도비 거절 ≠ 미캔 거절)\n` +
+      `총 ${ok.length}장 · 어도비 적격 ${adobeOk.length} · 미캔 전용 ${miriOnly.length}\n\n` +
+      `[어도비 + 미캔 제출] (밝은·선명 상업컷)\n` +
+      (adobeOk.map((s) => `  #${s.index} ${s.title || s.slug}`).join("\n") || "  (없음)") +
+      `\n\n[미캔 전용] (다크·글로우·야간·컨셉 — 어도비 기술거절 회피)\n` +
+      (miriOnly.map((s) => `  #${s.index} ${s.title || s.slug}`).join("\n") || "  (없음)");
+    zip.file(`${base}-routing.txt`, routing);
     /* 프롬프트 전체 백업도 동봉 */
     zip.file(`${base}-prompts-full.txt`, buildPromptsFullText(ok));
     /* ZIP 저장 (선택 폴더 or 기본 다운로드) */
     const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 6 } });
     await saveBlob(blob, `${base}-submit-pack.zip`);
-    addLog(`[제출 팩] ZIP 저장 완료 — 이미지 ${ok.length}장 + Adobe CSV + 미캔 XLSX + 프롬프트 TXT (요청 ${count}장 대비 ${ok.length === count ? "정확 일치 ✓" : "불일치 ⚠"})`);
-    setNotice(`제출 팩 ZIP 저장 완료: 이미지 ${ok.length}장 · Adobe CSV · 미캔 XLSX · 프롬프트 백업${saveDir ? ` → "${saveDir.name}" 폴더` : ""}${ok.length !== count ? ` — 요청 ${count}장과 다릅니다. 미완료 슬롯을 확인하세요.` : ""} ✅ adobe 폴더의 JPG는 4MP+ 자동 업스케일 완료 — CSV와 파일명이 일치해 바로 업로드 가능합니다. 제출 전 100% 확대로 아티팩트만 한번 훑어보세요.`);
+    addLog(`[제출 팩] ZIP 저장 완료 — 어도비 ${adobeOk.length}장(CSV·adobe/) + 미캔 ${ok.length}장(XLSX·miri/) + 라우팅·프롬프트 TXT`);
+    setNotice(`제출 팩 ZIP 저장 완료: 어도비 적격 ${adobeOk.length}장(CSV+adobe/) · 미캔 ${ok.length}장(XLSX+miri/)${miriOnly.length ? ` · 다크·글로우·야간·컨셉 ${miriOnly.length}장은 어도비 제외→미캔 전용(승인율 보호)` : ""}${saveDir ? ` → "${saveDir.name}" 폴더` : ""}. adobe/ JPG는 4MP+ 업스케일 완료·CSV 파일명 일치. 라우팅은 ${base}-routing.txt 참고. ✅`);
   };
 
   const updateSlot = (index, field, value) =>
