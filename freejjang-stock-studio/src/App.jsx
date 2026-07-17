@@ -179,18 +179,20 @@ const NIGHT_RE = /night|evening|dusk|midnight|sunset|밤|저녁|야간|새벽|�
 const MOODY_ALLOWED_RE = /풍경|여행|자연|산|바다|호수|숲|사막|폭포|일출|일몰|노을|안개|눈보라|은하수|밤하늘|야경|크리스마스\s*이브|landscape|travel|scenery|mountain|ocean|forest|desert|waterfall|sunrise|sunset|fog|mist|aurora|milkyway|night\s*sky/i;
 
 /* ── 플랫폼 라우팅: 어도비(기술심사 엄격) vs 미리캔버스(관대 · 실측 ~98% 승인) ──
-   핵심: 어도비 거절 ≠ 미캔 거절. 다크·글로우·야간·컨셉 렌더는 어도비 3대 기술거절(노이즈·소프트포커스·아티팩트)
-   대상이지만, 미캔에서는 배경·배너 소재로 잘 팔린다. 억지로 어도비에 밀어넣으면 계정 승인율만 깎이므로
-   제출 팩에서 자동 분리한다: 밝은·선명한 상업컷 → 어도비+미캔 / 다크·글로우·야간·컨셉 → 미캔 전용. */
-/* 어도비 3대 기술거절 유발 마커 — (1)어두운곳 과도한 네온·발광 (2)소프트/크리미 블러·보케 (3)다크·야간·컨셉.
-   프롬프트/메타에 이 중 하나라도 있으면 어도비 부적격(미캔 전용)으로 라우팅. */
+   정확한 이유: 어도비는 "어두워서" 거절하는 게 아니라, 어두운·글로우·블러 컷에서 실제 거절 사유
+   (노이즈·소프트포커스·노출·아티팩트) 발생률이 높아 통과율이 낮은 것이다. 그래서 이 유형은 양산
+   파이프라인의 안전한 기본값으로 미캔 전용 라우팅해 계정 승인율을 보호한다.
+   ※ 진짜 선명·저노이즈로 확인된 다크 풍경컷은 어도비 승인 가능 → 필요시 수동 승격.
+   미캔은 이 유형도 배경·배너로 잘 팔리므로 전량 수집한다. */
+/* 어도비 결함 발생률이 높은 유형 마커 — (1)어두운곳 과도한 네온·발광 (2)소프트/크리미 블러·보케 (3)다크·야간·컨셉. */
 const DARK_GLOW_RE = /\b(dark|darkness|night|nocturnal|moon\s*lit|moonlight|midnight|dusk|neon|glow|glowing|bioluminescent|luminescent|luminous|backlit|backlight|silhouette|candle\s*lit|candlelight|moody|deep navy|deep dark|soft\s*focus|soft\s*blur|creamy|bokeh|dreamy|hazy|shallow\s*depth|blurred|blurry)\b|발광|글로우|야간|어두운|다크|네온|달빛|실루엣|역광|촛불|소프트\s*블러|크리미|보케|몽환|흐릿/i;
-/* 슬롯 하나가 어도비 기술심사에 적격인지 판정 (false = 미캔 전용으로 라우팅) */
+/* 슬롯이 어도비 통과율이 높은 유형인지 판정 (false = 통과율 낮음 → 미캔 전용 기본 라우팅).
+   다크 자체가 실격은 아니며, 결함 발생률이 높은 유형을 자동 제출에서 걸러 승인율을 보호하는 리스크 기반 기본값. */
 function isAdobeEligible(slot, mode, tone) {
   if (mode === "wallpaper" || mode === "emotional") return false; // 여백·골든아워 배경 = 미캔 소재
-  if (tone === "concept" || tone === "cinematic") return false;   // 컨셉·시네마틱 렌더 = 어도비 대량거절 패턴
+  if (tone === "concept" || tone === "cinematic") return false;   // 컨셉·시네마틱 렌더 = 어도비 결함 발생률 높음
   const txt = `${slot.finalPrompt || ""} ${slot.title || ""} ${slot.subject || ""} ${slot.keywords || ""}`;
-  if (DARK_GLOW_RE.test(txt)) return false;                        // 다크·글로우·야간 마커 = 소프트포커스·노이즈 판정 위험
+  if (DARK_GLOW_RE.test(txt)) return false;                        // 다크·글로우·블러 마커 = 노이즈·소프트포커스 발생률↑
   return true;
 }
 /* 밝기 강제 문구 — 상업 슬롯에 강하게 주입해 어두운 언더익스포저·안개 우연 발생 차단 */
