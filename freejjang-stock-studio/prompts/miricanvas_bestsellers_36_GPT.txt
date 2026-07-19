@@ -1,0 +1,143 @@
+# 미리캔버스 전용 베스트셀러 36컷 (GPT용, Compact v2) — 검증된 판매 카테고리 v2
+# 앱 "외부 프롬프트 TXT 불러오기"로 임포트 / mode: commercial (밝은·선명) 권장
+# 미캔 시그니처: 밝은 하이키 + 웜뉴트럴(크림·베이지·우드) + 한국인 자연 미소 + 창가 채광
+#   + 프레임 끝 화분 하나 + 배경까지 선명 + 한글 텍스트 여백 45~55%
+# ※ v1 대비 변경: 건강식 5컷 → 여름과일 4 + 가을과일 4 + 건강식 3 = 11컷으로 확장
+#   + 2026 프리미엄 조각과일 패키지 트렌드 반영 (백화점·편의점·카페 조각수박 등)
+# ※ 어도비 아님 — 다양성·릴리스·다크회피 규칙 무시, 한국 캐스팅·웜톤·여백에 올인
+
+# ══════════════════════════════════════════
+# 🏢 부동산 (미캔 최고 수요 · 어도비엔 희소)
+# ══════════════════════════════════════════
+
+--- 01 아파트 단지 외관 파란하늘 ---
+a modern Korean apartment complex exterior with clean high-rise buildings and landscaped green garden under a bright blue sky, camera: eye-level wide, lighting: bright clear midday daylight, palette: fresh blue sky green trees and warm concrete, generous copy space in the sky, tack-sharp front-to-back, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, clean real-estate promotional look
+
+--- 02 밝은 거실 소파 부부 ---
+a Korean couple in their thirties relaxing together on a sofa in a bright modern living room, natural warm smiles, soft window daylight, camera: eye-level, palette: warm neutral cream beige and soft wood with a green plant at the edge, subject to one side with clean text-overlay area, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, cozy home lifestyle
+
+--- 03 모델하우스 거실 인테리어 ---
+a bright clean model-house living room interior with a minimal sofa low table and a gentle plant by the window, no people, camera: eye-level wide, lighting: soft bright window daylight, palette: warm neutral cream beige and light wood, generous clean copy space, tack-sharp front-to-back, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, interior catalog look
+
+--- 04 신혼부부 새집 이사 박스 ---
+a young Korean couple unpacking moving boxes in a bright empty new apartment, genuine happy expressions, soft daylight, camera: eye-level, palette: warm neutral with cardboard boxes and white walls, clean copy space on one side, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, new-home lifestyle
+
+--- 05 새집 열쇠 건네받는 손 ---
+close-up of hands handing over a set of house keys in a bright modern home, warm natural light, camera: 45° close, palette: warm neutral beige and soft wood, clean negative space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, real-estate contract concept
+
+--- 06 밝은 주방 다이닝 인테리어 ---
+a bright modern Korean kitchen and dining area with clean counters wooden table and a small plant, no people, camera: eye-level wide, lighting: soft bright daylight, palette: warm white light wood and sage green, generous copy space, tack-sharp front-to-back, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, interior catalog look
+
+--- 07 아파트 발코니 채광 화분 ---
+a cozy bright apartment balcony with potted plants a small chair and sheer curtains glowing in soft morning light, no people, camera: eye-level, lighting: soft warm morning daylight, palette: warm cream green and light wood, clean copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, calm home lifestyle
+
+--- 08 가족 새 아파트 앞 ---
+a happy young Korean family of three standing and smiling in front of a bright modern apartment building, natural genuine expressions, camera: eye-level, lighting: bright clear daylight, palette: fresh blue sky warm neutrals and green, copy space in the sky, tack-sharp front-to-back, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, new-home family lifestyle
+
+# ══════════════════════════════════════════
+# 👨‍👩‍👧 가족 라이프스타일 (미캔 코어)
+# ══════════════════════════════════════════
+
+--- 09 공원 잔디밭 가족 나들이 ---
+a Korean family enjoying a picnic on bright green grass in a sunny park, genuine laughing interaction, camera: eye-level, lighting: bright natural daylight, palette: fresh green warm skin tones and soft pastel picnic items, generous copy space in grass and sky, tack-sharp front-to-back, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, cheerful family lifestyle
+
+--- 10 아이 민들레 부는 잔디밭 ---
+a cute Korean child blowing a dandelion in a bright green meadow, joyful natural expression, camera: eye-level close, lighting: soft warm backlight, palette: fresh green and warm daylight, generous copy space, tack-sharp on the child with clean background, deep DOF, plain unlettered unbranded surfaces, one continuous scene, tender childhood moment
+
+--- 11 거실 보드게임 3대 가족 ---
+three generations of a Korean family laughing around a low living-room table playing a board game, genuine warm interaction, soft window daylight, camera: eye-level, palette: warm neutral wood cream with a plant, clean text-overlay area to one side, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, family home lifestyle
+
+--- 12 아빠 아이 목말 공원 ---
+a young Korean father carrying his laughing child on his shoulders in a sunny green park, genuine joyful expressions, camera: eye-level, lighting: bright warm daylight, palette: fresh green and warm skin tones, copy space in sky, tack-sharp front-to-back, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, warm family moment
+
+--- 13 엄마 아이 주방 요리 ---
+a Korean mother and young child happily cooking together in a bright clean kitchen, genuine smiles, soft window daylight, camera: eye-level, palette: warm white light wood and fresh vegetables, clean copy space to one side, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, cozy family lifestyle
+
+--- 14 소파에서 책 읽는 가족 ---
+a Korean family reading a picture book together on a comfy sofa in a bright living room, calm genuine expressions, soft window daylight, camera: eye-level, palette: warm neutral cream beige and soft wood with a plant, clean text area, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, quiet home moment
+
+--- 15 반려견과 가족 거실 ---
+a Korean family playing with their small dog in a bright airy living room, genuine happy interaction, soft window daylight, camera: eye-level, palette: warm neutral wood cream with a green plant, clean copy space, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, pet family lifestyle
+
+# ══════════════════════════════════════════
+# 💼 비즈니스 · 오피스
+# ══════════════════════════════════════════
+
+--- 16 밝은 회의실 팀미팅 ---
+a diverse small team of Korean professionals collaborating around a table in a bright modern meeting room, genuine engaged expressions, camera: eye-level, lighting: bright even office daylight, palette: clean white light wood and soft blue accents, clean copy space, tack-sharp front-to-back, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, business teamwork
+
+--- 17 노트북 프레젠테이션 화이트보드 ---
+a Korean businesswoman presenting beside a blank whiteboard to colleagues in a bright office, confident natural expression, camera: eye-level, lighting: bright even daylight, palette: clean white with warm skin tones and soft accents, copy space on the blank board area, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, business presentation
+
+--- 18 카페 노트북 업무 여성 ---
+a young Korean woman working on a laptop with a coffee cup in a bright airy cafe, calm focused expression, soft window daylight, camera: eye-level, palette: warm wood cream and green plant, clean text-overlay area, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, remote-work lifestyle
+
+--- 19 사무실 동료 협업 ---
+two Korean colleagues reviewing work together at a bright modern office desk with a laptop, genuine focused interaction, camera: over-shoulder eye-level, lighting: bright even daylight, palette: clean white light wood and soft blue, clean copy space, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, business collaboration
+
+--- 20 비즈니스 악수 ---
+two Korean business professionals shaking hands warmly in a bright modern office, confident genuine expressions, camera: eye-level, lighting: bright even daylight, palette: clean neutral with warm skin tones, clean copy space to one side, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, business deal concept
+
+--- 21 강의실 발표 ---
+a Korean presenter speaking in front of a bright modern classroom with attentive seated participants and a blank screen, natural engaged mood, camera: eye-level from the back, lighting: bright even daylight, palette: clean neutral with warm skin tones, copy space on blank screen, tack-sharp front-to-back, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, seminar education
+
+# ══════════════════════════════════════════
+# 🍉 여름 과일 · 프리미엄 조각과일 (2026 트렌드)
+# ══════════════════════════════════════════
+
+--- 22 조각수박 프리미엄 패키지 ---
+a premium pre-cut watermelon package in a clear plastic container on a bright clean white surface, neatly cubed fresh red watermelon pieces with visible seeds removed, small mint garnish, camera: 45° hero, lighting: bright high-key daylight, palette: vivid red and green on pure clean white, generous copy space to one side, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, Korean premium cut-fruit packaging style
+
+--- 23 여름 조각과일 도시락 세트 ---
+a set of three clear premium fruit containers with pre-cut mango cubes and mixed melon balls and fresh pineapple chunks arranged neatly on a bright white marble surface, camera: 45° overhead-ish, lighting: bright high-key daylight, palette: vivid tropical yellow orange and green on clean white, generous copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, Korean department-store cut-fruit display
+
+--- 24 통수박 + 여름과일 플래터 ---
+a whole small watermelon cut in half beside a platter of fresh summer fruits including peach slices cherries and grapes on a bright white surface, camera: 45° hero, lighting: bright high-key daylight, palette: vivid red pink yellow and green on clean white, generous copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, fresh summer fruit styling
+
+--- 25 복숭아 + 체리 바스켓 밝은 배경 ---
+a rustic woven basket overflowing with fresh ripe peaches and red cherries on a bright clean white table with soft linen, camera: 45° close, lighting: bright soft daylight, palette: warm peach pink and deep red on clean white and natural linen, clean copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, summer fruit gift basket styling
+
+# ══════════════════════════════════════════
+# 🍂 가을 과일 · 추석 선물세트
+# ══════════════════════════════════════════
+
+--- 26 샤인머스캣 + 포도 프리미엄 ---
+a premium gift box of fresh Shine Muscat green grapes and dark Kyoho grapes on a bright clean white surface with elegant simple wrapping, camera: 45° hero, lighting: bright high-key daylight, palette: fresh green and deep purple on clean white, generous copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, Korean premium fruit gift-set styling
+
+--- 27 감 + 배 추석 선물세트 ---
+a traditional Korean Chuseok fruit gift set with ripe orange persimmons and golden pears arranged neatly in a clean gift box on a bright white surface, camera: 45° hero, lighting: bright soft daylight, palette: warm orange and golden yellow on clean white, generous copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, Korean autumn holiday gift styling
+
+--- 28 가을 조각과일 프리미엄 컵 ---
+premium pre-cut autumn fruit cups in clear containers with sliced Korean pear apple and peeled grape pieces on a bright clean white surface, camera: 45° close, lighting: bright high-key daylight, palette: fresh pale yellow green and soft red on clean white, generous copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, Korean premium cut-fruit cafe trend
+
+--- 29 사과 + 밤 가을 수확 바스켓 ---
+a rustic basket with fresh red apples and roasted chestnuts on a bright clean white table with soft natural linen and a few autumn maple leaves, camera: 45° hero, lighting: bright soft daylight, palette: warm red and chestnut brown on clean white and linen, clean copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, Korean autumn harvest styling
+
+# ══════════════════════════════════════════
+# 🥗 건강식 · 밀프렙
+# ══════════════════════════════════════════
+
+--- 30 그레인 샐러드볼 ---
+a fresh colorful grain and vegetable salad bowl with avocado chickpeas and greens on a bright clean white table, camera: 45° hero, lighting: bright soft daylight, palette: fresh green orange and clean white, clean copy space to one side, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, healthy food styling
+
+--- 31 밀프렙 + 노트북 데스크 ---
+a healthy meal-prep bowl beside a laptop and a glass of water on a bright clean white desk, fresh work-lunch scene, camera: 45°, lighting: bright soft daylight, palette: fresh greens clean white and light wood, clean copy space, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, healthy work lifestyle
+
+--- 32 한식 건강 반상 ---
+a healthy Korean home meal set with rice soup and colorful banchan side dishes on a bright clean white wooden table, camera: 45° overhead-ish, lighting: bright soft daylight, palette: warm wood fresh vegetables and clean white ceramic, clean copy space, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, Korean food styling
+
+# ══════════════════════════════════════════
+# 🛏 홈 · 침구 · 인테리어 소품
+# ══════════════════════════════════════════
+
+--- 33 밝은 침실 리넨 침구 ---
+a bright airy bedroom with soft fresh linen bedding neatly made and a small plant by the window, no people, camera: eye-level, lighting: soft bright morning daylight, palette: warm white cream and soft beige, generous clean copy space, tack-sharp front-to-back, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, cozy bedroom interior
+
+--- 34 아침 햇살 침대 정돈 ---
+close-up of freshly made soft white bedding with morning sunlight casting gentle shadows through a sheer curtain, no people, camera: 45° detail, lighting: warm soft morning light, palette: warm white cream and soft beige, clean copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, serene home detail
+
+--- 35 아늑한 소파 담요 커피 ---
+a cozy corner of a bright living room with a chunky knit blanket on a sofa and a warm coffee cup on a side table, no people, camera: eye-level, lighting: soft warm daylight, palette: warm cream beige and soft wood with a plant, clean copy space, tack-sharp, deep DOF, everything in focus, plain unlettered unbranded surfaces, one continuous scene, hygge home lifestyle
+
+--- 36 홈카페 창가 커피 ---
+a warm coffee cup and a small plant on a wooden table by a bright window with soft daylight, no people, camera: 45° close, lighting: soft warm window daylight, palette: warm wood cream and green, generous clean copy space, tack-sharp, deep DOF, background in focus, plain unlettered unbranded surfaces, one continuous scene, calm home-cafe mood

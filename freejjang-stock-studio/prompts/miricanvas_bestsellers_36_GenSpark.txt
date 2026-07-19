@@ -1,0 +1,110 @@
+# 미리캔버스 베스트셀러 36컷 — GenSpark(젠스파크) 자동배치용
+# ─────────────────────────────────────────────────────────
+# 사용법: GenSpark AI Image Generator / Super Agent 배치 입력창에 아래 프롬프트를 붙여넣기
+#   · 젠스파크는 MJ 파라미터를 쓰지 않는 자연어 엔진 → --style / --ar / --no 전부 제거
+#   · 네거티브는 자연어로 문장 끝에 포함 ("no text, logo, watermark, or blur — sharp throughout")
+#   · 비율은 젠스파크 설정에서 지정: 미캔 카드형 4:5 또는 정사각 1:1 권장
+#   · 모델 추천: Flux / GPT-image 계열 (밝은 상업컷·인물 자연스러움에 강함)
+#   · 한 줄(라벨 블록) = 한 장. 라벨 miri-best-NN 은 GPT/MJ 버전·메타데이터와 1:1 매칭
+# 미캔 시그니처: 밝은 하이키 + 웜뉴트럴(크림·베이지·우드) + 한국인 자연 미소 + 창가 채광 + 배경까지 선명
+# ─────────────────────────────────────────────────────────
+
+# ══════════════════════════════════════════
+# 🏢 부동산
+# ══════════════════════════════════════════
+
+miri-best-01) A modern Korean apartment complex exterior with clean high-rise buildings and a landscaped green garden under a bright blue sky, eye-level wide shot, bright clear midday daylight, fresh blue-sky and green-tree tones with warm concrete, generous copy space in the sky, sharp focus front to back with everything in focus, plain unlettered unbranded surfaces, one continuous scene, clean real-estate promotional look. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-02) A Korean couple in their thirties relaxing together on a sofa in a bright modern living room, natural warm smiles, soft window daylight, eye-level shot, warm neutral cream and beige with soft wood and a green plant at the edge, subject to one side leaving a clean text-overlay area, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, cozy home lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-03) A bright clean model-house living room interior with a minimal sofa, low table and a gentle plant by the window, no people, eye-level wide shot, soft bright window daylight, warm neutral cream, beige and light wood, generous clean copy space, sharp focus front to back with everything in focus, plain unlettered unbranded surfaces, one continuous scene, interior catalog look. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-04) A young Korean couple unpacking moving boxes in a bright empty new apartment, genuine happy expressions, soft daylight, eye-level shot, warm neutral tones with cardboard boxes and white walls, clean copy space on one side, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, new-home lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-05) Close-up of hands handing over a set of house keys in a bright modern home, warm natural light, 45-degree close shot, warm neutral beige and soft wood, clean negative space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, real-estate contract concept. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-06) A bright modern Korean kitchen and dining area with clean counters, a wooden table and a small plant, no people, eye-level wide shot, soft bright daylight, warm white with light wood and sage green, generous copy space, sharp focus front to back with everything in focus, plain unlettered unbranded surfaces, one continuous scene, interior catalog look. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-07) A cozy bright apartment balcony with potted plants, a small chair and sheer curtains glowing in soft morning light, no people, eye-level shot, soft warm morning daylight, warm cream, green and light wood, clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, calm home lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-08) A happy young Korean family of three standing and smiling in front of a bright modern apartment building, natural genuine expressions, eye-level shot, bright clear daylight, fresh blue sky with warm neutrals and green, copy space in the sky, sharp focus front to back with everything in focus, plain unlettered unbranded surfaces, one continuous scene, new-home family lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+# ══════════════════════════════════════════
+# 👨‍👩‍👧 가족 라이프스타일
+# ══════════════════════════════════════════
+
+miri-best-09) A Korean family enjoying a picnic on bright green grass in a sunny park, genuine laughing interaction, eye-level shot, bright natural daylight, fresh green with warm skin tones and soft pastel picnic items, generous copy space in the grass and sky, sharp focus front to back with everything in focus, plain unlettered unbranded surfaces, one continuous scene, cheerful family lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-10) A cute Korean child blowing a dandelion in a bright green meadow, joyful natural expression, eye-level close shot, soft warm backlight, fresh green and warm daylight, generous copy space, the child sharp with a clean background, everything in focus, plain unlettered unbranded surfaces, one continuous scene, tender childhood moment. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-11) Three generations of a Korean family laughing around a low living-room table playing a board game, genuine warm interaction, soft window daylight, eye-level shot, warm neutral wood and cream with a plant, clean text-overlay area to one side, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, family home lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-12) A young Korean father carrying his laughing child on his shoulders in a sunny green park, genuine joyful expressions, eye-level shot, bright warm daylight, fresh green and warm skin tones, copy space in the sky, sharp focus front to back with everything in focus, plain unlettered unbranded surfaces, one continuous scene, warm family moment. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-13) A Korean mother and young child happily cooking together in a bright clean kitchen, genuine smiles, soft window daylight, eye-level shot, warm white with light wood and fresh vegetables, clean copy space to one side, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, cozy family lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-14) A Korean family reading a picture book together on a comfy sofa in a bright living room, calm genuine expressions, soft window daylight, eye-level shot, warm neutral cream and beige with soft wood and a plant, clean text area, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, quiet home moment. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-15) A Korean family playing with their small dog in a bright airy living room, genuine happy interaction, soft window daylight, eye-level shot, warm neutral wood and cream with a green plant, clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, pet family lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+# ══════════════════════════════════════════
+# 💼 비즈니스 · 오피스
+# ══════════════════════════════════════════
+
+miri-best-16) A diverse small team of Korean professionals collaborating around a table in a bright modern meeting room, genuine engaged expressions, eye-level shot, bright even office daylight, clean white with light wood and soft blue accents, clean copy space, sharp focus front to back with everything in focus, plain unlettered unbranded surfaces, one continuous scene, business teamwork. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-17) A Korean businesswoman presenting beside a blank whiteboard to colleagues in a bright office, confident natural expression, eye-level shot, bright even daylight, clean white with warm skin tones and soft accents, copy space on the blank board area, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, business presentation. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-18) A young Korean woman working on a laptop with a coffee cup in a bright airy cafe, calm focused expression, soft window daylight, eye-level shot, warm wood and cream with a green plant, clean text-overlay area, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, remote-work lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-19) Two Korean colleagues reviewing work together at a bright modern office desk with a laptop, genuine focused interaction, over-the-shoulder eye-level shot, bright even daylight, clean white with light wood and soft blue, clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, business collaboration. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-20) Two Korean business professionals shaking hands warmly in a bright modern office, confident genuine expressions, eye-level shot, bright even daylight, clean neutral with warm skin tones, clean copy space to one side, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, business deal concept. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-21) A Korean presenter speaking in front of a bright modern classroom with attentive seated participants and a blank screen, natural engaged mood, eye-level shot from the back, bright even daylight, clean neutral with warm skin tones, copy space on the blank screen, sharp focus front to back with everything in focus, plain unlettered unbranded surfaces, one continuous scene, seminar education. No text, logo, watermark, or blur — sharp throughout.
+
+# ══════════════════════════════════════════
+# 🍉 여름 과일 · 프리미엄 조각과일
+# ══════════════════════════════════════════
+
+miri-best-22) A premium pre-cut watermelon package in a clear plastic container on a bright clean white surface, neatly cubed fresh red watermelon pieces with seeds removed and a small mint garnish, 45-degree hero shot, bright high-key daylight, vivid red and green on pure clean white, generous copy space to one side, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, Korean premium cut-fruit packaging style. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-23) A set of three clear premium fruit containers with pre-cut mango cubes, mixed melon balls and fresh pineapple chunks arranged neatly on a bright white marble surface, 45-degree overhead shot, bright high-key daylight, vivid tropical yellow, orange and green on clean white, generous copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, Korean department-store cut-fruit display. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-24) A whole small watermelon cut in half beside a platter of fresh summer fruits including peach slices, cherries and grapes on a bright white surface, 45-degree hero shot, bright high-key daylight, vivid red, pink, yellow and green on clean white, generous copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, fresh summer fruit styling. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-25) A rustic woven basket overflowing with fresh ripe peaches and red cherries on a bright clean white table with soft linen, 45-degree close shot, bright soft daylight, warm peach-pink and deep red on clean white and natural linen, clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, summer fruit gift basket styling. No text, logo, watermark, or blur — sharp throughout.
+
+# ══════════════════════════════════════════
+# 🍂 가을 과일 · 추석 선물세트
+# ══════════════════════════════════════════
+
+miri-best-26) A premium gift box of fresh Shine Muscat green grapes and dark Kyoho grapes on a bright clean white surface with elegant simple wrapping, 45-degree hero shot, bright high-key daylight, fresh green and deep purple on clean white, generous copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, Korean premium fruit gift-set styling. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-27) A traditional Korean Chuseok fruit gift set with ripe orange persimmons and golden pears arranged neatly in a clean gift box on a bright white surface, 45-degree hero shot, bright soft daylight, warm orange and golden yellow on clean white, generous copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, Korean autumn holiday gift styling. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-28) Premium pre-cut autumn fruit cups in clear containers with sliced Korean pear, apple and peeled grape pieces on a bright clean white surface, 45-degree close shot, bright high-key daylight, fresh pale yellow, green and soft red on clean white, generous copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, Korean premium cut-fruit cafe trend. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-29) A rustic basket with fresh red apples and roasted chestnuts on a bright clean white table with soft natural linen and a few autumn maple leaves, 45-degree hero shot, bright soft daylight, warm red and chestnut brown on clean white and linen, clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, Korean autumn harvest styling. No text, logo, watermark, or blur — sharp throughout.
+
+# ══════════════════════════════════════════
+# 🥗 건강식 · 밀프렙
+# ══════════════════════════════════════════
+
+miri-best-30) A fresh colorful grain and vegetable salad bowl with avocado, chickpeas and greens on a bright clean white table, 45-degree hero shot, bright soft daylight, fresh green and orange on clean white, clean copy space to one side, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, healthy food styling. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-31) A healthy meal-prep bowl beside a laptop and a glass of water on a bright clean white desk, fresh work-lunch scene, 45-degree shot, bright soft daylight, fresh greens with clean white and light wood, clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, healthy work lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-32) A healthy Korean home meal set with rice, soup and colorful banchan side dishes on a bright clean white wooden table, 45-degree overhead shot, bright soft daylight, warm wood with fresh vegetables and clean white ceramic, clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, Korean food styling. No text, logo, watermark, or blur — sharp throughout.
+
+# ══════════════════════════════════════════
+# 🛏 홈 · 침구 · 인테리어 소품
+# ══════════════════════════════════════════
+
+miri-best-33) A bright airy bedroom with soft fresh linen bedding neatly made and a small plant by the window, no people, eye-level shot, soft bright morning daylight, warm white, cream and soft beige, generous clean copy space, sharp focus front to back with everything in focus, plain unlettered unbranded surfaces, one continuous scene, cozy bedroom interior. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-34) Close-up of freshly made soft white bedding with morning sunlight casting gentle shadows through a sheer curtain, no people, 45-degree detail shot, warm soft morning light, warm white, cream and soft beige, clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, serene home detail. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-35) A cozy corner of a bright living room with a chunky knit blanket on a sofa and a warm coffee cup on a side table, no people, eye-level shot, soft warm daylight, warm cream and beige with soft wood and a plant, clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, hygge home lifestyle. No text, logo, watermark, or blur — sharp throughout.
+
+miri-best-36) A warm coffee cup and a small plant on a wooden table by a bright window with soft daylight, no people, 45-degree close shot, soft warm window daylight, warm wood, cream and green, generous clean copy space, everything sharp and in focus, plain unlettered unbranded surfaces, one continuous scene, calm home-cafe mood. No text, logo, watermark, or blur — sharp throughout.
