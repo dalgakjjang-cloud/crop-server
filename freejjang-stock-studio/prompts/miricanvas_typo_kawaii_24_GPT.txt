@@ -1,0 +1,91 @@
+# 미리캔버스 예쁨·귀여움 축 24컷 (GPT용, Compact v2)
+# 공냥킷 v2.4 TP9·TP7·TP6 패턴을 우리 미캔 스타일로 재해석
+# ─────────────────────────────────────────────────────────
+# 미캔 시그니처 유지: 밝은 화이트톤 + 넉넉한 텍스트 여백 + 배경까지 선명
+# 사용자가 자기 한글 문구를 얹기 좋게 → 중앙 또는 여백 텍스트 자리 확보
+# HEX 팔레트 명시(공냥킷 규칙 반영) → 색감 정확도 향상
+# ─────────────────────────────────────────────────────────
+
+# ══════════════════════════════════════════
+# 🎈 인플레이터블 3D · 귀여움 축 (TP9)
+# ══════════════════════════════════════════
+
+--- 01 인플레이터블 핑크 하트 ---
+a large glossy inflatable puffy 3D pink heart floating on a bright clean cream background, cute rounded soft form with a hint of highlight, camera: eye-level hero, lighting: bright soft studio daylight, palette: soft pink #FFC1D8 and warm cream #FFF5EA with white highlight, generous clean copy space around the heart, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute inflatable object styling
+
+--- 02 인플레이터블 파스텔 리본 ---
+a large puffy 3D inflatable pastel ribbon bow floating on a bright clean white background, cute rounded soft form with gentle highlights, camera: eye-level hero, lighting: bright soft daylight, palette: butter yellow #FFE9A8 and pastel mint #C8ECD8 with clean white, generous clean copy space around the ribbon, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, kawaii inflatable object styling
+
+--- 03 인플레이터블 미니 꽃 ---
+a cute puffy 3D inflatable little flower with rounded petals on a bright clean cream background, soft glossy surface, camera: eye-level hero, lighting: bright soft daylight, palette: peach pink #FFCDB4 with sage green #C8DFC4 and cream #FFF5EA, generous clean copy space, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, kawaii inflatable flower styling
+
+--- 04 인플레이터블 별 클러스터 ---
+three puffy 3D inflatable stars of different sizes floating together on a bright clean white background, cute rounded forms with soft highlights, camera: eye-level composed, lighting: bright soft daylight, palette: baby blue #C7DDFF and soft lavender #DBCFF2 with clean white, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, kawaii star cluster styling
+
+--- 05 인플레이터블 구름 세트 ---
+a set of small puffy 3D inflatable rounded clouds floating on a bright clean pale blue background, cute cotton-like forms with gentle highlights, camera: eye-level composed, lighting: bright soft daylight, palette: pale sky blue #E0F0FF and soft white #FDFDFD with a hint of cream #FFF9EE, generous clean copy space in the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, kawaii cloud puff styling
+
+--- 06 인플레이터블 캔디 아이콘 ---
+a cute puffy 3D inflatable wrapped candy shape on a bright clean cream background, glossy soft surface with rounded twisted ends, camera: 45° hero close, lighting: bright soft daylight, palette: strawberry pink #FFB8C8 and mint #B8E8D4 with cream #FFF5EA, generous clean copy space, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, kawaii candy styling
+
+--- 07 인플레이터블 3D 케이크 ---
+a cute puffy 3D inflatable rounded birthday cake with soft frosting-like top on a bright clean cream background, glossy cute form, camera: 45° hero, lighting: bright soft daylight, palette: peach cream #FFDDB0 and pastel pink #FFC8D4 with warm white, generous clean copy space above the cake, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, kawaii inflatable cake styling
+
+--- 08 인플레이터블 하트 리본 세트 ---
+a small cluster of puffy 3D inflatable hearts and tiny bows on a bright clean white background, cute rounded glossy forms in playful arrangement, camera: eye-level composed, lighting: bright soft daylight, palette: soft pink #FFC1D8, butter yellow #FFE9A8, and clean white #FDFDFD, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, kawaii inflatable object set
+
+# ══════════════════════════════════════════
+# 💎 재질 조각 · 프리미엄 예쁨 축 (TP7)
+# ══════════════════════════════════════════
+
+--- 09 유리 하트 오브젝트 ---
+a translucent glossy glass heart-shaped object standing on a bright clean cream surface, subtle refraction and highlight, no text inside the heart, camera: eye-level hero, lighting: bright soft daylight from the side, palette: pale pink glass #FFD8E4 and clean white with warm cream #FFF5EA, generous clean copy space around, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, premium glass object styling
+
+--- 10 젤리 별 오브젝트 ---
+a translucent glossy jelly star-shaped object on a bright clean white surface, soft wobbly form with candy-like sheen, no text inside, camera: eye-level hero close, lighting: bright soft daylight, palette: soft peach jelly #FFC8A8 and clean white with pale cream #FFF5EA, generous clean copy space, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, premium jelly object styling
+
+--- 11 대리석 원형 플레이트 ---
+a smooth polished round white marble plate on a bright clean cream surface, elegant subtle veining, no text on the marble, camera: 45° hero, lighting: bright soft daylight, palette: soft white marble #F4F1EA with gentle gray veins and warm cream background #FFF5EA, generous clean copy space, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, premium marble object styling
+
+--- 12 크리스탈 큐브 소품 ---
+a translucent glossy small crystal cube standing on a bright clean cream surface, gentle refraction, no text inside, camera: eye-level hero close, lighting: bright soft daylight from the side, palette: pale blue crystal #DCEEFF and clean white with warm cream #FFF5EA, generous clean copy space around, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, premium crystal object styling
+
+--- 13 유리 미니 화병 ---
+a small clear glass vase with a single fresh flower stem on a bright clean cream table, subtle refraction, no text, camera: 45° hero, lighting: bright soft window daylight, palette: pale sage #C8DFC4 flower and clean glass with warm cream #FFF5EA background, generous clean copy space above, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, premium glass vase styling
+
+--- 14 젤리 꽃 오브젝트 ---
+a translucent glossy jelly flower-shaped object with rounded petals on a bright clean white surface, cute wobbly form, no text, camera: eye-level hero, lighting: bright soft daylight, palette: soft coral jelly #FFB8B0 and pale mint #C8ECD8 with clean white, generous clean copy space around, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, premium jelly flower styling
+
+--- 15 대리석 텍스처 배경 ---
+a large smooth polished white marble slab surface filling the frame with elegant subtle gray veining, no objects on top, no text, camera: overhead flat, lighting: bright soft daylight, palette: soft white marble #F4F1EA with delicate warm gray veins #D8D2C8, entire frame is one clean marble texture ready for text overlay, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, premium marble background styling
+
+--- 16 크리스탈 다이아 오브젝트 ---
+a translucent glossy small crystal diamond-shaped object standing on a bright clean cream surface, gentle refraction and sparkle, no text inside, camera: eye-level hero close, lighting: bright soft daylight, palette: pale lavender crystal #E4DCFF and clean white with warm cream #FFF5EA, generous clean copy space, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, premium crystal diamond styling
+
+# ══════════════════════════════════════════
+# 🎨 스위스 키네틱 · 미니멀 축 (TP6)
+# ══════════════════════════════════════════
+
+--- 17 미니멀 사선 컬러블록 ---
+a minimal clean design layout with a single diagonal soft-color block cutting across a bright clean cream background, sharp geometric edge, no text, camera: overhead flat, lighting: bright even daylight, palette: soft peach #FFCDB4 diagonal on warm cream #FFF5EA with clean white #FDFDFD accent, generous clean copy space on both sides of the diagonal, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, minimal Swiss layout styling
+
+--- 18 미니멀 그리드 라인 ---
+a minimal clean design layout with a thin light gray grid of horizontal and vertical lines on a bright clean cream background, no text, camera: overhead flat, lighting: bright even daylight, palette: warm cream #FFF5EA with soft warm gray lines #D8D2C8 and one small sage accent block #C8DFC4, generous clean copy space in the largest cell, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, minimal Swiss grid styling
+
+--- 19 미니멀 원형 + 사선 ---
+a minimal clean design layout with a single soft pastel circle and a thin diagonal line intersecting on a bright clean cream background, sharp geometric edges, no text, camera: overhead flat, lighting: bright even daylight, palette: soft lavender circle #DBCFF2 and warm cream #FFF5EA with clean white accent, generous clean copy space to one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, minimal Swiss composition styling
+
+--- 20 미니멀 컬러 블록 매트릭스 ---
+a minimal clean design layout with a small grid of pastel color blocks arranged neatly on a bright clean cream background, sharp geometric edges, no text, camera: overhead flat, lighting: bright even daylight, palette: soft peach #FFCDB4, butter yellow #FFE9A8, pale mint #C8ECD8, and warm cream #FFF5EA, generous clean copy space above the blocks, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, minimal Swiss matrix styling
+
+--- 21 미니멀 라인 + 도트 ---
+a minimal clean design layout with a single thin horizontal line and a few small dots on a bright clean cream background, delicate composition, no text, camera: overhead flat, lighting: bright even daylight, palette: warm cream #FFF5EA with warm gray line #B8B0A4 and soft peach dots #FFCDB4, generous clean copy space above and below the line, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, minimal Swiss line styling
+
+--- 22 미니멀 웨이브 스트라이프 ---
+a minimal clean design layout with a single soft pastel wavy stripe crossing a bright clean cream background, gentle curve, no text, camera: overhead flat, lighting: bright even daylight, palette: pale sky blue wave #C7DDFF on warm cream #FFF5EA with clean white accent, generous clean copy space above and below the wave, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, minimal Swiss wave styling
+
+--- 23 미니멀 사각형 그리드 ---
+a minimal clean design layout with a 2x2 grid of pastel rounded squares on a bright clean cream background, sharp geometric edges, no text, camera: overhead flat, lighting: bright even daylight, palette: soft pink #FFC8D4, butter yellow #FFE9A8, pale mint #C8ECD8, warm cream #FFF5EA, generous clean copy space beside the grid, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, minimal Swiss square grid styling
+
+--- 24 미니멀 삼각형 컴포지션 ---
+a minimal clean design layout with a single soft pastel triangle in the corner of a bright clean cream background, sharp geometric edge, no text, camera: overhead flat, lighting: bright even daylight, palette: soft coral #FFB8B0 triangle on warm cream #FFF5EA with clean white accent, generous clean copy space in the rest of the frame, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, minimal Swiss triangle styling
