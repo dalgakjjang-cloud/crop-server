@@ -12,9 +12,9 @@
 |---|---|
 | 리포 | https://github.com/kimsh-1/gongnyang-prompt-kit |
 | 저자 | kimsh-1 (일명 "공냥") |
-| 최신 버전 | v2.3 SKILL 기준 (2026-07-19 시점) |
+| 최신 버전 | **v3.0.0** SKILL 기준 (2026-07-20 업데이트 반영) |
 | 라이선스 | MIT |
-| 성격 | Claude Code 스킬 형태의 이미지 프롬프트 컴파일러 |
+| 성격 | Claude Code 스킬 형태의 이미지 프롬프트 컴파일러 (gpt-image-2 / Codex `$imagegen` 대상) |
 
 ---
 
@@ -31,7 +31,7 @@
 
 우리와 다른 지점:
 - 공냥킷은 **개인 창작자용 프롬프트 컴파일러**, 우리는 **양산·판매 파이프라인**
-- 공냥킷은 GPT-4 Vision 중심, 우리는 트리플 엔진(GPT·Gemini·Pollinations) + MJ + GenSpark
+- 공냥킷은 gpt-image-2 (Codex) 단일 엔진, 우리는 트리플 엔진(GPT·Gemini·Pollinations) + MJ + GenSpark
 - 공냥킷은 예술적 통제 강조, 우리는 판매 신호 기반 성과 최적화
 
 ---
@@ -120,13 +120,96 @@ TP 패턴 개념만 얹어 완전히 새 프롬프트를 작성.
 
 ---
 
+## v3.0.0 업데이트 (2026-07-20 반영)
+
+v2.4 → v3.0.0 은 **메이저 리라이트**. SKILL.md 전면 재작성.
+
+### 핵심 변경점
+
+| 항목 | v2.x | v3.0.0 |
+|---|---|---|
+| 구조 | 분산된 규칙 + 별도 TP/P/L 문서 | **단일 라우팅 테이블** (하나의 요청 → 하나의 카테고리 → 하나의 레퍼런스 파일) |
+| 부정문 관리 | 일괄 금지 | **Tier 시스템** (Tier-0 / Tier-1 / Tier-2) |
+| 핵심 규칙 | 여러 섹션에 분산 | **9개 아이언 룰**로 압축 |
+| 대상 모델 | GPT-4 Vision 일반 | **gpt-image-2 (Codex `$imagegen`)** 명시 |
+| 출력 포맷 | 자유형 | **Format A** (6섹션 라벨) + **Format B** (단일 플랫 문단 350~450자) |
+| 검증 | 수동 | **`check_prompt.mjs`** 스크립트 검증 게이트 |
+| AR 관리 | 자유 | **6개 안전 비율만 허용** (size lock) |
+
+### 9개 아이언 룰 (Iron Rules)
+
+1. **대괄호 금지** — `[AR x:y SIZE]` 식 프론트 브래킷 불가, AR 토큰은 끝에만
+2. **긍정형 장면 서술** — gpt-image-2는 부정문을 그대로 렌더. Tier 시스템으로 관리
+3. **SD 시대 어휘 금지** — `"masterpiece"`, `"8k"`, 가중치 구문 등 노이즈 제거
+4. **장비→결과 변환** — 카메라 스펙(50mm f/1.4) 대신 시각 결과(shallow DoF) 서술
+5. **수치 구체화** — HEX 팔레트 3~5색, 켈빈 값, 비율 표기
+6. **1줄=1컷=1API콜** — 멀티컷 그리드 금지
+7. **자연 피부 질감** — 이상화 금지, `"natural texture, visible pores"` 명시
+8. **실제 브랜드·인물 참조 금지**
+9. **후처리 텍스트 합성 금지** — 이미지 안에서 텍스트 렌더링만 허용
+
+### Tier 시스템 (부정문 가드레일)
+
+| Tier | 대상 | 허용 범위 |
+|---|---|---|
+| Tier-0 | 기본 (항상 적용) | **전면 긍정형만** — 부정문 일체 불가 |
+| Tier-1 | 텍스트 렌더링 컷 | 화이트리스트 7개 구문만 허용 (no duplicate text, no watermark 등) |
+| Tier-2 | 에디토리얼 패션 | 선언적 안전 어설션 + 네거티브 테일 페어링 구조 |
+
+**우리 파이프라인 적용:**
+- GPT/GenSpark 프롬프트 → Tier-0 원칙 유지 (이미 채택 중)
+- MJ `--no` 파라미터 → MJ 전용이므로 Tier 시스템 밖 (기존 유지)
+- 미캔 카와이 24컷 → Tier-1 수준 (문장 끝 "No text, logo, watermark" 허용)
+
+### 출력 포맷 2종
+
+- **Format A** (라벨 6섹션): Scene / Camera / Lighting / Color grading / Texture·Medium / Text-in-image — 포스터·인포그래픽·카드용
+- **Format B** (플랫 문단): 콤마 구분 단일 문단 350~450자 — 에디토리얼 패션, 기본 AR `2:3`
+
+**우리 적용:** 우리 GPT Compact v2 포맷(camera: / lighting: / palette: 라벨)은 Format A의 변형. 호환성 좋음.
+
+### 확장된 라이브러리 체계
+
+| 축 | 범위 | 설명 |
+|---|---|---|
+| C (카테고리) | C1~C12 | 에디토리얼, 포스터, 인포그래픽, 프레젠테이션 등 |
+| TP (타이포 포스터) | TP1~TP14 | 포토마스킹~미크로그래피 (v2.4와 동일) |
+| P (프로모) | P1~P8 | 홍보 자료 |
+| L (룩 프리셋) | L1~L9 | 무드 필터 |
+| M (컨셉 변주) | M1~M10 | 메인 컨셉 변주 축 |
+| R / X / T | R, X, T1~T5 | 추가 변주 축 |
+
+기존 C×L×P×TP 4중 크로스브리드에 **M/R/X/T 컨셉 변주 축**이 추가됨.
+
+### 검증 스크립트
+
+```bash
+node skills/image-prompt/scripts/check_prompt.mjs [파일]        # 기본 검증
+node skills/image-prompt/scripts/check_prompt.mjs --tier 2 [파일]  # Tier-2 검증
+node skills/image-prompt/scripts/check_prompt.mjs --jsonl [파일]   # JSONL 배치 검증
+node skills/image-prompt/scripts/check_prompt.mjs --test           # 회귀 테스트
+```
+
+**우리 적용 검토:** 우리 QC 7항목 + `repairSlot` 검증 체계와 병행 가능. 공냥킷 검증기를 우리 프롬프트에 돌려보면 누락 패턴 발견에 도움.
+
+### 우리 파이프라인에 새로 참고할 점
+
+1. **Size Lock 개념**: 6개 안전 비율만 허용 → 우리도 플랫폼별(미캔 4:5, 어도비 3:2/16:9) 비율 락 도입 검토
+2. **자연 피부 질감 명시**: 우리 인물 프롬프트(가족 라이프스타일 등)에 `natural texture, visible pores` 추가 검토
+3. **Format A/B 이원화**: 용도별 포맷 분리 → 우리도 오브젝트 컷 vs 인물 컷 포맷 분리 고려
+4. **검증 스크립트 게이트**: CI/CD에 프롬프트 검증 단계 추가 → 양산 파이프라인 품질 안정화
+
+---
+
 ## 참고 링크
 
 - 리포 홈: https://github.com/kimsh-1/gongnyang-prompt-kit
 - SKILL: https://github.com/kimsh-1/gongnyang-prompt-kit/blob/main/skills/image-prompt/SKILL.md
 - TP 라우터: https://github.com/kimsh-1/gongnyang-prompt-kit/blob/main/skills/image-prompt/references/typo-poster-router.md
 - 예시 컬렉션: https://github.com/kimsh-1/gongnyang-prompt-kit/tree/main/examples
+- 데모 사이트: https://kimsh-1.github.io/gongnyang-prompt-kit
+- 릴리스: https://github.com/kimsh-1/gongnyang-prompt-kit/releases
 
 ---
 
-_최초 작성: 2026-07-19 · 다음 리뷰: 공냥킷 v2.5 릴리스 시_
+_최초 작성: 2026-07-19 · v3.0.0 업데이트 반영: 2026-07-20 · 다음 리뷰: 공냥킷 v3.1 릴리스 시_
