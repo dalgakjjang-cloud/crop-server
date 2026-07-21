@@ -1,0 +1,141 @@
+# 미리캔버스 엑소좀 40컷 (GPT용, Compact v2)
+# 뷰티/바이오텍 네온 글로우 컨셉 — 다크 배경 위 발광 엑소좀 구체·세포막·앰플·피부흡수 비주얼
+# 미캔 시그니처 유지: 넉넉한 텍스트 여백 + 배경까지 선명 + HEX 팔레트 명시
+# ─────────────────────────────────────────────────────────
+
+# ════════════════════════════════════════════
+# 🧬 엑소좀 분자 매크로 · 네온 블루-퍼플 축 (EX-A)
+# ════════════════════════════════════════════
+
+--- 01 글로우 엑소좀 구체 ---
+a large glowing translucent exosome sphere with a soft double-membrane outline, floating in dark space with a gentle inner glow, camera: eye-level macro hero, lighting: soft ambient glow with a delicate rim light, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space around the sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+--- 02 엑소좀 클러스터 ---
+three glowing translucent exosome spheres of different sizes clustered together, soft inner light pulsing through each membrane, camera: eye-level composed macro, lighting: soft ambient glow with gentle rim light, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+--- 03 엑소좀 단면 ---
+a cross-section of a glowing exosome sphere revealing tiny luminous molecular cargo particles suspended inside, camera: 45-degree macro close, lighting: soft internal glow with a subtle rim light, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space around the sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+--- 04 엑소좀 막 표면 ---
+an extreme macro of a glowing exosome membrane surface studded with tiny luminous receptor bumps, camera: extreme macro close-up, lighting: soft raking glow light, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space in the lower half, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+--- 05 엑소좀 광류 ---
+a flowing stream of small glowing exosome spheres trailing like a comet of light through dark space, camera: eye-level dynamic macro, lighting: soft ambient glow with a long light trail, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space above the stream, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+--- 06 엑소좀 오빗 ---
+a central glowing exosome sphere with smaller luminous particles orbiting around it like tiny satellites, camera: eye-level macro hero, lighting: soft ambient glow with gentle rim light, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space around the sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+--- 07 엑소좀 융합 ---
+two glowing translucent exosome spheres merging together with a bright luminous seam where they meet, camera: 45-degree macro close, lighting: soft glow intensifying at the seam, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+--- 08 엑소좀 나선 ---
+a glowing exosome sphere with a faint luminous strand coiling gently inside its translucent membrane, camera: eye-level macro hero, lighting: soft internal glow with subtle rim light, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space around the sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+--- 09 엑소좀 스파클 ---
+a single glowing droplet-shaped exosome with a bright sparkling highlight catching the light, camera: extreme macro close-up, lighting: soft glow with a crisp specular highlight, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+--- 10 엑소좀 필드 ---
+a field of small glowing exosome spheres scattered like distant stars with one large sphere sharp in the foreground, camera: eye-level macro hero, lighting: soft ambient glow with gentle depth, palette: electric blue #4D7CFE and neon violet #9D4EDD on deep space navy #0A0E27, generous clean copy space around the foreground sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, biotech exosome sphere styling
+
+# ════════════════════════════════════════════
+# 🔬 엑소좀 세포막 구조 · 네온 그린-블루 / 핑크-블루 축 (EX-B)
+# ════════════════════════════════════════════
+
+--- 11 세포막 버딩 ---
+a cell membrane cross-section gently releasing a small glowing exosome sphere, a faint luminous trail following it, camera: 45-degree macro close, lighting: soft ambient glow with gentle rim light, palette: neon green #2EE6A6 and electric cyan #2EC4FF on deep teal black #081418, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+--- 12 베지클 버딩 ---
+a small vesicle budding off from a larger glowing cell membrane, a soft luminous trail behind it, camera: 45-degree macro close, lighting: soft ambient glow with gentle rim light, palette: neon pink #FF3D9A and azure blue #3DA9FF on deep plum black #120A1F, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+--- 13 지질층 매크로 ---
+an extreme macro of a lipid bilayer sphere surface with a glowing rim light tracing its curved edge, camera: extreme macro close-up, lighting: soft rim glow, palette: neon green #2EE6A6 and electric cyan #2EC4FF on deep teal black #081418, generous clean copy space around the sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+--- 14 핵 오빗 ---
+a glowing sphere resembling a cell nucleus with small luminous exosome particles orbiting gently around it, camera: eye-level macro hero, lighting: soft ambient glow, palette: neon pink #FF3D9A and azure blue #3DA9FF on deep plum black #120A1F, generous clean copy space around the sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+--- 15 이중막 구체 ---
+a translucent two-layer membrane sphere with a soft luminous glow visible between its inner and outer layers, camera: 45-degree macro close, lighting: soft internal glow, palette: neon pink #FF3D9A and azure blue #3DA9FF on deep plum black #120A1F, generous clean copy space around the sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+--- 16 세포 방출 ---
+a microscopic view of a cell releasing several small glowing exosome spheres like rising bubbles, camera: eye-level composed macro, lighting: soft ambient glow, palette: neon pink #FF3D9A and azure blue #3DA9FF on deep plum black #120A1F, generous clean copy space above the cell, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+--- 17 분자 사슬 ---
+a glowing molecular chain winding gently through dark space, each link softly luminous, camera: eye-level dynamic macro, lighting: soft trailing glow, palette: neon green #2EE6A6 and electric cyan #2EC4FF on deep teal black #081418, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+--- 18 베지클 알갱이 ---
+a vesicle sphere with tiny glowing granules visible drifting inside its translucent membrane, camera: 45-degree macro close, lighting: soft internal glow, palette: neon green #2EE6A6 and electric cyan #2EC4FF on deep teal black #081418, generous clean copy space around the sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+--- 19 듀얼 글로우 클러스터 ---
+a cluster of small glowing pink-toned spheres orbiting a larger blue-glowing central sphere, camera: eye-level macro hero, lighting: soft ambient glow with gentle rim light, palette: neon pink #FF3D9A and azure blue #3DA9FF on deep plum black #120A1F, generous clean copy space around the cluster, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+--- 20 막 표면 이슬 ---
+an extreme macro of a translucent membrane surface with dew-like glowing droplets resting on it, camera: extreme macro close-up, lighting: soft raking glow, palette: neon green #2EE6A6 and electric cyan #2EC4FF on deep teal black #081418, generous clean copy space in the lower half, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cellular microscopy styling
+
+# ════════════════════════════════════════════
+# 💧 엑소좀 앰플·세럼 · 네온 시안-퍼플 축 (EX-C)
+# ════════════════════════════════════════════
+
+--- 21 앰플 실루엣 ---
+a glass ampoule bottle silhouette filled with glowing swirling liquid, faint light escaping through the glass, camera: eye-level hero macro, lighting: soft internal glow with a gentle rim light, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space around the ampoule, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+--- 22 세럼 드롭 ---
+a serum droplet caught mid-fall with tiny glowing molecular particles suspended inside it, camera: extreme macro close-up, lighting: soft glow with a crisp highlight, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space around the droplet, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+--- 23 리퀴드 스플래시 ---
+a liquid splash frozen mid-motion with a glowing particle trail arcing through the dark background, camera: eye-level dynamic macro, lighting: soft glow tracing the splash, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+--- 24 드로퍼 비드 ---
+a dropper tip releasing a single glowing serum bead, light gathering at its tip, camera: 45-degree macro close, lighting: soft glow with a focused highlight, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space around the bead, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+--- 25 세럼 텍스처 ---
+an extreme macro of glossy serum texture with tiny glowing spheres suspended just beneath its surface, camera: extreme macro close-up, lighting: soft ambient glow, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space in the lower half, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+--- 26 글로우 오브 ---
+a glass orb filled with swirling glowing liquid, soft light curling through its translucent core, camera: eye-level hero macro, lighting: soft internal glow with gentle rim light, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space around the orb, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+--- 27 세럼 스트림 ---
+a thin stream of serum pouring downward with a soft glowing light trail following its curve, camera: eye-level dynamic macro, lighting: soft trailing glow, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+--- 28 버블 폼 매크로 ---
+an extreme macro of fine bubble foam texture with soft glowing highlights caught in each bubble, camera: extreme macro close-up, lighting: soft ambient glow with crisp highlights, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space in the upper half, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+--- 29 젤 텍스처 매크로 ---
+a translucent gel texture with tiny glowing molecular dots embedded just beneath its glossy surface, camera: extreme macro close-up, lighting: soft internal glow, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space around the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+--- 30 앰플 드립 ---
+an ampoule cap with a single glowing droplet forming at its tip against a dark background, camera: 45-degree macro close, lighting: soft glow with a focused highlight, palette: electric cyan #22E5FF and violet #A855F7 on deep indigo black #0D0B1F, generous clean copy space around the droplet, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, serum ampoule macro styling
+
+# ════════════════════════════════════════════
+# ✨ 엑소좀 피부 흡수 비주얼 · 네온 골드-블루 축 (EX-D)
+# ════════════════════════════════════════════
+
+--- 31 피부 흡수 단면 ---
+a macro cross-section of skin-like translucent layers with tiny glowing gold particles absorbing gently between them, camera: 45-degree macro close, lighting: soft internal glow, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space around the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
+--- 32 분자 메쉬 네트워크 ---
+a glowing molecular mesh network spreading softly across a dark textured surface, camera: overhead flat, lighting: soft ambient glow, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space around the network, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
+--- 33 스킨 랜드스케이프 ---
+a gentle skin-like gradient surface stretching wide with scattered glowing gold-blue particles resting on it, camera: wide landscape hero, lighting: soft ambient glow with gentle falloff, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
+--- 34 포어 앱저브션 ---
+an extreme macro of a skin pore with tiny glowing gold particles gently entering it, camera: extreme macro close-up, lighting: soft focused glow, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space around the pore, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
+--- 35 라디언트 버스트 ---
+a soft radiating burst of glowing light expanding outward from a central point on a dark skin-like surface, camera: eye-level hero macro, lighting: soft radial glow, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space around the burst, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
+--- 36 엑소좀 별자리 ---
+a wide dark gradient surface scattered with small glowing gold-blue spheres arranged like a gentle constellation, camera: wide landscape hero, lighting: soft ambient glow, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space in the lower half, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
+--- 37 듀이 하이라이트 ---
+a softly lit skin-like surface with a dewy glow highlight and a few suspended glowing gold particles nearby, camera: 45-degree macro close, lighting: soft dewy glow, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
+--- 38 스킨 레이어 다이어그램 ---
+a macro of layered skin-like translucent bands with a gentle glowing gradient tracing their absorption path, camera: eye-level composed macro, lighting: soft gradient glow, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space in the upper half, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
+--- 39 분자 웨이브 ---
+a wide dark surface with a soft glowing molecular wave pattern flowing gently across it, camera: wide landscape hero, lighting: soft ambient glow with gentle motion, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space in the lower half, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
+--- 40 엑소좀 히어로 ---
+a large glowing exosome sphere with a warm gold rim light, resting against a soft blurred skin-like dark background, camera: eye-level hero macro, lighting: soft gold rim light with gentle falloff, palette: warm gold #FFC94D and electric blue #2E6FFF on deep charcoal navy #0B0F1F, generous clean copy space around the sphere, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, skin absorption macro styling
+
