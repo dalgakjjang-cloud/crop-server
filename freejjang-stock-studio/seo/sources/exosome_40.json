@@ -1,0 +1,884 @@
+[
+ {
+  "n": 1,
+  "grp": "A",
+  "title_en": "A large glowing translucent exosome sphere",
+  "title_ko": "글로우 엑소좀 구체 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "membrane"
+  ],
+  "core_ko": [
+   "구체",
+   "막"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 2,
+  "grp": "A",
+  "title_en": "Three glowing translucent exosome spheres of different sizes",
+  "title_ko": "엑소좀 클러스터 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "cluster",
+   "membrane"
+  ],
+  "core_ko": [
+   "구체",
+   "클러스터",
+   "막"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 3,
+  "grp": "A",
+  "title_en": "A cross-section of a glowing exosome sphere revealing tiny",
+  "title_ko": "엑소좀 단면 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "cross section"
+  ],
+  "core_ko": [
+   "구체",
+   "단면"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 4,
+  "grp": "A",
+  "title_en": "An extreme macro of a glowing exosome membrane surface studded",
+  "title_ko": "엑소좀 막 표면 · 네온 바이오텍",
+  "core_en": [
+   "membrane"
+  ],
+  "core_ko": [
+   "막"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 5,
+  "grp": "A",
+  "title_en": "A flowing stream of small glowing exosome spheres trailing like a",
+  "title_ko": "엑소좀 광류 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "stream"
+  ],
+  "core_ko": [
+   "구체",
+   "흐름"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 6,
+  "grp": "A",
+  "title_en": "A central glowing exosome sphere",
+  "title_ko": "엑소좀 오빗 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "orbit",
+   "orb"
+  ],
+  "core_ko": [
+   "구체",
+   "궤도",
+   "오브"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 7,
+  "grp": "A",
+  "title_en": "Two glowing translucent exosome spheres merging together",
+  "title_ko": "엑소좀 융합 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "fusion"
+  ],
+  "core_ko": [
+   "구체",
+   "융합"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 8,
+  "grp": "A",
+  "title_en": "A glowing exosome sphere",
+  "title_ko": "엑소좀 나선 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "membrane",
+   "strand"
+  ],
+  "core_ko": [
+   "구체",
+   "막",
+   "가닥"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 9,
+  "grp": "A",
+  "title_en": "A single glowing droplet-shaped exosome",
+  "title_ko": "엑소좀 스파클 · 네온 바이오텍",
+  "core_en": [
+   "droplet"
+  ],
+  "core_ko": [
+   "방울"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 10,
+  "grp": "A",
+  "title_en": "A field of small glowing exosome spheres scattered like distant",
+  "title_ko": "엑소좀 필드 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "field"
+  ],
+  "core_ko": [
+   "구체",
+   "필드"
+  ],
+  "color_en": [
+   "electric blue",
+   "neon violet"
+  ],
+  "color_ko": [
+   "블루",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 11,
+  "grp": "B",
+  "title_en": "A cell membrane cross-section gently releasing a small glowing",
+  "title_ko": "세포막 버딩 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "cross section",
+   "membrane"
+  ],
+  "core_ko": [
+   "구체",
+   "단면",
+   "막"
+  ],
+  "color_en": [
+   "neon green",
+   "electric cyan"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 12,
+  "grp": "B",
+  "title_en": "A small vesicle budding off from a larger glowing cell membrane",
+  "title_ko": "베지클 버딩 · 네온 바이오텍",
+  "core_en": [
+   "membrane",
+   "vesicle",
+   "cell"
+  ],
+  "core_ko": [
+   "막",
+   "베지클",
+   "세포"
+  ],
+  "color_en": [
+   "neon pink",
+   "azure blue"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 13,
+  "grp": "B",
+  "title_en": "An extreme macro of a lipid bilayer sphere surface",
+  "title_ko": "지질층 매크로 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "lipid bilayer"
+  ],
+  "core_ko": [
+   "구체",
+   "지질층"
+  ],
+  "color_en": [
+   "neon green",
+   "electric cyan"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 14,
+  "grp": "B",
+  "title_en": "A glowing sphere resembling a cell nucleus",
+  "title_ko": "핵 오빗 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "orbit",
+   "nucleus"
+  ],
+  "core_ko": [
+   "구체",
+   "궤도",
+   "핵"
+  ],
+  "color_en": [
+   "neon pink",
+   "azure blue"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 15,
+  "grp": "B",
+  "title_en": "A translucent two-layer membrane sphere",
+  "title_ko": "이중막 구체 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "membrane"
+  ],
+  "core_ko": [
+   "구체",
+   "막"
+  ],
+  "color_en": [
+   "neon pink",
+   "azure blue"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 16,
+  "grp": "B",
+  "title_en": "A microscopic view of a cell releasing several small glowing",
+  "title_ko": "세포 방출 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "cell"
+  ],
+  "core_ko": [
+   "구체",
+   "세포"
+  ],
+  "color_en": [
+   "neon pink",
+   "azure blue"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 17,
+  "grp": "B",
+  "title_en": "A glowing molecular chain winding gently through dark space",
+  "title_ko": "분자 사슬 · 네온 바이오텍",
+  "core_en": [
+   "molecular chain"
+  ],
+  "core_ko": [
+   "사슬"
+  ],
+  "color_en": [
+   "neon green",
+   "electric cyan"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 18,
+  "grp": "B",
+  "title_en": "A vesicle sphere",
+  "title_ko": "베지클 알갱이 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "membrane",
+   "vesicle"
+  ],
+  "core_ko": [
+   "구체",
+   "막",
+   "베지클"
+  ],
+  "color_en": [
+   "neon green",
+   "electric cyan"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 19,
+  "grp": "B",
+  "title_en": "A cluster of small glowing pink-toned spheres orbiting a larger",
+  "title_ko": "듀얼 글로우 클러스터 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "cluster",
+   "orbit"
+  ],
+  "core_ko": [
+   "구체",
+   "클러스터",
+   "궤도"
+  ],
+  "color_en": [
+   "neon pink",
+   "azure blue"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 20,
+  "grp": "B",
+  "title_en": "An extreme macro of a translucent membrane surface",
+  "title_ko": "막 표면 이슬 · 네온 바이오텍",
+  "core_en": [
+   "membrane",
+   "droplet"
+  ],
+  "core_ko": [
+   "막",
+   "방울"
+  ],
+  "color_en": [
+   "neon green",
+   "electric cyan"
+  ],
+  "color_ko": [
+   "그린",
+   "블루",
+   "핑크"
+  ]
+ },
+ {
+  "n": 21,
+  "grp": "C",
+  "title_en": "A glass ampoule bottle silhouette filled",
+  "title_ko": "앰플 실루엣 · 네온 바이오텍",
+  "core_en": [
+   "ampoule"
+  ],
+  "core_ko": [
+   "앰플"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 22,
+  "grp": "C",
+  "title_en": "A serum droplet caught mid-fall",
+  "title_ko": "세럼 드롭 · 네온 바이오텍",
+  "core_en": [
+   "droplet",
+   "serum"
+  ],
+  "core_ko": [
+   "방울",
+   "세럼"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 23,
+  "grp": "C",
+  "title_en": "A liquid splash frozen mid-motion",
+  "title_ko": "리퀴드 스플래시 · 네온 바이오텍",
+  "core_en": [
+   "splash"
+  ],
+  "core_ko": [
+   "스플래시"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 24,
+  "grp": "C",
+  "title_en": "A dropper tip releasing a single glowing serum bead",
+  "title_ko": "드로퍼 비드 · 네온 바이오텍",
+  "core_en": [
+   "serum",
+   "dropper"
+  ],
+  "core_ko": [
+   "세럼",
+   "드로퍼"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 25,
+  "grp": "C",
+  "title_en": "An extreme macro of glossy serum texture",
+  "title_ko": "세럼 텍스처 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "serum"
+  ],
+  "core_ko": [
+   "구체",
+   "세럼"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 26,
+  "grp": "C",
+  "title_en": "A glass orb filled",
+  "title_ko": "글로우 오브 · 네온 바이오텍",
+  "core_en": [
+   "orb"
+  ],
+  "core_ko": [
+   "오브"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 27,
+  "grp": "C",
+  "title_en": "A thin stream of serum pouring downward",
+  "title_ko": "세럼 스트림 · 네온 바이오텍",
+  "core_en": [
+   "stream",
+   "serum"
+  ],
+  "core_ko": [
+   "흐름",
+   "세럼"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 28,
+  "grp": "C",
+  "title_en": "An extreme macro of fine bubble foam texture",
+  "title_ko": "버블 폼 매크로 · 네온 바이오텍",
+  "core_en": [
+   "foam"
+  ],
+  "core_ko": [
+   "폼"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 29,
+  "grp": "C",
+  "title_en": "A translucent gel texture",
+  "title_ko": "젤 텍스처 매크로 · 네온 바이오텍",
+  "core_en": [
+   "gel"
+  ],
+  "core_ko": [
+   "젤"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 30,
+  "grp": "C",
+  "title_en": "An ampoule cap",
+  "title_ko": "앰플 드립 · 네온 바이오텍",
+  "core_en": [
+   "droplet",
+   "ampoule"
+  ],
+  "core_ko": [
+   "방울",
+   "앰플"
+  ],
+  "color_en": [
+   "electric cyan",
+   "violet"
+  ],
+  "color_ko": [
+   "시안",
+   "퍼플"
+  ]
+ },
+ {
+  "n": 31,
+  "grp": "D",
+  "title_en": "A macro cross-section of skin-like translucent layers",
+  "title_ko": "피부 흡수 단면 · 네온 바이오텍",
+  "core_en": [
+   "cross section",
+   "skin",
+   "orb"
+  ],
+  "core_ko": [
+   "단면",
+   "피부",
+   "오브"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ },
+ {
+  "n": 32,
+  "grp": "D",
+  "title_en": "A glowing molecular mesh network spreading softly across a dark",
+  "title_ko": "분자 메쉬 네트워크 · 네온 바이오텍",
+  "core_en": [
+   "network"
+  ],
+  "core_ko": [
+   "네트워크"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ },
+ {
+  "n": 33,
+  "grp": "D",
+  "title_en": "A gentle skin-like gradient surface stretching wide",
+  "title_ko": "스킨 랜드스케이프 · 네온 바이오텍",
+  "core_en": [
+   "skin"
+  ],
+  "core_ko": [
+   "피부"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ },
+ {
+  "n": 34,
+  "grp": "D",
+  "title_en": "An extreme macro of a skin pore",
+  "title_ko": "포어 앱저브션 · 네온 바이오텍",
+  "core_en": [
+   "skin",
+   "pore"
+  ],
+  "core_ko": [
+   "피부",
+   "모공"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ },
+ {
+  "n": 35,
+  "grp": "D",
+  "title_en": "A soft radiating burst of glowing light expanding outward from a",
+  "title_ko": "라디언트 버스트 · 네온 바이오텍",
+  "core_en": [
+   "skin",
+   "burst"
+  ],
+  "core_ko": [
+   "피부",
+   "버스트"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ },
+ {
+  "n": 36,
+  "grp": "D",
+  "title_en": "A wide dark gradient surface scattered",
+  "title_ko": "엑소좀 별자리 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "constellation"
+  ],
+  "core_ko": [
+   "구체",
+   "별자리"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ },
+ {
+  "n": 37,
+  "grp": "D",
+  "title_en": "A softly lit skin-like surface",
+  "title_ko": "듀이 하이라이트 · 네온 바이오텍",
+  "core_en": [
+   "skin"
+  ],
+  "core_ko": [
+   "피부"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ },
+ {
+  "n": 38,
+  "grp": "D",
+  "title_en": "A macro of layered skin-like translucent bands",
+  "title_ko": "스킨 레이어 다이어그램 · 네온 바이오텍",
+  "core_en": [
+   "skin"
+  ],
+  "core_ko": [
+   "피부"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ },
+ {
+  "n": 39,
+  "grp": "D",
+  "title_en": "A wide dark surface",
+  "title_ko": "분자 웨이브 · 네온 바이오텍",
+  "core_en": [
+   "wave"
+  ],
+  "core_ko": [
+   "웨이브"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ },
+ {
+  "n": 40,
+  "grp": "D",
+  "title_en": "A large glowing exosome sphere",
+  "title_ko": "엑소좀 히어로 · 네온 바이오텍",
+  "core_en": [
+   "sphere",
+   "skin"
+  ],
+  "core_ko": [
+   "구체",
+   "피부"
+  ],
+  "color_en": [
+   "warm gold",
+   "electric blue"
+  ],
+  "color_ko": [
+   "골드",
+   "블루"
+  ]
+ }
+]

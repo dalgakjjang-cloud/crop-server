@@ -13,10 +13,12 @@ usage:
     python3 seo/build_metadata.py          # 전 배치 생성
 """
 import csv
+import json
 import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR = os.path.join(HERE, "metadata")
+SRC_DIR = os.path.join(HERE, "sources")
 
 # ── 공통 키워드 풀 ─────────────────────────────────────────────
 UNIVERSAL_EN = ["cute", "kawaii", "pastel", "soft", "3d render", "adorable",
@@ -228,6 +230,125 @@ def build_kawaii():
     return rows
 
 
+# ── 엑소좀40 (Adobe · 네온 바이오텍) ───────────────────────────
+EXO_UNIVERSAL_EN = ["exosome", "biotechnology", "science", "3d render", "dark background",
+                    "glowing", "neon", "futuristic", "medical", "research", "abstract",
+                    "technology", "macro", "scientific", "molecular", "closeup",
+                    "microbiology", "healthcare", "blue", "digital"]
+EXO_UNIVERSAL_KO = ["엑소좀", "바이오텍", "과학", "3d 렌더", "다크 배경", "발광", "네온",
+                    "미래적", "의학", "연구", "추상", "기술", "매크로", "분자", "생물학",
+                    "헬스케어", "디지털"]
+EXO_GROUP_EN = {
+    "A": ["molecule", "molecular structure", "particle", "nanotechnology", "sphere", "cell", "atom"],
+    "B": ["cell", "cell membrane", "vesicle", "cellular", "biology", "microorganism", "organism"],
+    "C": ["serum", "cosmetics", "skincare", "beauty", "ampoule", "liquid", "droplet", "anti aging"],
+    "D": ["skincare", "skin", "beauty", "absorption", "dermatology", "collagen", "regeneration", "cosmetics"],
+}
+EXO_GROUP_KO = {
+    "A": ["분자", "입자", "나노", "구체", "세포"],
+    "B": ["세포", "세포막", "베지클", "생물학", "미생물"],
+    "C": ["세럼", "화장품", "스킨케어", "뷰티", "앰플", "리퀴드"],
+    "D": ["스킨케어", "피부", "뷰티", "흡수", "피부과", "콜라겐"],
+}
+EXO_COLOR_KO_EXTRA = ["블루", "퍼플", "네온"]
+
+
+# 프롬프트에서 잘린 제목의 꼬리 군더더기(전치사·관사·형용사)를 제거하고,
+# 너무 짧으면 다크 배경 맥락을 붙여 자연스러운 스톡 제목으로 정리한다.
+_TITLE_TAIL_BAD = {"tiny", "the", "a", "of", "with", "and", "in", "on", "soft",
+                   "gentle", "its", "like", "each", "through", "revealing",
+                   "resembling", "filled", "caught", "forming", "studded",
+                   "trailing", "spreading", "scattered", "winding", "expanding",
+                   "stretching", "different", "small", "large", "off", "from",
+                   "several", "together", "larger", "wide"}
+
+
+def clean_exo_title(t):
+    words = t.split()
+    while len(words) > 3 and words[-1].lower().strip(",") in _TITLE_TAIL_BAD:
+        words.pop()
+    t = " ".join(words)
+    if len(t) < 45 and "background" not in t.lower():
+        t = t + " on dark background"
+    return t
+
+
+def build_exosome():
+    data = json.load(open(os.path.join(SRC_DIR, "exosome_40.json"), encoding="utf-8"))
+    rows = []
+    for c in data:
+        grp = c["grp"]
+        kw_en = merge(c["core_en"], c["color_en"], EXO_GROUP_EN[grp],
+                      EXO_UNIVERSAL_EN, cap=28)
+        kw_ko = merge(c["core_ko"], c["color_ko"], EXO_GROUP_KO[grp],
+                      EXO_UNIVERSAL_KO, cap=24)
+        rows.append({
+            "filename": "exosome-%02d.png" % c["n"],
+            "asset_type": "photo",
+            "title_en": clean_exo_title(c["title_en"]),
+            "title_ko": c["title_ko"],
+            "keywords_en": ", ".join(kw_en),
+            "keywords_ko": ", ".join(kw_ko),
+            "category": "9. Graphic Resources",
+            "batch": "exosome_40",
+            "axis_subject": c["title_ko"].split(" · ")[0],
+            "axis_color": "/".join(c["color_ko"]),
+        })
+    return rows
+
+
+# ── 베스트셀러36 (MiriCanvas · 한국 라이프스타일) ──────────────
+# 용도·무드 중심 공통 풀 (내용이 아니라 쓰임새를 서술 → 전 컷 안전)
+BEST_UNIVERSAL_EN = ["korean", "bright", "clean", "copy space", "background",
+                     "natural light", "lifestyle", "modern", "no text",
+                     "advertising", "promotion", "template", "banner",
+                     "commercial", "design", "marketing", "concept", "poster"]
+BEST_UNIVERSAL_KO = ["한국", "밝은", "깨끗한", "여백", "배경", "자연광",
+                     "라이프스타일", "모던", "텍스트 없음", "광고", "홍보",
+                     "템플릿", "배너", "상업", "디자인", "마케팅", "컨셉", "포스터"]
+BEST_CAT_EN = {
+    "부동산": ["real estate", "apartment", "interior", "home", "housing", "residential", "property", "building"],
+    "가족": ["family", "korean family", "happy", "together", "parenting", "love", "children"],
+    "비즈니스": ["business", "office", "professional", "meeting", "work", "teamwork", "corporate"],
+    "여름과일": ["fruit", "fresh", "summer", "healthy", "food", "delicious", "organic"],
+    "가을과일": ["fruit", "fresh", "autumn", "gift", "healthy", "premium", "food"],
+    "건강식": ["healthy food", "diet", "fresh", "meal", "nutrition", "vegetable", "wellness"],
+    "홈·침구": ["interior", "home", "cozy", "bedroom", "bedding", "minimal", "comfortable"],
+}
+BEST_CAT_KO = {
+    "부동산": ["부동산", "아파트", "인테리어", "주거", "주택", "건물"],
+    "가족": ["가족", "행복", "함께", "육아", "사랑", "아이"],
+    "비즈니스": ["비즈니스", "사무실", "전문가", "회의", "업무", "팀워크"],
+    "여름과일": ["과일", "신선", "여름", "건강", "음식", "유기농"],
+    "가을과일": ["과일", "신선", "가을", "선물", "건강", "프리미엄"],
+    "건강식": ["건강식", "다이어트", "신선", "식사", "영양", "채소"],
+    "홈·침구": ["인테리어", "홈", "아늑한", "침실", "침구", "미니멀"],
+}
+
+
+def build_bestsellers():
+    data = json.load(open(os.path.join(SRC_DIR, "bestsellers_36.json"), encoding="utf-8"))
+    rows = []
+    for c in data:
+        cat = c["cat"]
+        # 기존 키워드(내용 정확)를 선두로 시드 → 카테고리 풀 → 공통 순 병합
+        kw_en = merge(c["seed_en"], BEST_CAT_EN.get(cat, []), BEST_UNIVERSAL_EN, cap=28)
+        kw_ko = merge(c["seed_ko"], BEST_CAT_KO.get(cat, []), BEST_UNIVERSAL_KO, cap=24)
+        rows.append({
+            "filename": "miri-best-%02d.png" % c["n"],
+            "asset_type": "photo",
+            "title_en": c["title_en"],
+            "title_ko": c["title_ko"],
+            "keywords_en": ", ".join(kw_en),
+            "keywords_ko": ", ".join(kw_ko),
+            "category": c["category"],
+            "batch": "bestsellers_36",
+            "axis_subject": cat,
+            "axis_color": "",
+        })
+    return rows
+
+
 COLUMNS = ["filename", "asset_type", "title_en", "title_ko",
            "keywords_en", "keywords_ko", "category", "batch",
            "axis_subject", "axis_color"]
@@ -244,5 +365,8 @@ def write_csv(batch, rows):
 
 
 if __name__ == "__main__":
-    p = write_csv("kawaii_24", build_kawaii())
-    print("wrote", p)
+    for batch, builder in [("kawaii_24", build_kawaii),
+                           ("exosome_40", build_exosome),
+                           ("bestsellers_36", build_bestsellers)]:
+        p = write_csv(batch, builder())
+        print("wrote", p)
