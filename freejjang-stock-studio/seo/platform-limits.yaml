@@ -1,0 +1,82 @@
+# 스톡 플랫폼별 메타데이터 상한 — 단일 진실 공급원
+# seo-check.py가 이 파일을 읽어 검사한다. 규칙 문서는 keyword-governance.md.
+version: 1.0
+updated: 2026-07-22
+
+platforms:
+  adobe:
+    name: Adobe Stock
+    keywords_max: 49          # 하드 상한
+    keywords_recommended_min: 25
+    keywords_weighted_first: 10   # 앞 N개에 검색 가중
+    title_max_chars: 200
+    title_recommended_chars: 70
+    notes: 앞 10개 키워드가 검색 순위를 크게 좌우. 제목은 자연문.
+
+  shutterstock:
+    name: Shutterstock
+    keywords_max: 50
+    keywords_recommended_min: 25
+    keywords_weighted_first: 7
+    title_max_chars: 200
+    title_recommended_chars: 70
+
+  istock:
+    name: iStock / Getty
+    keywords_max: 50
+    keywords_recommended_min: 20
+    keywords_weighted_first: 10
+    title_max_chars: 200
+    title_recommended_chars: 70
+    notes: 통제 어휘(controlled vocabulary). 관련 없는 키워드 과다 시 페널티.
+
+  freepik:
+    name: Freepik
+    keywords_max: 50
+    keywords_recommended_min: 20
+    keywords_weighted_first: 10
+    title_max_chars: 200
+    title_recommended_chars: 70
+
+# 국내 채널(한글 키워드) 별도 하한
+korean_keywords:
+  recommended_min: 15
+
+# 검사 기본 대상 플랫폼 (가장 엄격한 하한을 쓰는 어도비 기준)
+default_platform: adobe
+
+# 전 플랫폼 공통 금지어 (브랜드·상표·캐릭터 — 스톡 거절 사유)
+banned_terms:
+  - sanrio
+  - disney
+  - pixar
+  - hello kitty
+  - mickey
+  - pokemon
+  - iphone
+  - apple
+  - samsung
+  - nike
+  - starbucks
+  - lego
+  - barbie
+  - marvel
+  - coca cola
+  - louis vuitton
+  - chanel
+  - gucci
+
+# asset_type 허용값
+asset_types:
+  - photo
+  - video
+
+# 비디오 자산에 필수로 포함돼야 하는 모션 키워드 (하나 이상)
+video_motion_keywords_any:
+  - motion graphics
+  - animation
+  - animated
+  - loop
+  - seamless loop
+  - moving background
+  - video background
