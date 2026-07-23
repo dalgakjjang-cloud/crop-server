@@ -3,7 +3,7 @@ import {
   Sparkles, Download, Trash2, RefreshCw, Copy, Check, Cpu, AlertTriangle,
   FileSpreadsheet, Wand2, X, Play, Square, Image as ImageIcon, ScanSearch,
   Layers, Key, Settings2, CornerDownLeft, FileText, ClipboardCheck,
-  ShieldAlert, CircleDollarSign, ChevronRight, Ban, FolderOpen, Sun, Moon, Upload
+  ShieldAlert, CircleDollarSign, ChevronRight, Ban, FolderOpen, Sun, Moon, Upload, ExternalLink
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import JSZip from "jszip";
@@ -2212,6 +2212,11 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <a href="https://free-atelier.pages.dev" target="_blank" rel="noopener noreferrer"
+                title="벡터 아뜰리에 — 생성한 요소 이미지를 배경 제거·벡터로 따내는 편집기 (새 탭)"
+                className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-violet-500/30 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 transition">
+                <ExternalLink className="w-3 h-3" /> 벡터 아뜰리에 <span className="text-violet-500/70">↗</span>
+              </a>
               <button onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
                 title={theme === "dark" ? "밝은 테마로 전환" : "어두운 테마로 전환"}
                 className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-neutral-700 text-neutral-300 hover:text-neutral-100 transition">
