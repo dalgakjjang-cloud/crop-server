@@ -2227,6 +2227,11 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
                 className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-orange-500/30 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20 transition">
                 <ExternalLink className="w-3 h-3" /> 로고공방 <span className="text-orange-500/70">↗</span>
               </a>
+              <a href="https://autocrop-tool.hopot13.workers.dev/" target="_blank" rel="noopener noreferrer"
+                title="자동크롭 — 이미지 배경·여백 자동 감지 후 일괄 크롭 (새 탭)"
+                className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-teal-500/30 bg-teal-500/10 text-teal-300 hover:bg-teal-500/20 transition">
+                <ExternalLink className="w-3 h-3" /> 자동크롭 <span className="text-teal-500/70">↗</span>
+              </a>
               <button onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
                 title={theme === "dark" ? "밝은 테마로 전환" : "어두운 테마로 전환"}
                 className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-neutral-700 text-neutral-300 hover:text-neutral-100 transition">
