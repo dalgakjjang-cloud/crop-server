@@ -2212,6 +2212,11 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <a href="hub.html" target="_blank" rel="noopener noreferrer"
+                title="제작 스위트 허브 — 모든 도구를 한 곳에서"
+                className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition">
+                <ExternalLink className="w-3 h-3" /> 허브 <span className="text-amber-500/70">↗</span>
+              </a>
               <a href="https://free-atelier.pages.dev" target="_blank" rel="noopener noreferrer"
                 title="벡터 아뜰리에 — 생성한 요소 이미지를 배경 제거·벡터로 따내는 편집기 (새 탭)"
                 className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-violet-500/30 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 transition">

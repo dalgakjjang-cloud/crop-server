@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>제작 스위트 · 달깍클라우드 도구 허브</title>
+<meta name="description" content="AI 스톡 제작 · 로고 · 벡터 · 움짤 · 크롭 — 흩어진 제작 도구를 한 곳에서 열어보는 허브." />
+<style>
+  :root{
+    --bg:#17140f; --bg2:#1f1a13; --panel:#221c14; --panel2:#2a2319;
+    --ink:#efe7d8; --muted:#a99b83; --faint:#7a6e5b;
+    --line:#352c20; --line2:#41362700; --amber:#e8a13c; --amber-soft:#3a2c14;
+    --shadow:0 24px 60px -30px rgba(0,0,0,.8);
+    --c-studio:#8b6cf0; --c-logo:#e0632e; --c-atelier:#d9a441; --c-gif:#e0559a; --c-crop:#37a98b;
+    --radius:20px;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#f7f3ec; --bg2:#efe8db; --panel:#ffffff; --panel2:#faf6ee;
+      --ink:#2a2118; --muted:#7c6f5b; --faint:#a89a82;
+      --line:#e8dfce; --amber:#c9791d; --amber-soft:#fbf0dc;
+      --shadow:0 22px 50px -28px rgba(120,80,20,.42);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#17140f; --bg2:#1f1a13; --panel:#221c14; --panel2:#2a2319;
+    --ink:#efe7d8; --muted:#a99b83; --faint:#7a6e5b;
+    --line:#352c20; --amber:#e8a13c; --amber-soft:#3a2c14;
+    --shadow:0 24px 60px -30px rgba(0,0,0,.8);
+  }
+  :root[data-theme="light"]{
+    --bg:#f7f3ec; --bg2:#efe8db; --panel:#ffffff; --panel2:#faf6ee;
+    --ink:#2a2118; --muted:#7c6f5b; --faint:#a89a82;
+    --line:#e8dfce; --amber:#c9791d; --amber-soft:#fbf0dc;
+    --shadow:0 22px 50px -28px rgba(120,80,20,.42);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    font-family:'Pretendard','Apple SD Gothic Neo',system-ui,-apple-system,'Segoe UI','Malgun Gothic',sans-serif;
+    color:var(--ink); background:var(--bg);
+    -webkit-font-smoothing:antialiased; min-height:100vh;
+    background-image:
+      radial-gradient(900px 460px at 88% -8%, color-mix(in srgb, var(--amber) 16%, transparent) 0%, transparent 60%),
+      radial-gradient(760px 420px at 6% 4%, color-mix(in srgb, var(--c-studio) 12%, transparent) 0%, transparent 55%);
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 22px 84px}
+
+  header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:34px}
+  .mark{display:flex;align-items:center;gap:11px}
+  .mark .glyph{width:38px;height:38px;border-radius:12px;flex:none;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--amber),var(--c-logo));color:#1a1206;font-weight:900;font-size:19px;
+    box-shadow:0 10px 22px -8px color-mix(in srgb,var(--amber) 70%,transparent)}
+  .mark b{font-size:15px;letter-spacing:-.01em}
+  .mark small{display:block;font-size:11px;color:var(--muted);letter-spacing:.02em;margin-top:1px}
+  .themeBtn{display:flex;align-items:center;gap:6px;font:inherit;font-size:12px;font-weight:700;cursor:pointer;
+    color:var(--muted);background:var(--panel);border:1px solid var(--line);padding:8px 13px;border-radius:999px;transition:.15s}
+  .themeBtn:hover{color:var(--ink);border-color:var(--amber)}
+
+  .hero{margin-bottom:30px}
+  .eyebrow{font-size:11.5px;font-weight:800;letter-spacing:.24em;color:var(--amber);margin:0 0 12px}
+  h1{font-size:clamp(30px,5vw,46px);line-height:1.06;margin:0;letter-spacing:-.035em;font-weight:850;text-wrap:balance;max-width:14ch}
+  h1 em{font-style:normal;color:var(--amber)}
+  .hero p{color:var(--muted);margin:14px 0 0;max-width:52ch;font-size:15px;line-height:1.62}
+  .meta{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:18px;font-size:12px;color:var(--faint)}
+  .meta b{color:var(--muted);font-weight:700}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(292px,1fr));gap:16px;margin-top:8px}
+
+  .card{position:relative;display:flex;flex-direction:column;gap:0;text-decoration:none;color:inherit;overflow:hidden;
+    background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);
+    transition:transform .18s cubic-bezier(.2,.7,.3,1), border-color .18s, box-shadow .18s}
+  a.card:hover{transform:translateY(-4px);border-color:color-mix(in srgb,var(--ac) 60%,var(--line));
+    box-shadow:0 30px 64px -30px color-mix(in srgb,var(--ac) 55%,transparent)}
+  a.card:focus-visible{outline:2px solid var(--ac);outline-offset:3px}
+  .card .band{height:5px;background:linear-gradient(90deg,var(--ac),color-mix(in srgb,var(--ac) 30%,transparent))}
+  .card .body{padding:18px 18px 16px;display:flex;flex-direction:column;gap:12px;flex:1}
+  .card .rowtop{display:flex;align-items:flex-start;gap:12px}
+  .tile{width:46px;height:46px;border-radius:13px;flex:none;display:grid;place-items:center;font-size:23px;
+    background:color-mix(in srgb,var(--ac) 15%,var(--panel2));
+    border:1px solid color-mix(in srgb,var(--ac) 35%,var(--line));
+    box-shadow:0 8px 20px -10px color-mix(in srgb,var(--ac) 60%,transparent)}
+  .nm{min-width:0}
+  .nm b{display:block;font-size:16.5px;letter-spacing:-.02em;line-height:1.2}
+  .nm span{display:block;font-size:11px;color:var(--faint);letter-spacing:.06em;text-transform:uppercase;margin-top:3px}
+  .card .desc{font-size:13px;line-height:1.58;color:var(--muted);margin:0}
+  .card .foot{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;padding-top:4px}
+  .status{font-size:11px;font-weight:700;letter-spacing:.02em;padding:4px 10px;border-radius:999px;
+    color:var(--ac);background:color-mix(in srgb,var(--ac) 14%,transparent);
+    border:1px solid color-mix(in srgb,var(--ac) 32%,transparent)}
+  .open{font-size:12.5px;font-weight:800;color:var(--ac);display:flex;align-items:center;gap:4px}
+  .open .arw{transition:transform .18s}
+  a.card:hover .open .arw{transform:translate(2px,-2px)}
+
+  .card.soon{opacity:.72}
+  .card.soon .tile{filter:grayscale(.35)}
+  .card.soon .status{color:var(--muted);background:color-mix(in srgb,var(--muted) 12%,transparent);border-color:var(--line)}
+  .card.soon .open{color:var(--faint)}
+  .card.soon .desc .todo{color:var(--faint);font-style:italic}
+
+  .note{margin-top:30px;padding:16px 18px;border:1px dashed var(--line);border-radius:16px;background:var(--bg2);
+    font-size:12.5px;line-height:1.65;color:var(--muted)}
+  .note b{color:var(--ink)}
+  .note code{font-family:ui-monospace,'SFMono-Regular',Consolas,monospace;font-size:11.5px;
+    background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:var(--amber)}
+
+  footer{margin-top:34px;text-align:center;color:var(--faint);font-size:12px;line-height:1.7}
+  footer a{color:var(--muted);text-decoration:none;border-bottom:1px dotted var(--faint)}
+  footer a:hover{color:var(--amber);border-color:var(--amber)}
+
+  @media (prefers-reduced-motion: reduce){
+    *{transition:none !important}
+    a.card:hover{transform:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="mark">
+      <span class="glyph">달</span>
+      <div><b>제작 스위트</b><small>DALGAKJJANG CLOUD · TOOL HUB</small></div>
+    </div>
+    <button class="themeBtn" id="themeBtn" type="button" aria-label="테마 전환">
+      <span id="themeIcon">☾</span><span id="themeTxt">어둡게</span>
+    </button>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">ONE PLACE · ALL TOOLS</p>
+    <h1>흩어진 제작 도구를<br><em>한 곳에서</em> 연다</h1>
+    <p>AI 스톡 제작부터 로고·벡터·움짤·크롭까지 — 각자 다른 곳에 배포된 도구를 이 허브에서 한 번에 열어보세요. 각 카드는 새 탭으로 바로 이동합니다.</p>
+    <div class="meta">
+      <span><b id="liveCount">3</b> 라이브 · <b id="soonCount">2</b> 준비 중</span>
+      <span>서로 헤더 바로가기로 <b>양방향 연결</b>됨</span>
+    </div>
+  </section>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="note">
+    <b>움짤공방 · 자동크롭</b>은 배포 주소만 넣으면 바로 라이브 카드로 바뀝니다. 아래 데이터 배열의 <code>url</code>과 <code>soon:false</code>만 채우면 끝 —
+    이 페이지는 <code>github.io/crop-server/hub.html</code>에 함께 배포됩니다.
+  </div>
+
+  <footer>
+    달깍클라우드 제작 스위트 · 각 도구는 독립 배포 · 이 허브는 <a href="https://dalgakjjang-cloud.github.io/crop-server/">양산공장</a>과 함께 GitHub Pages에 배포됩니다.
+  </footer>
+</div>
+
+<script>
+  const TOOLS = [
+    { key:'studio',  emoji:'🏭', ac:'var(--c-studio)',  name:'양산공장', en:'FreeJJang Stock Studio',
+      url:'https://dalgakjjang-cloud.github.io/crop-server/', soon:false,
+      desc:'AI 두뇌가 초안을 설계하고 트리플 엔진이 이미지를 생성 — QC·업스케일 거쳐 Adobe·미리캔버스 제출팩까지 원클릭.' },
+    { key:'logo',    emoji:'🎨', ac:'var(--c-logo)',     name:'로고공방', en:'Logo Gongbang',
+      url:'https://dalgakjjang-cloud.github.io/logo-gongbang/', soon:false,
+      desc:'상호명·기획의도만 넣으면 음식 로고 프롬프트 세트를 8가지 스타일로. 참고 시안 색상 자동 추출.' },
+    { key:'atelier', emoji:'🖼', ac:'var(--c-atelier)',  name:'벡터 아뜰리에', en:'Free.Atelier',
+      url:'https://free-atelier.pages.dev', soon:false,
+      desc:'생성한 요소 이미지를 배경 제거 → 벡터로 따내는 편집기. imagetracer 기반, 로컬에서만 동작.' },
+    { key:'gif',     emoji:'🎞', ac:'var(--c-gif)',      name:'움짤공방', en:'GIF Workshop',
+      url:'', soon:true,
+      desc:'움직이는 GIF·짧은 루프 제작 도구.' },
+    { key:'crop',    emoji:'✂️', ac:'var(--c-crop)',     name:'자동크롭', en:'Auto Crop',
+      url:'', soon:true,
+      desc:'이미지 배경·여백 자동 감지 후 일괄 크롭.' },
+  ];
+
+  const grid = document.getElementById('grid');
+  let live = 0, soon = 0;
+  for (const t of TOOLS){
+    const active = !t.soon && t.url;
+    active ? live++ : soon++;
+    const el = document.createElement(active ? 'a' : 'div');
+    el.className = 'card' + (active ? '' : ' soon');
+    el.style.setProperty('--ac', t.ac);
+    if (active){ el.href = t.url; el.target = '_blank'; el.rel = 'noopener'; }
+    const descHtml = active ? t.desc
+      : `${t.desc} <span class="todo">— 배포 주소 대기</span>`;
+    el.innerHTML = `
+      <div class="band"></div>
+      <div class="body">
+        <div class="rowtop">
+          <div class="tile">${t.emoji}</div>
+          <div class="nm"><b>${t.name}</b><span>${t.en}</span></div>
+        </div>
+        <p class="desc">${descHtml}</p>
+        <div class="foot">
+          <span class="status">${active ? '라이브' : '준비 중'}</span>
+          <span class="open">${active ? '열기' : 'URL 대기'} <span class="arw">↗</span></span>
+        </div>
+      </div>`;
+    grid.appendChild(el);
+  }
+  document.getElementById('liveCount').textContent = live;
+  document.getElementById('soonCount').textContent = soon;
+
+  // theme toggle (persist)
+  const root = document.documentElement, TK = 'suitehub.theme';
+  const icon = document.getElementById('themeIcon'), txt = document.getElementById('themeTxt');
+  function sysDark(){ return matchMedia('(prefers-color-scheme: dark)').matches; }
+  function apply(mode){
+    if (mode === 'system'){ root.removeAttribute('data-theme'); }
+    else root.setAttribute('data-theme', mode);
+    const dark = mode === 'dark' || (mode === 'system' && sysDark());
+    icon.textContent = dark ? '☀' : '☾';
+    txt.textContent  = dark ? '밝게' : '어둡게';
+  }
+  let cur = localStorage.getItem(TK) || 'system';
+  apply(cur);
+  document.getElementById('themeBtn').onclick = () => {
+    const dark = cur === 'dark' || (cur === 'system' && sysDark());
+    cur = dark ? 'light' : 'dark';
+    localStorage.setItem(TK, cur);
+    apply(cur);
+  };
+</script>
+</body>
+</html>
