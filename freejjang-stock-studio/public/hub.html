@@ -139,7 +139,7 @@
   <div class="grid" id="grid"></div>
 
   <div class="note">
-    <b>움짤공방 · 자동크롭</b>은 배포 주소만 넣으면 바로 라이브 카드로 바뀝니다. 아래 데이터 배열의 <code>url</code>과 <code>soon:false</code>만 채우면 끝 —
+    <b>움짤공방</b>은 배포 주소만 넣으면 바로 라이브 카드로 바뀝니다. 아래 데이터 배열의 <code>url</code>과 <code>soon:false</code>만 채우면 끝 —
     이 페이지는 <code>github.io/crop-server/hub.html</code>에 함께 배포됩니다.
   </div>
 
@@ -163,8 +163,8 @@
       url:'', soon:true,
       desc:'움직이는 GIF·짧은 루프 제작 도구.' },
     { key:'crop',    emoji:'✂️', ac:'var(--c-crop)',     name:'자동크롭', en:'Auto Crop',
-      url:'', soon:true,
-      desc:'이미지 배경·여백 자동 감지 후 일괄 크롭.' },
+      url:'https://autocrop-tool.hopot13.workers.dev/', soon:false,
+      desc:'이미지 배경·여백을 자동 감지해 일괄 크롭. Cloudflare Workers 배포.' },
   ];
 
   const grid = document.getElementById('grid');
