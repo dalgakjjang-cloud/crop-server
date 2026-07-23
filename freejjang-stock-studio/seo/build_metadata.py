@@ -349,6 +349,50 @@ def build_bestsellers():
     return rows
 
 
+# ── 엑소좀 비디오 5컷 파일럿 (video · 5초+ 루프) ───────────────
+# 정지 엑소좀40에서 모션 내재 컷 선별. asset_type=video, .mp4, 모션 키워드 필수.
+VIDEO_MOTION_EN = ["motion graphics", "animation", "animated", "seamless loop",
+                   "loop", "moving background", "video background", "3d animation"]
+VIDEO_MOTION_KO = ["모션 그래픽", "애니메이션", "루프 영상", "움직이는 배경",
+                   "영상 배경", "3d 애니메이션"]
+# 선별 컷: n → (모션 영문 라벨, 모션 한글 라벨)
+EXO_VIDEO_PICKS = {
+    1:  ("pulsing floating sphere", "펄스 부양"),
+    5:  ("drifting light stream", "광류 드리프트"),
+    6:  ("orbiting particles", "입자 오빗"),
+    23: ("slow motion serum splash", "슬로모션 스플래시"),
+    35: ("radiating light burst", "확산 버스트"),
+}
+
+
+def build_exosome_video():
+    data = {c["n"]: c for c in
+            json.load(open(os.path.join(SRC_DIR, "exosome_40.json"), encoding="utf-8"))}
+    rows = []
+    for n, (motion_en, motion_ko) in EXO_VIDEO_PICKS.items():
+        c = data[n]
+        grp = c["grp"]
+        # 정지 컷 키워드 풀 + 모션 키워드를 선두 근처에 병합
+        kw_en = merge([motion_en], VIDEO_MOTION_EN, c["core_en"], c["color_en"],
+                      EXO_GROUP_EN[grp], EXO_UNIVERSAL_EN, cap=28)
+        kw_ko = merge([motion_ko], VIDEO_MOTION_KO, c["core_ko"], c["color_ko"],
+                      EXO_GROUP_KO[grp], EXO_UNIVERSAL_KO, cap=24)
+        subj = c["title_ko"].split(" · ")[0]
+        rows.append({
+            "filename": "exosome-v%02d.mp4" % n,
+            "asset_type": "video",
+            "title_en": "Animated glowing exosome %s, seamless loop" % motion_en,
+            "title_ko": "%s 엑소좀 루프 영상 · 네온 바이오텍" % subj,
+            "keywords_en": ", ".join(kw_en),
+            "keywords_ko": ", ".join(kw_ko),
+            "category": "9. Graphic Resources",
+            "batch": "exosome_video_5",
+            "axis_subject": subj,
+            "axis_color": "/".join(c["color_ko"]),
+        })
+    return rows
+
+
 COLUMNS = ["filename", "asset_type", "title_en", "title_ko",
            "keywords_en", "keywords_ko", "category", "batch",
            "axis_subject", "axis_color"]
@@ -367,6 +411,7 @@ def write_csv(batch, rows):
 if __name__ == "__main__":
     for batch, builder in [("kawaii_24", build_kawaii),
                            ("exosome_40", build_exosome),
-                           ("bestsellers_36", build_bestsellers)]:
+                           ("bestsellers_36", build_bestsellers),
+                           ("exosome_video_5", build_exosome_video)]:
         p = write_csv(batch, builder())
         print("wrote", p)

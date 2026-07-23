@@ -1,0 +1,15 @@
+# 미리캔버스 엑소좀 비디오 5컷 파일럿 (자연어판 — Runway / Luma / Sora / Pika 호환)
+# Kling판(_Kling.txt)과 동일 컷, 파라미터 표기 제거하고 순수 서술로
+# 각 프롬프트 한 줄, 라벨/주석 없이 그대로 복붙 가능
+# 공통: 5초 이상, 부드러운 루프, 다크 배경 유지, 텍스트/워터마크 없음
+# ─────────────────────────────────────────────────────────
+
+A glowing translucent exosome sphere with a soft double-membrane outline floats in dark space, pulsing with a slow inner light and gently rotating as tiny particles drift around it, electric blue and neon violet on deep navy, a very slow camera push-in, seamless loop, generous empty space around the sphere, no text or watermark, smooth and stable.
+
+A stream of small glowing exosome spheres drifts slowly across the frame like a comet of light, its glowing trail flowing behind, electric blue and neon violet on deep navy, the camera drifting gently to follow, a seamless wrapping loop, generous empty space above the stream, no text or watermark, smooth and stable.
+
+A central glowing exosome sphere breathes with a soft light while smaller luminous particles orbit slowly around it like satellites, electric blue and neon violet on deep navy, a locked camera with a subtle push-in, a seamless full-orbit loop, generous empty space around the sphere, no text or watermark, smooth and stable.
+
+A glowing serum splash rises and falls in smooth slow motion, luminous droplets arcing through a dark background as a light trail traces the curve, electric cyan and violet on deep indigo, a locked hero shot, a seamless rise-and-settle loop, generous empty space to one side, no text or watermark, smooth and stable.
+
+A soft burst of glowing light radiates outward from a central point on a dark surface, expanding in a slow pulsing bloom then gently contracting as particles ride the wave, warm gold and electric blue on deep charcoal, a locked centered camera, a seamless expand-and-contract loop, generous empty space around the burst, no text or watermark, smooth and stable.

@@ -1,0 +1,24 @@
+# 미리캔버스 엑소좀 비디오 5컷 파일럿 (Kling용)
+# 5초+ 루프 영상 — 미리캔버스 영상 제출 채널용 첫 실험
+# 엑소좀40 정지 배치에서 모션 내재 컷 5개 선별 (구체·광류·오빗·스플래시·버스트)
+# 공통 세팅: 5s, 30fps, seamless loop, 다크 네온 바이오텍
+# MJ는 영상 미지원 → Kling으로 대체. 자연어판은 _natural.txt 참조.
+# ─────────────────────────────────────────────────────────
+
+# 공통 네거티브(전 컷): no text, no watermark, no logo, no morphing artifacts,
+#   no flicker, no sudden cuts, stable exposure, no warping
+
+--- v01 글로우 엑소좀 구체 (펄스·부양) ---
+A large glowing translucent exosome sphere with a soft double-membrane outline floating in dark space, electric blue 4D7CFE and neon violet 9D4EDD on deep space navy 0A0E27. Motion: the sphere pulses with a slow inner glow, gently floating up and down and rotating in place, tiny particles drifting around it. Camera: very slow push-in. Loop: seamless, the sphere returns to its start position. 5 seconds, 30fps, generous clean copy space around the sphere.
+
+--- v05 엑소좀 광류 (드리프트) ---
+A flowing stream of small glowing exosome spheres trailing like a comet of light through dark space, electric blue 4D7CFE and neon violet 9D4EDD on deep space navy 0A0E27. Motion: the stream drifts slowly and continuously across the frame, the light trail flowing behind it, spheres shimmering. Camera: gentle lateral drift following the stream. Loop: seamless left-to-right flow that wraps. 5 seconds, 30fps, generous copy space above the stream.
+
+--- v06 엑소좀 오빗 (회전) ---
+A central glowing exosome sphere with smaller luminous particles orbiting around it like tiny satellites, electric blue 4D7CFE and neon violet 9D4EDD on deep space navy 0A0E27. Motion: the small particles orbit slowly and continuously around the central sphere, the sphere breathing with a soft glow. Camera: locked, very subtle push-in. Loop: seamless full orbit cycle. 5 seconds, 30fps, generous copy space around the sphere.
+
+--- v23 엑소좀 리퀴드 스플래시 (슬로모션) ---
+A liquid splash of glowing serum with a luminous particle trail arcing through a dark background, electric cyan 22E5FF and violet A855F7 on deep indigo black 0D0B1F. Motion: the splash rises and falls in smooth slow motion, glowing droplets arcing and settling, light trail tracing the curve. Camera: locked hero shot. Loop: seamless rise-and-settle cycle. 5 seconds, 30fps, generous copy space to one side.
+
+--- v35 엑소좀 라디언트 버스트 (확산 펄스) ---
+A soft radiating burst of glowing light expanding outward from a central point on a dark surface, warm gold FFC94D and electric blue 2E6FFF on deep charcoal navy 0B0F1F. Motion: light radiates outward in a slow pulsing bloom, expanding then gently contracting, particles carried on the wave. Camera: locked, centered. Loop: seamless expand-contract pulse. 5 seconds, 30fps, generous copy space around the burst.

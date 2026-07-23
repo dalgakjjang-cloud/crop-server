@@ -110,12 +110,13 @@ python3 seo/seo-check.py kawaii_24  # 특정 배치만
 
 ## 7. 현재 커버리지
 
-| 배치 | 컷 수 | 정본 파일 | EN 키워드/컷 | 검사 |
-|---|---|---|---|---|
-| kawaii_24 | 24 | `metadata/kawaii_24.csv` | 28 | PASS |
-| exosome_40 | 40 | `metadata/exosome_40.csv` | 28 | PASS |
-| bestsellers_36 | 36 | `metadata/bestsellers_36.csv` | 26~28 | PASS |
-| **합계** | **100** | | | **에러 0** |
+| 배치 | 컷 수 | 정본 파일 | 자산 | EN 키워드/컷 | 검사 |
+|---|---|---|---|---|---|
+| kawaii_24 | 24 | `metadata/kawaii_24.csv` | photo | 28 | PASS |
+| exosome_40 | 40 | `metadata/exosome_40.csv` | photo | 28 | PASS |
+| bestsellers_36 | 36 | `metadata/bestsellers_36.csv` | photo | 26~28 | PASS |
+| exosome_video_5 | 5 | `metadata/exosome_video_5.csv` | video | 28 | PASS |
+| **합계** | **105** | | | | **에러 0** |
 
 ## 8. 개정 이력
 
@@ -123,3 +124,4 @@ python3 seo/seo-check.py kawaii_24  # 특정 배치만
 |---|---|---|
 | 1.0 | 2026-07-22 | 최초 제정. 스키마·3티어·플랫폼 상한·비디오 확장·검사기 계약 고정. 카와이24 확장. |
 | 1.1 | 2026-07-22 | 엑소좀40·베스트셀러36 확장 → 100컷 전체 정본화. 금지어에서 'apple'(과일) 제거. |
+| 1.2 | 2026-07-23 | 엑소좀 비디오 5컷 파일럿(`exosome_video_5.csv`) 추가 → 105행. 첫 `asset_type=video` 배치. |
