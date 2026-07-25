@@ -1,0 +1,85 @@
+# 미리캔버스 베스트셀러 방향 20컷 (GPT용) — 사용자 실판매 히트 5장 기반
+# 두 갈래: [블루 테크] 나노신소재·회로반도체·위성네트워크 / [자연감성] 자연뷰 인테리어·캠핑
+# 미캔 시그니처 유지: 넉넉한 텍스트 여백 + 배경까지 선명 + HEX 팔레트 명시 + 사람/텍스트 없음
+# 그룹: A 신소재나노(4) · B 회로반도체(5) · C 우주위성(4) · D 자연인테리어(4) · E 캠핑아웃도어(3)
+# ─────────────────────────────────────────────────────────
+
+# ════════════════════════════════════════════
+# 🔷 A. 신소재·나노 그래핀 · 다크블루+골드 글로우 (BS-A)
+# ════════════════════════════════════════════
+
+--- 01 그래핀 격자 + 전극 ---
+a 3D graphene hexagonal lattice sheet with glowing blue energy nodes at the vertices and polished metal electrode contacts at the edges, camera: low-angle dramatic macro hero, lighting: cinematic rim light with warm gold reflections on the metal, palette: electric blue #2E6BFF and cyan glow #38E0FF with warm gold #E8B04B on deep navy #0A1230, generous clean copy space in the upper area, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 02 탄소나노튜브 다발 ---
+a bundle of glowing carbon nanotubes twisting through dark space with pulses of light traveling along their length, camera: 45-degree macro, lighting: soft blue inner glow with warm gold rim, palette: electric blue #2E6BFF and cyan glow #38E0FF with warm gold #E8B04B on deep navy #0A1230, generous clean copy space on one side, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 03 2D 나노소재 적층 ---
+stacked translucent layers of a 2D nanomaterial with glowing blue light seeping between each sheet, camera: eye-level macro, lighting: soft edge glow with subtle gold highlights, palette: electric blue #2E6BFF and cyan glow #38E0FF with warm gold #E8B04B on deep navy #0A1230, generous clean copy space above the stack, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 04 분자 결정 격자 ---
+an abstract molecular crystal lattice with luminous energy traveling along the atomic bonds, camera: extreme macro close-up, lighting: cool blue glow with tiny gold sparkle highlights, palette: electric blue #2E6BFF and cyan glow #38E0FF with warm gold #E8B04B on deep navy #0A1230, generous clean copy space in the lower half, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+# ════════════════════════════════════════════
+# 🔷 B. 회로·반도체·AI칩 · 라이트 테크블루 (BS-B)
+# ════════════════════════════════════════════
+
+--- 05 AI 마이크로칩 히어로 ---
+a glowing AI microchip at the center of a light blue circuit board with radiating traces, camera: top-down hero, lighting: bright clean studio light, palette: soft tech blue #7FB3E6 and steel silver #C6D2DE on airy white-blue #EEF4FA background, generous clean copy space on the right, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 06 회로 트레이스 매크로 ---
+macro of light-blue printed circuit board traces flowing toward a soft-focus horizon of tiny chips, camera: low-angle macro, lighting: bright airy light, palette: soft tech blue #7FB3E6 and steel silver #C6D2DE on airy white-blue #EEF4FA, generous clean copy space in the upper right, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 07 CPU 프로세서 제품컷 ---
+a modern CPU processor standing upright as a hero with a cool blue glow beneath it on a bright surface, camera: three-quarter product shot, lighting: soft even studio light, palette: soft tech blue #7FB3E6 and steel silver #C6D2DE on airy white-blue #EEF4FA, generous clean copy space to the left, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 08 반도체 웨이퍼 ---
+a silicon semiconductor wafer with a grid of microchip dies reflecting soft spectral blue light, camera: angled top view, lighting: bright clean light, palette: soft tech blue #7FB3E6 with subtle spectral sheen and steel silver #C6D2DE on airy white-blue #EEF4FA, generous clean copy space on one side, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 09 데이터 흐름 회로 ---
+streams of glowing data light flowing across a light circuit board into the distance, camera: dynamic diagonal macro, lighting: bright with soft blue light trails, palette: soft tech blue #7FB3E6 and steel silver #C6D2DE on airy white-blue #EEF4FA, generous clean copy space in the upper left, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+# ════════════════════════════════════════════
+# 🔷 C. 우주·위성·글로벌 네트워크 · 다크 스페이스 (BS-C)
+# ════════════════════════════════════════════
+
+--- 10 위성 네트워크 (지구 야경) ---
+a network of small satellites orbiting Earth at night with glowing city lights below and cyan connection lines linking them across the globe, camera: wide orbital view, lighting: soft earth-glow and starlight, palette: deep space blue #060B1F with warm city gold #FFC864 and connection cyan #38C8FF, generous clean copy space in the dark sky, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 11 단일 통신위성 ---
+a single communication satellite gliding above the glowing curved horizon of Earth at night, camera: cinematic three-quarter space shot, lighting: soft rim light from the sunrise limb, palette: deep space blue #060B1F with warm city gold #FFC864 and cyan #38C8FF, generous clean copy space in the upper black sky, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 12 글로벌 데이터 네트워크 ---
+a glowing global data network of luminous arcs connecting continents seen from space at night, camera: top-down earth view, lighting: soft blue atmospheric glow, palette: deep space blue #060B1F with warm city gold #FFC864 and connection cyan #38C8FF, generous clean copy space to one side, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 13 위성군 (달빛 바다) ---
+a constellation of tiny satellites leaving faint light trails over a moonlit ocean seen from high orbit, camera: wide cinematic shot, lighting: soft moonlight and starlight, palette: deep space blue #060B1F with silver cyan #38C8FF highlights and faint city gold #FFC864, generous clean copy space in the dark area, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+# ════════════════════════════════════════════
+# 🌿 D. 아늑한 자연뷰 인테리어 · 우드톤+숲 (BS-D)
+# ════════════════════════════════════════════
+
+--- 14 숲뷰 소형주택 침실 ---
+a cozy tiny-house bedroom with a large picture window looking out to a misty green forest strung with warm fairy lights, camera: soft morning interior, lighting: gentle warm lamp glow against cool forest daylight, palette: warm wood #B08A5A and linen cream #EDE4D3 with forest green #3E5C43 and warm light #FFCE8A, generous clean copy space on the wall and bedding, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 15 창가 독서 코너 ---
+a snug reading nook with soft cushions beside a window overlooking a lush green forest, camera: eye-level interior, lighting: warm diffused daylight, palette: warm wood #B08A5A and linen cream #EDE4D3 with forest green #3E5C43, generous clean copy space above the nook, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 16 가을숲 캐빈 인테리어 ---
+a minimalist wooden cabin interior with a big picture window framing warm autumn trees, camera: wide calm interior, lighting: soft natural light, palette: warm wood #B08A5A and linen cream #EDE4D3 with amber autumn #D98A45, generous clean copy space on the empty wall, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 17 비오는 숲뷰 침실 ---
+a warm bedroom filled with potted plants and a window revealing a gentle rainy forest, camera: soft cozy interior, lighting: warm lamp glow against cool rain light, palette: warm wood #B08A5A and linen cream #EDE4D3 with forest green #3E5C43, generous clean copy space on the bedding, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+# ════════════════════════════════════════════
+# 🏕 E. 캠핑·아웃도어 감성 · 무디 달빛 (BS-E)
+# ════════════════════════════════════════════
+
+--- 18 달빛 들판 텐트 ---
+a softly illuminated camping tent glowing warm in a misty moonlit meadow with mountain silhouettes behind, camera: wide atmospheric night shot, lighting: cool moonlight with a warm tent glow, palette: twilight blue-green #2A3B45 and moonlight silver #CFE0E8 with warm tent glow #F0C070, generous clean copy space in the sky, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 19 별밤 캠프파이어 ---
+a cozy campsite with a warm campfire glow under a vast starry night sky framed by pine trees, camera: wide cinematic night shot, lighting: warm firelight against deep blue night, palette: deep night blue #1B2A38 and star silver #CFE0E8 with firelight gold #F0A850, generous clean copy space in the starry sky, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
+
+--- 20 블루아워 호숫가 텐트 ---
+a lone tent on a calm lakeside at blue-hour dawn with soft mist and a still water reflection, camera: wide serene shot, lighting: soft cool dawn light, palette: blue-hour teal #2A3B45 and pale dawn #CFE0E8 with a faint warm horizon #E6B27A, generous clean copy space over the water and sky, tack-sharp with everything in focus, no text or branding, one continuous scene, photorealistic stock photography
