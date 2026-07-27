@@ -826,7 +826,7 @@ function toMidjourney(slot, mode, tone, people, aspect, hands = "auto") {
     neg += ", cluttered background, busy background, shelves behind subject, wall art, picture frames, hanging wall decor";
   /* 과거 세션의 finalPrompt에 남은 블러 표현까지 소독 (구버전 가드 문구 대비) */
   pos = scrubBlurText(pos);
-  const style = slot.kind === "illustration" ? "" : " --style raw";
+  const style = slot.kind === "illustration" ? "" : " --raw";
   return `${pos} --ar ${aspect || "16:9"}${style} --no ${neg}`;
 }
 
@@ -880,7 +880,7 @@ function buildMidjourneyPrompt(slot, { aspect = "16:9", tone = "realism", people
   /* 전역 블러 절대 금지 + 배경 클러터 차단 — 전 장르 공통 */
   if (!isIllust) neg += ", blur, blurry, blurred background, bokeh, shallow depth of field, out of focus, soft focus, cluttered background, shelves behind subject, wall art, picture frames";
   const params = [];
-  if (!isIllust) params.push("--style raw");
+  if (!isIllust) params.push("--raw");
   params.push(`--no ${neg}`);
   params.push(`--ar ${aspect}`);
   return `${scrubBlurText(core)} ${params.join(" ")}`.replace(/\s+/g, " ").trim();
@@ -1722,13 +1722,13 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-min.txt`);
     addLog(`[백업] 프롬프트 TXT(일반) 저장 완료 — ${rows.length}슬롯`);
   };
-  /* ── Midjourney 형식 변환: 자연어 배제문 → --no 플래그, --ar/--style raw 부착 ── */
+  /* ── Midjourney 형식 변환: 자연어 배제문 → --no 플래그, --ar/--raw 부착 ── */
   const exportPromptsMidjourney = () => {
     const rows = slots.filter((s) => s.subject);
     if (!rows.length) { setNotice("내보낼 슬롯이 없습니다."); return; }
     const head =
       `# FreeJJang 프롬프트 (Midjourney 형식) — 주제: ${topic || "(미지정)"} · 종횡비: ${aspect}\n` +
-      `# 배제문을 --no 로, 종횡비를 --ar 로, 사진 슬롯은 --style raw 로 자동 변환했습니다.\n` +
+      `# 배제문을 --no 로, 종횡비를 --ar 로, 사진 슬롯은 --raw 로 자동 변환했습니다.\n` +
       `# 아래는 순수 영어 프롬프트만 담았습니다 (한 줄 = 슬롯 하나). 그대로 미드저니에 붙여넣으세요.\n\n`;
     const body = rows.map((s) => toMidjourney(s, mode, refTone, refPeople, aspect, refHands)).join("\n\n");
     saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-prompts-midjourney.txt`);
@@ -1771,7 +1771,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       `# 사용법: 이 파일을 midjourney-batch/mj_batch.py 에 그대로 넣으세요\n` +
       `#   python mj_batch.py --prompts <이파일>.txt\n` +
       `# 한 줄 = 프롬프트 하나. '#' 줄과 빈 줄은 무시됩니다.\n` +
-      `# --ar/--style/--no 파라미터는 이미 포함됨. 버전을 고정하려면 각 줄 끝에 --v 6.1 등을 추가하세요.\n\n`;
+      `# --ar/--raw/--no 파라미터는 이미 포함됨. 버전은 현재 기본 --v 8.2 (V8부터 '--style raw' 대신 '--raw'). 고정하려면 각 줄 끝에 --v 8.2 추가.\n\n`;
     const body = rows.map((s) => buildMidjourneyPrompt(s, { aspect, tone: refTone, people: refPeople })).join("\n");
     saveBlob(new Blob([head + body], { type: "text/plain;charset=utf-8" }), `${cleanName(topic, 20) || "freejjang"}-midjourney.txt`);
     addLog(`[미드저니] 배치 TXT 저장 — ${rows.length}슬롯 (mj_batch.py 파이프라인용)`);
@@ -2749,7 +2749,7 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
                         <Download className="w-3.5 h-3.5" /> 일반 프롬프트 TXT
                       </button>
                       <button onClick={exportPromptsMidjourney}
-                        title="--no 네거티브 · --ar 종횡비 · --style raw 로 변환된 Midjourney 전용 프롬프트"
+                        title="--no 네거티브 · --ar 종횡비 · --raw 로 변환된 Midjourney 전용 프롬프트"
                         className="bg-neutral-950 hover:bg-neutral-700 border border-sky-700/50 text-sky-200 font-bold text-xs py-2 px-3 rounded flex items-center gap-1.5 transition">
                         <Download className="w-3.5 h-3.5" /> Midjourney용 TXT
                       </button>
