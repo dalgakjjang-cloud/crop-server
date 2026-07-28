@@ -1,0 +1,66 @@
+# 미리캔버스 비비드 자연·다큐멘터리 20컷 (MJ용) — 사실 극대화
+# 방향: 내셔널지오그래픽식 실사 자연 — 야생동물·웅장 풍경·매크로 자연, 채도 높은 자연색
+# 전 컷 공통: --ar 3:2 --raw --s 200 --v 8.2 · hyper-real 다큐멘터리 · 넓은 카피공간
+#  ※ 꽃 매크로 컷은 --ar 2:3(세로)로 바꿔도 좋아요.
+#  ※ 사람은 기본 제외. vn-12(카약)만 뒷모습·먼 거리로 예외 허용(얼굴 안 보임).
+# 그룹: A 매크로자연(4) · B 야생동물(4) · C 웅장풍경(4) · D 물·수중(4) · E 하늘·나무 로우앵글(4)
+
+# ════════════════════════════════════════════
+# 🌸 A. 매크로 자연 · 꽃/곤충 (VN-A)
+# ════════════════════════════════════════════
+
+vn-01) extreme macro of a vivid orange lily flower with long red-tipped stamens, dark moody background, soft directional light, rich saturated orange, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-02) macro close-up of a vivid deep red rose in full bloom with a honeybee resting on its petals, natural soft light, lush saturated red, dewy petals, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-03) backlit yellow daffodil flowers glowing against a soft warm background, golden-hour rim light, dreamy vivid yellow, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-04) extreme macro of a butterfly wing showing symmetric vivid orange and iridescent blue scales in fine detail, soft even light, hyper-detailed, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+# ════════════════════════════════════════════
+# 🦌 B. 야생동물 다큐멘터리 (VN-B)
+# ════════════════════════════════════════════
+
+vn-05) a brown horned cow standing in a misty green meadow beside a lone ancient tree, soft foggy morning light, documentary atmosphere, vivid green, generous clean copy space in the fog, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-06) a bearded dragon lizard lit by a single dramatic spotlight against deep black, hyper-detailed scales, chiaroscuro documentary lighting, warm amber tones, generous clean dark copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-07) two white swans gliding on a calm vivid blue lake with snow-capped Mount Fuji behind, clear morning light, serene, rich blue and white, generous clean copy space in the sky, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-08) a majestic red deer stag with large antlers standing in a misty golden morning meadow, backlit rim light, documentary wildlife, warm vivid tones, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+# ════════════════════════════════════════════
+# 🏔 C. 웅장한 풍경 (VN-C)
+# ════════════════════════════════════════════
+
+vn-09) a flock of sheep grazing on vivid rolling green hills at golden sunset, warm low light, pastoral documentary, saturated green and gold, generous clean copy space in the sky, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-10) a lone bare tree casting a long shadow on rippled desert sand dunes at sunset, warm golden light, minimalist, vivid orange sand, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-11) a top-down aerial drone view of a vivid autumn forest in red, orange and gold with a winding road cutting through, midday light, rich saturated fall color, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-12) a distant lone kayaker in a yellow kayak seen from behind gliding across a calm mirror lake with pine-forest reflection at misty dawn, face not visible, serene vivid blue-green, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, close-up face, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+# ════════════════════════════════════════════
+# 🐠 D. 물·수중 (VN-D)
+# ════════════════════════════════════════════
+
+vn-13) a vivid colorful underwater coral reef teeming with tropical fish, clear blue water, bright saturated coral colors, documentary dive, generous clean blue copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-14) macro of concentric water ripples on a vivid green pond surface from a single droplet impact, glossy reflective, rich saturated green, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-15) a green sea turtle gliding gracefully through vivid blue ocean water with sun rays streaming from above, documentary underwater, saturated blue, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-16) branching orange sea-fan coral silhouetted against bright blue water and sunlight, upward view, vivid contrast, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+# ════════════════════════════════════════════
+# 🌵 E. 하늘·나무 로우앵글 (VN-E)
+# ════════════════════════════════════════════
+
+vn-17) a cluster of tall saguaro cacti photographed from a low angle against a vivid clear blue sky, bright midday light, saturated blue and green, generous clean copy space in the sky, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-18) tall palm trees photographed looking straight up against a deep vivid blue sky, sunlit fronds, tropical, saturated blue, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-19) a glowing tent suspended in a tree at blue-hour twilight above a sea of fog with mountains, adventure documentary, moody vivid blue with a warm tent glow, generous clean copy space, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution
+
+vn-20) a lone majestic oak tree standing in a vivid green field under dramatic sunlit clouds, golden light breaking through, rich saturated green, generous clean copy space in the sky, National Geographic documentary style, hyper-realistic, rich vivid natural color, tack-sharp fine detail, professional nature photography --ar 3:2 --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, cartoon, illustration, painting, oversaturated, deformed, extra limbs, fused, low resolution

@@ -1,0 +1,85 @@
+# 미리캔버스 비비드 자연·다큐멘터리 20컷 (GPT용) — 사실 극대화
+# 방향: 내셔널지오그래픽식 실사 자연 — 야생동물·웅장 풍경·매크로 자연, 채도 높은 자연색
+# 미캔 시그니처: 넓은 텍스트 여백 + hyper-real 다큐멘터리 · 사람 기본 제외(vn-12만 예외)
+# 그룹: A 매크로자연(4) · B 야생동물(4) · C 웅장풍경(4) · D 물·수중(4) · E 하늘·나무 로우앵글(4)
+# ─────────────────────────────────────────────────────────
+
+# ════════════════════════════════════════════
+# 🌸 A. 매크로 자연 · 꽃/곤충 (VN-A)
+# ════════════════════════════════════════════
+
+--- 01 오렌지 릴리 매크로 ---
+extreme macro of a vivid orange lily flower with long red-tipped stamens, camera: extreme macro, lighting: soft directional against dark moody background, mood: rich saturated orange, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 02 레드 로즈 + 꿀벌 ---
+macro close-up of a vivid deep red rose in full bloom with a honeybee on its petals, camera: macro, lighting: natural soft, mood: lush saturated red with dewy petals, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 03 백라이트 수선화 ---
+backlit yellow daffodil flowers glowing against a soft warm background, camera: macro, lighting: golden-hour rim light, mood: dreamy vivid yellow, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 04 나비 날개 매크로 ---
+extreme macro of a butterfly wing showing symmetric vivid orange and iridescent blue scales, camera: extreme macro, lighting: soft even, mood: hyper-detailed, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+# ════════════════════════════════════════════
+# 🦌 B. 야생동물 다큐멘터리 (VN-B)
+# ════════════════════════════════════════════
+
+--- 05 안개 목초지의 소 ---
+a brown horned cow standing in a misty green meadow beside a lone ancient tree, camera: documentary, lighting: soft foggy morning, mood: vivid green atmosphere, generous clean copy space in the fog, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 06 비어디드 드래곤 (스포트라이트) ---
+a bearded dragon lizard lit by a single dramatic spotlight against deep black, camera: documentary close, lighting: chiaroscuro spotlight, mood: warm amber, hyper-detailed scales, generous clean dark copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 07 백조 + 후지산 ---
+two white swans gliding on a calm vivid blue lake with snow-capped Mount Fuji behind, camera: wide, lighting: clear morning, mood: serene rich blue and white, generous clean copy space in the sky, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 08 레드디어 수사슴 ---
+a majestic red deer stag with large antlers standing in a misty golden morning meadow, camera: documentary wildlife, lighting: backlit rim, mood: warm vivid, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+# ════════════════════════════════════════════
+# 🏔 C. 웅장한 풍경 (VN-C)
+# ════════════════════════════════════════════
+
+--- 09 노을 언덕의 양떼 ---
+a flock of sheep grazing on vivid rolling green hills at golden sunset, camera: wide landscape, lighting: warm low sun, mood: pastoral saturated green and gold, generous clean copy space in the sky, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 10 사막 듄의 고목 ---
+a lone bare tree casting a long shadow on rippled desert sand dunes at sunset, camera: wide, lighting: warm golden, mood: minimalist vivid orange sand, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 11 가을숲 항공뷰 ---
+a top-down aerial drone view of a vivid autumn forest in red, orange and gold with a winding road, camera: top-down drone, lighting: midday, mood: rich saturated fall color, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 12 미러레이크 카약 (먼 뒷모습) ---
+a distant lone kayaker in a yellow kayak seen from behind gliding across a calm mirror lake with pine-forest reflection at misty dawn, face not visible, camera: wide, lighting: soft dawn, mood: serene vivid blue-green, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+# ════════════════════════════════════════════
+# 🐠 D. 물·수중 (VN-D)
+# ════════════════════════════════════════════
+
+--- 13 컬러풀 산호초 ---
+a vivid colorful underwater coral reef teeming with tropical fish, camera: documentary dive, lighting: clear blue water, mood: bright saturated coral, generous clean blue copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 14 그린 워터 물결 ---
+macro of concentric water ripples on a vivid green pond surface from a single droplet impact, camera: macro, lighting: glossy reflective, mood: rich saturated green, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 15 바다거북 ---
+a green sea turtle gliding gracefully through vivid blue ocean water with sun rays from above, camera: documentary underwater, lighting: god rays, mood: saturated blue, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 16 씨팬 산호 (역광) ---
+branching orange sea-fan coral silhouetted against bright blue water and sunlight, camera: upward view, lighting: backlit, mood: vivid contrast, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+# ════════════════════════════════════════════
+# 🌵 E. 하늘·나무 로우앵글 (VN-E)
+# ════════════════════════════════════════════
+
+--- 17 사구아로 선인장 (로우앵글) ---
+a cluster of tall saguaro cacti from a low angle against a vivid clear blue sky, camera: low angle, lighting: bright midday, mood: saturated blue and green, generous clean copy space in the sky, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 18 야자수 올려다보기 ---
+tall palm trees looking straight up against a deep vivid blue sky, camera: looking up, lighting: sunlit fronds, mood: tropical saturated blue, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 19 트리텐트 블루아워 ---
+a glowing tent suspended in a tree at blue-hour twilight above a sea of fog with mountains, camera: wide, lighting: blue hour with warm tent glow, mood: moody vivid blue, generous clean copy space, National Geographic documentary, hyper-realistic, tack-sharp fine detail
+
+--- 20 들판의 고독한 참나무 ---
+a lone majestic oak tree in a vivid green field under dramatic sunlit clouds, camera: wide, lighting: golden light breaking through, mood: rich saturated green, generous clean copy space in the sky, National Geographic documentary, hyper-realistic, tack-sharp fine detail
