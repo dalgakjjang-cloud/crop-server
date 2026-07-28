@@ -1,0 +1,67 @@
+# 미리캔버스 비비드 추상 20컷 (MJ용) — 어도비 2026 트렌드 반영
+# 방향: 밝고 채도 높은(VIVID) 팔레트 + 초현실·감각 추상 (All the Feels · Surreal Silliness)
+# 전 컷 공통: --ar 16:9 --s 350 --v 8.2 · 사람/텍스트 없음 · 넓은 카피공간
+#  ※ 추상 아트는 MJ 미감을 살려야 해서 이 배치는 --raw 를 뺐고 --s 를 350으로 올림 (사진 배치와 의도적 차이)
+# HEX 팔레트 명시 → 색감 정확도 ↑ · 미캔에서 사용자가 문구 얹기
+# 그룹: A 리퀴드플루이드(4) · B 3D그라디언트블롭(4) · C 감각텍스처(4) · D 기하추상(4) · E 초현실플레이풀(4)
+# 공통 접미: --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+# ════════════════════════════════════════════
+# 🌀 A. 리퀴드·플루이드 추상 · 잉크/페인트/리퀴드메탈 (VA-A)
+# ════════════════════════════════════════════
+
+va-01) swirling liquid ink blooming and diffusing in clear water, vivid marbling of magenta hex FF2FB9, electric cyan hex 00E5FF and acid lime hex B6FF3C, macro abstract, high saturation with luminous glow, generous clean copy space on one side, one continuous abstract scene, vivid saturated fluid art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-02) glossy liquid metal flowing in smooth ribbons, iridescent vivid chrome shifting between hot pink hex FF2FB9, cyan hex 00E5FF and gold hex FFD400, studio reflection light, generous clean copy space above, one continuous abstract scene, vivid saturated fluid art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-03) thick acrylic paint pour with blooming cells and lacing, bold vivid tangerine hex FF7A18, ultraviolet hex 7A2BFF and sunny yellow hex FFD400, top-down abstract macro, saturated and glossy, generous clean copy space in one corner, one continuous abstract scene, vivid saturated fluid art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-04) macro of colorful oil-and-water bubbles and droplets, saturated candy tones of hot coral hex FF4D6D, teal hex 12C4B6 and magenta hex FF2FB9, glowing translucent spheres, generous clean copy space, one continuous abstract scene, vivid saturated fluid art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+# ════════════════════════════════════════════
+# 🫧 B. 3D 그라디언트·블롭 · Warp & Wonder (VA-B)
+# ════════════════════════════════════════════
+
+va-05) soft matte 3D blob shapes floating in a dreamy space, vivid gradient from magenta hex FF2FB9 to tangerine hex FF7A18, soft studio light with gentle shadows, generous clean copy space around the blobs, one continuous abstract scene, vivid saturated 3D render --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-06) a cluster of glossy gradient sphere orbs, vivid electric blue hex 2E6BFF through ultraviolet hex 7A2BFF to pink hex FF2FB9, soft ambient shadows, generous clean copy space on one side, one continuous abstract scene, vivid saturated 3D render --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-07) a smooth flowing gradient mesh wave, vivid sunset spectrum of coral hex FF4D6D, magenta hex FF2FB9 and indigo hex 2B1B6B, silky and luminous, generous clean copy space in the upper area, one continuous abstract scene, vivid saturated 3D render --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-08) a twisted glossy 3D ribbon loop floating, high-gloss vivid holographic surface shifting cyan hex 00E5FF, pink hex FF2FB9 and lime hex B6FF3C, soft studio light, generous clean copy space, one continuous abstract scene, vivid saturated 3D render --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+# ════════════════════════════════════════════
+# 🧶 C. 감각 텍스처 · All the Feels (VA-C)
+# ════════════════════════════════════════════
+
+va-09) extreme macro of soft velvet fabric folds, vivid ultraviolet hex 7A2BFF and magenta hex FF2FB9 with deep sheen, soft tactile raking light, generous clean copy space, one continuous abstract scene, vivid saturated tactile texture --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-10) a rippled soft 3D dune surface like sculpted sand, vivid coral hex FF4D6D and sunny yellow hex FFD400, warm raking light casting soft shadows, generous clean copy space in the sky area, one continuous abstract scene, vivid saturated tactile texture --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-11) macro of soft plush knitted wool texture, vivid candy pink hex FF7EC8 and acid lime hex B6FF3C, cozy tactile soft light, generous clean copy space, one continuous abstract scene, vivid saturated tactile texture --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-12) macro of glossy dripping gel and honey-like liquid, vivid amber hex FF9E1B and pink hex FF2FB9, glistening sensory highlights, generous clean copy space, one continuous abstract scene, vivid saturated tactile texture --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+# ════════════════════════════════════════════
+# 🔺 D. 기하 추상 · 볼드 바우하우스/리소 (VA-D)
+# ════════════════════════════════════════════
+
+va-13) bold overlapping flat geometric shapes, circles arcs and triangles, vivid primary and neon palette of magenta hex FF2FB9, cyan hex 00E5FF and yellow hex FFD400, playful balanced composition, generous clean copy space, one continuous abstract scene, vivid saturated geometric art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-14) floating 3D geometric primitives, cubes spheres and cones, vivid gradient tangerine hex FF7A18 to ultraviolet hex 7A2BFF, isometric arrangement with soft shadows, generous clean copy space, one continuous abstract scene, vivid saturated geometric art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-15) rhythmic concentric arcs and dots pattern, vivid retro palette of tangerine hex FF7A18, teal hex 12C4B6 and magenta hex FF2FB9, clean playful repetition, generous clean copy space in the center, one continuous abstract scene, vivid saturated geometric art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-16) layered paper-cut style abstract rolling hills, vivid saturated bands of coral hex FF4D6D, magenta hex FF2FB9, ultraviolet hex 7A2BFF and cyan hex 00E5FF, soft depth shadows, generous clean copy space in the sky, one continuous abstract scene, vivid saturated geometric art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+# ════════════════════════════════════════════
+# ✨ E. 초현실·플레이풀 · Surreal Silliness (VA-E)
+# ════════════════════════════════════════════
+
+va-17) surreal floating clouds made of vivid cotton-candy pink hex FF7EC8 and cyan hex 00E5FF drifting in a saturated dream sky, dreamlike and playful, generous clean copy space, one continuous abstract scene, vivid saturated surreal art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-18) a glowing vivid gradient portal doorway floating in an abstract saturated void, ultraviolet hex 7A2BFF, magenta hex FF2FB9 and cyan hex 00E5FF, surreal and inviting, generous clean copy space around it, one continuous abstract scene, vivid saturated surreal art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-19) melting surreal geometric shapes dripping and stretching, vivid neon magenta hex FF2FB9, lime hex B6FF3C and cyan hex 00E5FF, dreamy glossy surfaces, generous clean copy space, one continuous abstract scene, vivid saturated surreal art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts
+
+va-20) an abstract vivid liquid splash frozen mid-air into surreal floating droplets and ribbons, hot coral hex FF4D6D, tangerine hex FF7A18 and cyan hex 00E5FF, playful and luminous, generous clean copy space, one continuous abstract scene, vivid saturated surreal art --ar 16:9 --s 350 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts

@@ -1,0 +1,85 @@
+# 미리캔버스 비비드 추상 20컷 (GPT용) — 어도비 2026 트렌드 반영
+# 방향: 밝고 채도 높은(VIVID) 팔레트 + 초현실·감각 추상 (All the Feels · Surreal Silliness)
+# 미캔 시그니처: 넉넉한 텍스트 여백 + HEX 팔레트 명시 + 사람/텍스트 없음
+# 그룹: A 리퀴드플루이드(4) · B 3D그라디언트블롭(4) · C 감각텍스처(4) · D 기하추상(4) · E 초현실플레이풀(4)
+# ─────────────────────────────────────────────────────────
+
+# ════════════════════════════════════════════
+# 🌀 A. 리퀴드·플루이드 추상 (VA-A)
+# ════════════════════════════════════════════
+
+--- 01 잉크 블룸 (물속 확산) ---
+swirling liquid ink blooming and diffusing in clear water, camera: macro abstract, lighting: high saturation with luminous glow, palette: vivid magenta #FF2FB9, electric cyan #00E5FF and acid lime #B6FF3C, generous clean copy space on one side, one continuous abstract scene, vivid saturated fluid art
+
+--- 02 리퀴드 메탈 리본 ---
+glossy liquid metal flowing in smooth ribbons, camera: abstract macro, lighting: studio reflection, palette: iridescent vivid chrome shifting hot pink #FF2FB9, cyan #00E5FF and gold #FFD400, generous clean copy space above, one continuous abstract scene, vivid saturated fluid art
+
+--- 03 아크릴 페인트 푸어 ---
+thick acrylic paint pour with blooming cells and lacing, camera: top-down abstract macro, lighting: saturated and glossy, palette: bold vivid tangerine #FF7A18, ultraviolet #7A2BFF and sunny yellow #FFD400, generous clean copy space in one corner, one continuous abstract scene, vivid saturated fluid art
+
+--- 04 오일 버블 매크로 ---
+macro of colorful oil-and-water bubbles and droplets, camera: abstract macro, lighting: glowing translucent, palette: saturated candy hot coral #FF4D6D, teal #12C4B6 and magenta #FF2FB9, generous clean copy space, one continuous abstract scene, vivid saturated fluid art
+
+# ════════════════════════════════════════════
+# 🫧 B. 3D 그라디언트·블롭 (VA-B)
+# ════════════════════════════════════════════
+
+--- 05 소프트 3D 블롭 ---
+soft matte 3D blob shapes floating in a dreamy space, camera: studio abstract, lighting: soft with gentle shadows, palette: vivid gradient magenta #FF2FB9 to tangerine #FF7A18, generous clean copy space around the blobs, one continuous abstract scene, vivid saturated 3D render
+
+--- 06 그라디언트 오브 클러스터 ---
+a cluster of glossy gradient sphere orbs, camera: studio abstract, lighting: soft ambient shadows, palette: vivid electric blue #2E6BFF through ultraviolet #7A2BFF to pink #FF2FB9, generous clean copy space on one side, one continuous abstract scene, vivid saturated 3D render
+
+--- 07 그라디언트 메쉬 웨이브 ---
+a smooth flowing gradient mesh wave, camera: abstract, lighting: silky and luminous, palette: vivid sunset coral #FF4D6D, magenta #FF2FB9 and indigo #2B1B6B, generous clean copy space in the upper area, one continuous abstract scene, vivid saturated 3D render
+
+--- 08 홀로그래픽 리본 루프 ---
+a twisted glossy 3D ribbon loop floating, camera: studio abstract, lighting: soft studio, palette: vivid holographic cyan #00E5FF, pink #FF2FB9 and lime #B6FF3C, generous clean copy space, one continuous abstract scene, vivid saturated 3D render
+
+# ════════════════════════════════════════════
+# 🧶 C. 감각 텍스처 · All the Feels (VA-C)
+# ════════════════════════════════════════════
+
+--- 09 벨벳 주름 매크로 ---
+extreme macro of soft velvet fabric folds, camera: extreme macro, lighting: soft tactile raking light, palette: vivid ultraviolet #7A2BFF and magenta #FF2FB9 with deep sheen, generous clean copy space, one continuous abstract scene, vivid saturated tactile texture
+
+--- 10 소프트 듄 표면 ---
+a rippled soft 3D dune surface like sculpted sand, camera: abstract, lighting: warm raking light with soft shadows, palette: vivid coral #FF4D6D and sunny yellow #FFD400, generous clean copy space in the sky area, one continuous abstract scene, vivid saturated tactile texture
+
+--- 11 니트 울 텍스처 ---
+macro of soft plush knitted wool texture, camera: macro, lighting: cozy tactile soft light, palette: vivid candy pink #FF7EC8 and acid lime #B6FF3C, generous clean copy space, one continuous abstract scene, vivid saturated tactile texture
+
+--- 12 글로시 젤·허니 ---
+macro of glossy dripping gel and honey-like liquid, camera: macro, lighting: glistening sensory highlights, palette: vivid amber #FF9E1B and pink #FF2FB9, generous clean copy space, one continuous abstract scene, vivid saturated tactile texture
+
+# ════════════════════════════════════════════
+# 🔺 D. 기하 추상 · 바우하우스/리소 (VA-D)
+# ════════════════════════════════════════════
+
+--- 13 볼드 플랫 지오메트리 ---
+bold overlapping flat geometric shapes, circles arcs and triangles, camera: flat composition, lighting: even, palette: vivid primary and neon magenta #FF2FB9, cyan #00E5FF and yellow #FFD400, generous clean copy space, one continuous abstract scene, vivid saturated geometric art
+
+--- 14 3D 지오메트릭 프리미티브 ---
+floating 3D geometric primitives, cubes spheres and cones, camera: isometric, lighting: soft shadows, palette: vivid gradient tangerine #FF7A18 to ultraviolet #7A2BFF, generous clean copy space, one continuous abstract scene, vivid saturated geometric art
+
+--- 15 콘센트릭 아크·닷 ---
+rhythmic concentric arcs and dots pattern, camera: flat, lighting: even, palette: vivid retro tangerine #FF7A18, teal #12C4B6 and magenta #FF2FB9, generous clean copy space in the center, one continuous abstract scene, vivid saturated geometric art
+
+--- 16 페이퍼컷 힐 ---
+layered paper-cut style abstract rolling hills, camera: abstract, lighting: soft depth shadows, palette: vivid coral #FF4D6D, magenta #FF2FB9, ultraviolet #7A2BFF and cyan #00E5FF, generous clean copy space in the sky, one continuous abstract scene, vivid saturated geometric art
+
+# ════════════════════════════════════════════
+# ✨ E. 초현실·플레이풀 · Surreal Silliness (VA-E)
+# ════════════════════════════════════════════
+
+--- 17 초현실 코튼캔디 구름 ---
+surreal floating clouds made of cotton-candy pink and cyan drifting in a saturated dream sky, camera: dreamlike abstract, lighting: soft glow, palette: vivid pink #FF7EC8 and cyan #00E5FF, generous clean copy space, one continuous abstract scene, vivid saturated surreal art
+
+--- 18 그라디언트 포탈 ---
+a glowing vivid gradient portal doorway floating in an abstract saturated void, camera: surreal abstract, lighting: inner glow, palette: vivid ultraviolet #7A2BFF, magenta #FF2FB9 and cyan #00E5FF, generous clean copy space around it, one continuous abstract scene, vivid saturated surreal art
+
+--- 19 멜팅 지오메트리 ---
+melting surreal geometric shapes dripping and stretching, camera: surreal abstract, lighting: dreamy glossy, palette: vivid neon magenta #FF2FB9, lime #B6FF3C and cyan #00E5FF, generous clean copy space, one continuous abstract scene, vivid saturated surreal art
+
+--- 20 프로즌 리퀴드 스플래시 ---
+an abstract liquid splash frozen mid-air into surreal floating droplets and ribbons, camera: surreal abstract, lighting: luminous, palette: vivid hot coral #FF4D6D, tangerine #FF7A18 and cyan #00E5FF, generous clean copy space, one continuous abstract scene, vivid saturated surreal art
