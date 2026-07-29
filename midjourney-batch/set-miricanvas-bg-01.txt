@@ -1,0 +1,62 @@
+# MiriCanvas 배경 전용 세트 01 — 미드저니 8.2 배치용
+# 원칙: 배경 전용 · 정사각 크롭 안전 · 텍스트 오버레이 여백 확보 · 로고/텍스트/인물/캐릭터 원천 차단
+# 밸런스: 그라디언트 4 · 텍스처 4 · 비즈니스 3 · 계절 4 · SNS/파스텔 3 · 자연 무드 3 · 프리미엄 다크 2 · 패턴 2 (총 25개)
+# 실행: python mj_batch.py --prompts set-miricanvas-bg-01.txt --cookies cookies.txt
+
+# ── 1. 소프트 그라디언트 & 오라 (4)
+soft peach and cream mesh gradient background, luminous aura glow, distributed blur, negative space center for text overlay, high-resolution square canvas, editorial minimalism --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+muted lavender and pale mint aura gradient, soft light bloom, translucent layered composition, calm luxury minimalism, crop-safe distributed mood, clean square background --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+warm ivory to dusty rose blurred gradient, subtle 3D paper-cut depth, elegant negative space, text-overlay safe zone across center, editorial background --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+sky blue to soft coral sunrise wash, gentle diffusion, luminous mist, high-key clean background, distributed softness, no dominant subject --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+# ── 2. 텍스처 베이스 (4)
+neutral warm beige paper grain texture background, subtle organic fibers, soft matte surface, distributed low-contrast noise, crop-safe universal base, premium clean canvas --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+soft watercolor wash background, pale ivory with faint peach and gray blooms, distributed pigment diffusion, no central subject, text-overlay friendly, editorial usability --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+chalk pastel surface texture, muted mint and cream, gently uneven matte finish, distributed softness, calm study mood, clean square background for card news --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+subtle marbling background, ivory base with soft gray and gold veining, low-contrast luxury minimalism, distributed pattern, no dominant swirl, crop-safe --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+# ── 3. 비즈니스 / 프레젠테이션 (3)
+clean corporate blue gradient background, subtle digital grid texture, professional minimal tech flow, distributed depth, text-overlay safe center, keynote-ready --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames, charts, graphs
+
+premium black and gold restrained glow background, elegant negative space, subtle luminous particles, distributed luxury mood, corporate presentation base --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+silver white innovation gradient, clean future aesthetic, soft light bloom, minimal tech flow, distributed brightness, startup keynote backdrop, crop-safe square --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+# ── 4. 계절 무드 (4)
+spring pastel floral haze background, soft cherry blossom pink and cream diffusion, distributed petals softly blurred, no dominant flower, text-overlay friendly, seasonal card news base --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames, big flowers
+
+summer fresh mint and sky blue soft wash, gentle water ripple mood, cool light diffusion, distributed brightness, crop-safe seasonal background --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+autumn warm earthy background, muted terracotta and cream paper texture, soft dry leaf shadow diffusion, distributed warmth, no central object, seasonal usability --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames, big leaves
+
+winter sparkling soft snow background, pale ice blue and white diffusion, subtle luminous flakes distributed, calm holiday mood, no snowman, no central subject --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+# ── 5. SNS 파스텔 트렌드 (3)
+trendy pastel gradient background, soft baby blue to butter yellow, editorial minimalism, distributed brightness, mobile-friendly clean base, Korean card news aesthetic --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+soft Y2K gloss mood background, translucent lilac and pale peach layered shapes, subtle 3D dimensionality, distributed decoration, no central object, SNS-friendly --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+lifestyle neutral background, warm cream and dusty pink soft blend, gentle organic curves, distributed calm mood, editorial sophistication, text-overlay safe --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+# ── 6. 자연 무드 (3)
+misty natural light background, soft green foliage shadow diffusion, distributed dappled brightness, no tree trunk, no central branch, calm botanical mood --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+soft cloud sky background, pale blue and cream distributed diffusion, gentle atmospheric wash, no horizon line, crop-safe universal base, dreamy calm --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+warm sand texture background, muted beige and soft ochre grain, distributed subtle ripples, no shell, no footprints, calm natural minimalism --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+# ── 7. 프리미엄 다크 (2)
+deep navy premium background, subtle luminous glow distributed, minimal restrained particles, elegant negative space, luxury corporate mood, text-overlay safe center --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+soft charcoal background with warm amber glow diffusion, distributed cinematic light, calm luxury minimalism, no lamp, no window, crop-safe square --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+# ── 8. 패턴 리핏 (2)
+seamless subtle dot pattern background, warm ivory base with soft muted taupe dots, low-contrast distributed rhythm, text-overlay friendly, universal card news base --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
+
+seamless minimal line pattern background, pale mint base with soft white thin lines, low-contrast geometric repeat, distributed calm rhythm, crop-safe --style raw --ar 1:1 --no text, logo, watermark, letters, numbers, faces, people, characters, mascots, product, hands, borders, frames
