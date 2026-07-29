@@ -50,7 +50,7 @@
 | 도구 | 주소 |
 |---|---|
 | 🎨 로고공방 | `https://dalgakjjang-cloud.github.io/logo-gongbang/` (repo: logo-gongbang) |
-| 🖼 벡터 아뜰리에 (Free.Atelier, 움짤 포함) | `https://free-atelier.pages.dev` (repo 없음 · 로컬 폴더 → wrangler 배포) |
+| 🖼 벡터 아뜰리에 (Free.Atelier, 움짤 포함) | `https://free-atelier.pages.dev` (repo 없음 · wrangler 배포) · **로컬 경로**: `C:\Users\COM\조롱이-배포` · 비밀번호 잠금: `functions/auth.js` (`const PASSWORD`) · **배포**: `cd "C:\Users\COM\조롱이-배포"` → `wrangler pages deploy . --project-name=free-atelier` |
 | ✂️ 자동크롭 | `https://autocrop-tool.hopot13.workers.dev/` (Cloudflare Workers) |
 
 이 도구들은 서로 헤더 바로가기 + 허브로 연결돼 있다.
