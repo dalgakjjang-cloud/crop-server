@@ -145,6 +145,12 @@ const WALLPAPER_RE = /배경화면|월페이퍼|wallpaper|배너|banner|카피\s
 /* 감성 배경 자동 감지 — 절기·예배·감성 문구 (미캔 텍스트 배경 수요) */
 const EMOTIONAL_RE = /추수감사|감사절|thanksgiving|예배|찬양|워십|worship|말씀|성경\s*구절|묵상|은혜|축복|빛내림|감성\s*배경|성탄|크리스마스|부활절|간증|주일|찬송|새해\s*인사|명절\s*인사/i;
 
+/* 미리캔버스 배경 전용 하드룰 트리거 — 사용자가 "미캔 배경 / 미리캔버스 배경 / 미캔용 배경 / miricanvas background" 를 명시할 때만 발동.
+   일반 배경화면(WALLPAPER_RE)보다 더 엄격: 인물·캐릭터·중앙 지배 오브젝트 완전 차단, 정사각 크롭 안전, 상업 범용 배경 자산 규칙 강제 */
+const MIRICANVAS_BG_RE = /미캔[^\n]{0,4}배경|미리캔버스[^\n]{0,4}배경|미캔용|miricanvas[^\n]{0,10}(background|bg)/i;
+const MIRICANVAS_BG_STYLING = "MiriCanvas contributor background asset — versatile visual base for text/graphic overlay: distributed calm mood without a dominant central subject, gentle organic composition with a large low-contrast area reserved for text overlay, crop-safe on all four edges (top/bottom/left/right can be trimmed without breaking the mood), universally reusable across card news / presentation / poster / flyer / SNS / banner, editorial minimalism, background-first (never a poster, never a finished template, never a hero shot)";
+const MIRICANVAS_BG_GUARD = "background asset only, no dominant person, no dominant face, no central character or mascot, no product hero shot, no readable text or slogan, no poster-style headline area, no template layout boxes, no busy clutter, no rigid frame corners, no single large object filling the frame, calm distributed visual field with clean text-overlay space";
+
 const ANALYSIS_BLOCKS = ["주제","스타일","구도","조명","색감","외형","의상","포즈/표정","소품/오브젝트","배경","카메라","분위기","여백/카피스페이스"];
 
 /* Adobe Stock 공식 콘텐츠 카테고리 (1-21) — 초안 선정·CSV·카드 표시 공용 */
@@ -624,26 +630,29 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
   const foodAuto = !slot.angle || slot.angle === "auto";
   const isEmotional = mode === "emotional";
   const themeAll = `${slot.subject || ""} ${slot.title || ""} ${slot.keywords || ""} ${slot.props || ""}`;
+  /* 미리캔버스 배경 하드룰 — 주제/제목/키워드에 "미캔 배경/미리캔버스 배경/미캔용" 명시 시 발동.
+     다른 라이프스타일/음식/헬스케어 분기를 모두 억제하고 배경 자산 규칙만 적용 (정사각 크롭 세이프·분산 무드·인물 차단) */
+  const isMiriBg = !isIllust && MIRICANVAS_BG_RE.test(themeAll);
   /* 디지털 업무(POS·태블릿·재고·온라인)가 주인공이면 음식/라이프스타일/헬스케어 오분류를 억제하고 선명한 상업 업무샷으로 */
-  const isWorkTech = !isIllust && WORK_TECH_RE.test(themeAll);
+  const isWorkTech = !isIllust && !isMiriBg && WORK_TECH_RE.test(themeAll);
   /* 테크 하드웨어(반도체·칩·서버·로봇) 제품컷 강제는 '상업 모드'에서만 — 배경화면·감성 모드의 테크는
      네온·어둠·글로우가 오히려 판매 미학(승인됨)이라 밝은 제품컷으로 뭉개지 않는다.
      (어도비 거절은 '선명해야 할 상업 제품/인물컷'이 소프트할 때 나지, 분위기용 배경화면에선 안 남) */
-  const isTechProduct = !isIllust && mode !== "wallpaper" && !isEmotional && TECH_PRODUCT_RE.test(themeAll);
+  const isTechProduct = !isIllust && !isMiriBg && mode !== "wallpaper" && !isEmotional && TECH_PRODUCT_RE.test(themeAll);
   /* 흰배경 제품격리 (PIW) — 심리스 화이트 위 오브젝트 격리 촬영. 음식·라이프스타일보다 우선 (food close-up 구도 대신 PIW 구도) */
-  const isPIW = !isIllust && !isWorkTech && PIW_RE.test(themeAll);
+  const isPIW = !isIllust && !isMiriBg && !isWorkTech && PIW_RE.test(themeAll);
   /* 음식은 밝은 초근접 실사 인스타 느낌이 기본 — PIW가 잡히면 PIW 스타일 우선 (디지털 업무 장면도 제외) */
-  const isFood = !isIllust && !isWorkTech && !isPIW && FOOD_RE.test(themeAll);
+  const isFood = !isIllust && !isMiriBg && !isWorkTech && !isPIW && FOOD_RE.test(themeAll);
   /* 일본·한국 카페 컴포트 — 깅엄 체크 + 파스텔 접시 카와이 스타일링. 어도비 배치 승인 검증 완료 */
-  const isJpkrCafe = !isIllust && !isPIW && JPKR_CAFE_RE.test(themeAll);
+  const isJpkrCafe = !isIllust && !isMiriBg && !isPIW && JPKR_CAFE_RE.test(themeAll);
   /* 밀프랩·도시락 — 칸막이 용기(밥·반찬 분리) + 화이트 하이키 스타일링 강제. 음식 접사 구도보다 우선 */
-  const isMealprep = !isIllust && !isPIW && MEALPREP_RE.test(themeAll);
+  const isMealprep = !isIllust && !isMiriBg && !isPIW && MEALPREP_RE.test(themeAll);
   /* 골프 — 페어웨이·하늘·잔디 딥DOF 선명 (미캔라이프의 얕은심도와 분리) */
-  const isGolf = !isIllust && !isPIW && !isWorkTech && GOLF_RE.test(themeAll);
-  /* 미캔 라이프스타일 — 부동산·가족·솔로 데일리 등 밝은 홈 미학 (골프·감성·음식·PIW·디지털업무 아닐 때만) */
-  const isMiriLifestyle = !isIllust && !isEmotional && !isFood && !isPIW && !isWorkTech && !isGolf && MIRI_LIFESTYLE_RE.test(themeAll);
-  /* 어도비 헬스케어 — 글로벌 다양성 상업 구도 (감성·음식·PIW·미캔라이프·디지털업무 아닐 때) */
-  const isHealthcare = !isIllust && !isEmotional && !isFood && !isPIW && !isMiriLifestyle && !isWorkTech && HEALTHCARE_RE.test(themeAll);
+  const isGolf = !isIllust && !isMiriBg && !isPIW && !isWorkTech && GOLF_RE.test(themeAll);
+  /* 미캔 라이프스타일 — 부동산·가족·솔로 데일리 등 밝은 홈 미학 (골프·감성·음식·PIW·디지털업무·미캔배경 아닐 때만) */
+  const isMiriLifestyle = !isIllust && !isMiriBg && !isEmotional && !isFood && !isPIW && !isWorkTech && !isGolf && MIRI_LIFESTYLE_RE.test(themeAll);
+  /* 어도비 헬스케어 — 글로벌 다양성 상업 구도 (감성·음식·PIW·미캔라이프·미캔배경·디지털업무 아닐 때) */
+  const isHealthcare = !isIllust && !isMiriBg && !isEmotional && !isFood && !isPIW && !isMiriLifestyle && !isWorkTech && HEALTHCARE_RE.test(themeAll);
   /* 한국 명시 시 어도비 글로벌 다양성 규칙 억제 (Korean 캐스팅 유지)
      — 슬롯 영어 텍스트에 Korean이 없어도, 주제/지역이 한국이면(koreanCast) 강제 */
   const isKoreanExplicit = koreanCast || KOREAN_EXPLICIT_RE.test(themeAll);
@@ -653,8 +662,11 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
     (slot.angle === "top_down" || (foodAuto && FOOD_TOPVIEW_RE.test(themeAll)));
   /* 음식 전 앵글 풀프레임 — 탑뷰뿐 아니라 45도·아이레벨에서도 포장 용기까지 짤림 0 (클로즈업/매크로 제외) */
   const isFoodAny = (isFood || isMealprep) && !isPIW && !isJpkrCafe && !isTight;
-  /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중) */
-  const comp = mode === "wallpaper"
+  /* 클로즈업/매크로를 명시 선택한 경우엔 여백 규칙을 완화 (사용자 의도 존중).
+     미캔 배경 하드룰 발동 시 정사각·분산 무드·크롭 세이프 강제 (다른 comp 분기 무시) */
+  const comp = isMiriBg
+    ? `square-friendly distributed background with a calm center safe zone for text overlay, mood spread evenly across the frame (no single dominant object), all four edges crop-safe (${slot.copy_space || "large low-contrast overlay area"})`
+    : mode === "wallpaper"
     ? `40-60% copy space (${slot.copy_space || "clean margin"})`
     : isEmotional
       ? `subject to one side, 45-60% copy space for text (${slot.copy_space || "sky or soft area"})`
@@ -729,9 +741,12 @@ function buildSlotPrompt(slot, mode, tone = "realism", people = "auto", koreanCa
     isTechProduct ? "premium product photo, bright studio, even lighting, realistic materials" : "",
     isCleanCommercial ? "clean minimal backdrop, sharp front-to-back" : "",
     isCleanBackdrop ? "plain bare wall behind subject, accent at edge, tone-and-light separation" : "",
+    /* 미리캔버스 배경 하드룰 — 다른 시그니처보다 우선 (배경 자산 스타일링) */
+    isMiriBg ? MIRICANVAS_BG_STYLING : "",
     quality,
     isIllust ? "" : "plain unlettered unbranded surfaces, one continuous scene",
-    mode === "wallpaper" ? "" : isPIW ? "white bg only, even light" : isEmotional ? "calm area for text overlay" : isFaith ? "reverent, golden light welcome" : isFood ? "bright appetizing, bg in focus" : isGolf ? "deep DOF to sky, bright" : isMiriLifestyle ? "bg in focus, text overlay area" : isHealthcare ? "clean setting, editorial realism" : "clean bg, even light",
+    /* 미캔배경(최우선)=배경자산가드 · 배경화면=제외 · PIW=흰배경 · 감성=텍스트여백 · 신앙=골든 · 음식=밝게 · 골프=딥DOF · 미캔라이프=포커스 · 헬스케어=클리닉 · 그 외=클린배경 */
+    isMiriBg ? MIRICANVAS_BG_GUARD : mode === "wallpaper" ? "" : isPIW ? "white bg only, even light" : isEmotional ? "calm area for text overlay" : isFaith ? "reverent, golden light welcome" : isFood ? "bright appetizing, bg in focus" : isGolf ? "deep DOF to sky, bright" : isMiriLifestyle ? "bg in focus, text overlay area" : isHealthcare ? "clean setting, editorial realism" : "clean bg, even light",
   ].filter(Boolean).join(". ");
 }
 
@@ -747,6 +762,8 @@ const MJ_NEG_COMMERCIAL = "backlit, backlight, silhouette, lens flare, bokeh, bl
 const MJ_NEG_QUALITY = "noise, film grain, banding, chroma noise, glow, bloom, halo, soft focus, hazy";
 const MJ_NEG_NEON = "neon, hologram, sci-fi glow, glowing circuits, dark room, cinematic dark lighting";
 const MJ_NEG_PIW = "background scenery, floor line, horizon, environment, table cloth, harsh shadow, gradient background, surface texture";
+/* 미리캔버스 배경 하드룰용 MJ 네거티브 — 인물·캐릭터·중앙 지배 오브젝트·템플릿 원천 차단 */
+const MJ_NEG_MIRICANVAS_BG = "person, people, face, portrait, character, mascot, product, hero shot, headline, title area, slogan, poster, template layout, layout box, frame corners, single dominant object, big flower, big leaf, cluttered scene";
 /* CLEAN_STUDIO_BG의 MJ 안전판 — 부정문 없이 원하는 배경만 서술 */
 const MJ_CLEAN_BG = "backdrop is a simple tidy plain interior wall of a premium minimal space with calm empty space directly behind the subject, everything sharp and in focus front-to-back like a crisp commercial set, distraction-free";
 const MJ_FRONT_LIGHT = "subject evenly lit from the front-side, key light from the camera side, bright open illumination on the subject, ";
@@ -782,7 +799,7 @@ const MJ_WINDOW_FIXES = [
 function toMidjourney(slot, mode, tone, people, aspect, hands = "auto") {
   let pos = slot.finalPrompt || buildSlotPrompt(slot, mode, tone, people, false, hands);
   /* NO_TEXT_LOCK도 반드시 제거 — 미드저니는 "no Hangul/calligraphy" 속 명사를 유인어로 읽고 오히려 그린다 (--no 네거티브로만 전달) */
-  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(GOLF_GUARD, "").replace(PIW_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(HEALTHCARE_GUARD, "").replace(GUARD, "").replace(NO_TEXT_LOCK, "")
+  pos = pos.replace(COMMERCIAL_GUARD, "").replace(EMOTIONAL_GUARD, "").replace(FAITH_GUARD, "").replace(FOOD_GUARD, "").replace(GOLF_GUARD, "").replace(PIW_GUARD, "").replace(MIRI_LIFESTYLE_GUARD, "").replace(HEALTHCARE_GUARD, "").replace(MIRICANVAS_BG_GUARD, "").replace(GUARD, "").replace(NO_TEXT_LOCK, "")
     .replace(/\.\s*\.\s*/g, ". ").replace(/[.\s]+$/g, "").trim();
   /* 부정문 소독 — 미드저니가 부정 단어를 유인어로 읽는 사고 차단 */
   for (const [from, to] of MJ_POSITIVE_FIXES) pos = pos.split(from).join(to);
@@ -826,8 +843,12 @@ function toMidjourney(slot, mode, tone, people, aspect, hands = "auto") {
     neg += ", cluttered background, busy background, shelves behind subject, wall art, picture frames, hanging wall decor";
   /* 과거 세션의 finalPrompt에 남은 블러 표현까지 소독 (구버전 가드 문구 대비) */
   pos = scrubBlurText(pos);
+  /* 미캔 배경 하드룰: 인물·중앙 지배·템플릿 원천 차단 + 정사각(1:1) 강제 */
+  const isMiriBg = MIRICANVAS_BG_RE.test(themeText);
+  if (isMiriBg) neg += `, ${MJ_NEG_MIRICANVAS_BG}`;
+  const finalAspect = isMiriBg ? "1:1" : (aspect || "16:9");
   const style = slot.kind === "illustration" ? "" : " --raw";
-  return `${pos} --ar ${aspect || "16:9"}${style} --no ${neg}`;
+  return `${pos} --ar ${finalAspect}${style} --no ${neg}`;
 }
 
 /* ── Midjourney 배치 파이프라인용 (mj_batch.py) ── */
@@ -1088,7 +1109,8 @@ export default function App() {
 
   const onTopicChange = (v) => {
     setTopic(v);
-    if (modeAuto) setMode(EMOTIONAL_RE.test(v) ? "emotional" : WALLPAPER_RE.test(v) ? "wallpaper" : "commercial");
+    /* 미캔 배경 하드룰 트리거는 wallpaper 모드로 자동 전환 (기존 파이프라인 재사용) */
+    if (modeAuto) setMode(MIRICANVAS_BG_RE.test(v) ? "wallpaper" : EMOTIONAL_RE.test(v) ? "emotional" : WALLPAPER_RE.test(v) ? "wallpaper" : "commercial");
   };
 
   /* 한국인 캐스팅 강제 여부: 지역을 '한국'으로 골랐거나, 지역 미선택인데 주제/키워드에 한국이 명시되면 자동 강제.
