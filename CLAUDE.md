@@ -55,6 +55,17 @@
 
 이 도구들은 서로 헤더 바로가기 + 허브로 연결돼 있다.
 
+### 💻 내 컴퓨터 로컬 폴더 경로 (사용자 PC = COM)
+> 세션마다 다시 물어보지 않기 위해 고정한다. 작업 요청이 오면 여기부터 본다.
+
+| 무엇 | 로컬 경로 | 비고 |
+|---|---|---|
+| 양산공장 코드 (crop-server 저장소) | `C:\Users\COM\crop-server` | git 저장소. GitHub Pages 자동 배포 |
+| 양산공장 작업 폴더 | `C:\Users\COM\Documents\이미지 양산공장` | outputs·work·MJ 배치 실행 결과 |
+| 아뜰리에 배포 폴더 (조롱이-배포) | `C:\Users\COM\조롱이-배포` | `functions/auth.js`에 비번 · `wrangler pages deploy . --project-name=free-atelier` |
+| 로고공방 | (로컬 경로 미확인) | repo: logo-gongbang · GitHub Pages |
+| 자동크롭 | (로컬 경로 미확인) | Cloudflare Workers |
+
 ---
 
 ## 🔧 작업 규칙
