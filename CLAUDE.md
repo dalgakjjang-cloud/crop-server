@@ -63,8 +63,10 @@
 | 양산공장 코드 (crop-server 저장소) | `C:\Users\COM\crop-server` | git 저장소. GitHub Pages 자동 배포 |
 | 양산공장 작업 폴더 | `C:\Users\COM\Documents\이미지 양산공장` | outputs·work·MJ 배치 실행 결과 |
 | 아뜰리에 배포 폴더 (조롱이-배포) | `C:\Users\COM\조롱이-배포` | `functions/auth.js`에 비번 · `wrangler pages deploy . --project-name=free-atelier` |
-| 로고공방 | (로컬 경로 미확인) | repo: logo-gongbang · GitHub Pages |
-| 자동크롭 | (로컬 경로 미확인) | Cloudflare Workers |
+| 로고공방 | **로컬 폴더 없음** (2026-07-31 검색 확인) | GitHub(logo-gongbang) 웹에서 관리로 추정 |
+| 자동크롭 | **로컬 폴더 없음** (2026-07-31 검색 확인) | Cloudflare 대시보드에서 관리로 추정 |
+
+> 참고: `C:\Users\COM\crop-server2` 폴더도 있음 — crop-server의 복사본/백업으로 추정. 작업은 `crop-server`(2 없는 쪽)에서 한다.
 
 ---
 
