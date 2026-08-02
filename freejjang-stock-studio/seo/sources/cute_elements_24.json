@@ -1,0 +1,1395 @@
+{
+  "batch": "cute_elements_24",
+  "signals_batch": "cute-elements-24",
+  "slug": "cute_elements",
+  "prefix": "ce",
+  "count": 24,
+  "header_note": "미리캔버스 귀여움 PNG 요소 24컷 — 리서치 기반, 카와이24와 겹치지 않는 스티커·토퍼·라벨 계열",
+  "platform": "어도비+미캔",
+  "pools": {
+    "usecase_en": [
+      "sticker",
+      "planner sticker",
+      "cardnews",
+      "topper",
+      "label",
+      "digital sticker",
+      "greeting card",
+      "social media",
+      "invitation"
+    ],
+    "usecase_ko": [
+      "스티커",
+      "플래너 스티커",
+      "카드뉴스",
+      "토퍼",
+      "라벨",
+      "디지털 스티커",
+      "카드",
+      "소셜 미디어",
+      "초대장"
+    ],
+    "group_en": {
+      "A": [
+        "reward sticker",
+        "praise",
+        "chibi character",
+        "mascot",
+        "sticker set",
+        "hand drawn"
+      ],
+      "B": [
+        "cake topper",
+        "party",
+        "celebration",
+        "decorative topper",
+        "banner",
+        "birthday"
+      ],
+      "C": [
+        "label",
+        "tag",
+        "badge",
+        "handwritten",
+        "note",
+        "text label"
+      ],
+      "D": [
+        "seasonal element",
+        "hanbok",
+        "korean holiday",
+        "chuseok",
+        "traditional",
+        "decorative element"
+      ]
+    },
+    "group_ko": {
+      "A": [
+        "칭찬 스티커",
+        "리워드",
+        "치비 캐릭터",
+        "마스코트",
+        "스티커 세트",
+        "손그림"
+      ],
+      "B": [
+        "케이크 토퍼",
+        "파티",
+        "축하",
+        "장식 토퍼",
+        "배너",
+        "생일"
+      ],
+      "C": [
+        "라벨",
+        "태그",
+        "뱃지",
+        "손글씨",
+        "메모",
+        "텍스트 라벨"
+      ],
+      "D": [
+        "시즌 요소",
+        "한복",
+        "명절",
+        "추석",
+        "전통",
+        "장식 요소"
+      ]
+    },
+    "universal_en": [
+      "cute",
+      "kawaii",
+      "pastel",
+      "soft",
+      "adorable",
+      "cartoon",
+      "clipart",
+      "transparent background",
+      "isolated",
+      "no people",
+      "design element",
+      "decoration",
+      "hand illustrated",
+      "flat illustration",
+      "sweet",
+      "lovely"
+    ],
+    "universal_ko": [
+      "귀여운",
+      "카와이",
+      "파스텔",
+      "부드러운",
+      "사랑스러운",
+      "카툰",
+      "클립아트",
+      "투명 배경",
+      "아이솔레이티드",
+      "사람 없음",
+      "디자인 요소",
+      "데코레이션",
+      "손그림 일러스트",
+      "플랫 일러스트",
+      "스위트",
+      "러블리"
+    ]
+  },
+  "sections": [
+    {
+      "title": "🌟 A. 칭찬 스티커·리워드 (CE-A)",
+      "groups": [
+        "A"
+      ]
+    },
+    {
+      "title": "🎂 B. 파티·케이크 토퍼 (CE-B)",
+      "groups": [
+        "B"
+      ]
+    },
+    {
+      "title": "🏷 C. 라벨·태그·뱃지 (CE-C)",
+      "groups": [
+        "C"
+      ]
+    },
+    {
+      "title": "🍁 D. 시즌·명절 장식 (CE-D)",
+      "groups": [
+        "D"
+      ]
+    }
+  ],
+  "cuts": [
+    {
+      "n": 1,
+      "grp": "A",
+      "shape": "제품형",
+      "axis_subject": "칭찬 별 스티커 (A 리워드)",
+      "axis_color": "옐로-핑크",
+      "label_ko": "최고예요 별 스티커",
+      "title_en": "Cute reward sticker with a smiling star and thumbs up",
+      "title_ko": "웃는 별과 엄지척이 있는 귀여운 칭찬 스티커",
+      "core_en": [
+        "reward sticker",
+        "star sticker",
+        "smiling star",
+        "praise sticker",
+        "thumbs up",
+        "kids sticker"
+      ],
+      "core_ko": [
+        "리워드 스티커",
+        "별 스티커",
+        "웃는 별",
+        "칭찬 스티커",
+        "엄지척",
+        "아이 스티커"
+      ],
+      "color_en": [
+        "yellow",
+        "pink"
+      ],
+      "color_ko": [
+        "옐로",
+        "핑크"
+      ],
+      "subject": "a smiling cute star mascot with tiny thumbs up isolated on a clean white background",
+      "detail": "chubby rounded outline with a soft outer glow",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "sunny yellow",
+          "hex": "FFD84C"
+        },
+        {
+          "name": "candy pink",
+          "hex": "FFA6C1"
+        }
+      ],
+      "copy_space": "clean space around the sticker",
+      "style": "cute reward sticker illustration"
+    },
+    {
+      "n": 2,
+      "grp": "A",
+      "shape": "제품형",
+      "axis_subject": "칭찬 하트 (A 리워드)",
+      "axis_color": "핑크-크림",
+      "label_ko": "참잘했어요 하트",
+      "title_en": "Cute reward heart sticker with a gentle sparkle",
+      "title_ko": "은은한 스파클이 있는 귀여운 칭찬 하트 스티커",
+      "core_en": [
+        "heart sticker",
+        "reward heart",
+        "sparkle heart",
+        "praise heart",
+        "cute heart",
+        "glossy heart"
+      ],
+      "core_ko": [
+        "하트 스티커",
+        "리워드 하트",
+        "스파클 하트",
+        "칭찬 하트",
+        "귀여운 하트",
+        "광택 하트"
+      ],
+      "color_en": [
+        "pink",
+        "cream"
+      ],
+      "color_ko": [
+        "핑크",
+        "크림"
+      ],
+      "subject": "a rounded glossy pink heart with a tiny sparkle isolated on a clean white background",
+      "detail": "soft highlight on the top edge",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "candy pink",
+          "hex": "FF9EBB"
+        },
+        {
+          "name": "warm cream",
+          "hex": "FFF3E0"
+        }
+      ],
+      "copy_space": "clean space around the sticker",
+      "style": "cute reward sticker illustration"
+    },
+    {
+      "n": 3,
+      "grp": "A",
+      "shape": "제품형",
+      "axis_subject": "치비 곰돌이 (A 리워드)",
+      "axis_color": "카라멜-크림",
+      "label_ko": "치비 곰돌이 마스코트",
+      "title_en": "Cute chibi bear mascot sticker waving hello",
+      "title_ko": "인사하는 귀여운 치비 곰돌이 마스코트 스티커",
+      "core_en": [
+        "chibi bear",
+        "bear mascot",
+        "waving",
+        "cute bear",
+        "mascot sticker",
+        "bear character"
+      ],
+      "core_ko": [
+        "치비 곰돌이",
+        "곰돌이 마스코트",
+        "인사",
+        "귀여운 곰",
+        "마스코트 스티커",
+        "곰 캐릭터"
+      ],
+      "color_en": [
+        "caramel",
+        "cream"
+      ],
+      "color_ko": [
+        "카라멜",
+        "크림"
+      ],
+      "subject": "a chubby chibi bear character waving one paw isolated on a clean white background",
+      "detail": "big head small body with soft rounded outline",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "caramel",
+          "hex": "C89968"
+        },
+        {
+          "name": "warm cream",
+          "hex": "FFF1DC"
+        }
+      ],
+      "copy_space": "clean space around the character",
+      "style": "cute reward sticker illustration"
+    },
+    {
+      "n": 4,
+      "grp": "A",
+      "shape": "제품형",
+      "axis_subject": "치비 토끼 (A 리워드)",
+      "axis_color": "파스텔 핑크-화이트",
+      "label_ko": "치비 토끼 마스코트",
+      "title_en": "Cute chibi bunny mascot sticker with a big smile",
+      "title_ko": "환한 미소의 귀여운 치비 토끼 마스코트 스티커",
+      "core_en": [
+        "chibi bunny",
+        "bunny mascot",
+        "cute rabbit",
+        "smiling bunny",
+        "rabbit character",
+        "bunny sticker"
+      ],
+      "core_ko": [
+        "치비 토끼",
+        "토끼 마스코트",
+        "귀여운 래빗",
+        "웃는 토끼",
+        "래빗 캐릭터",
+        "토끼 스티커"
+      ],
+      "color_en": [
+        "pastel pink",
+        "white"
+      ],
+      "color_ko": [
+        "파스텔 핑크",
+        "화이트"
+      ],
+      "subject": "a chubby chibi bunny with long ears and a big smile isolated on a clean white background",
+      "detail": "big head small body with soft rounded outline",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel pink",
+          "hex": "FFD1DA"
+        },
+        {
+          "name": "warm white",
+          "hex": "FFFAF5"
+        }
+      ],
+      "copy_space": "clean space around the character",
+      "style": "cute reward sticker illustration"
+    },
+    {
+      "n": 5,
+      "grp": "A",
+      "shape": "제품형",
+      "axis_subject": "응원 말풍선 (A 리워드)",
+      "axis_color": "민트-화이트",
+      "label_ko": "응원 메시지 말풍선",
+      "title_en": "Cute cheer message speech bubble sticker",
+      "title_ko": "귀여운 응원 메시지 말풍선 스티커",
+      "core_en": [
+        "speech bubble",
+        "cheer bubble",
+        "message bubble",
+        "chat bubble",
+        "cute bubble",
+        "talk balloon"
+      ],
+      "core_ko": [
+        "말풍선",
+        "응원 말풍선",
+        "메시지 버블",
+        "채팅 버블",
+        "귀여운 버블",
+        "토크 벌룬"
+      ],
+      "color_en": [
+        "mint",
+        "white"
+      ],
+      "color_ko": [
+        "민트",
+        "화이트"
+      ],
+      "subject": "a rounded pastel mint speech bubble with a tiny heart inside isolated on a clean white background",
+      "detail": "soft drop shadow and clean outline",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel mint",
+          "hex": "B7EBD8"
+        },
+        {
+          "name": "warm white",
+          "hex": "FFFAF5"
+        }
+      ],
+      "copy_space": "clean space around the bubble",
+      "style": "cute reward sticker illustration"
+    },
+    {
+      "n": 6,
+      "grp": "A",
+      "shape": "제품형",
+      "axis_subject": "숫자 뱃지 세트 (A 리워드)",
+      "axis_color": "파스텔 멀티컬러",
+      "label_ko": "숫자 리워드 뱃지 세트",
+      "title_en": "Cute number reward badge sticker set",
+      "title_ko": "귀여운 숫자 리워드 뱃지 스티커 세트",
+      "core_en": [
+        "number badge",
+        "reward badge",
+        "score sticker",
+        "points badge",
+        "numeric sticker",
+        "kids reward"
+      ],
+      "core_ko": [
+        "숫자 뱃지",
+        "리워드 뱃지",
+        "점수 스티커",
+        "포인트 뱃지",
+        "숫자 스티커",
+        "아이 리워드"
+      ],
+      "color_en": [
+        "pastel",
+        "multicolor"
+      ],
+      "color_ko": [
+        "파스텔",
+        "멀티컬러"
+      ],
+      "subject": "a row of rounded pastel number badges from 1 to 5 isolated on a clean white background",
+      "detail": "soft ribbon detail at the top of each badge",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel pink",
+          "hex": "FFC1D8"
+        },
+        {
+          "name": "pastel yellow",
+          "hex": "FFE9A8"
+        },
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        },
+        {
+          "name": "pastel blue",
+          "hex": "B7D9F0"
+        }
+      ],
+      "copy_space": "clean space around the badges",
+      "style": "cute reward sticker illustration"
+    },
+    {
+      "n": 7,
+      "grp": "B",
+      "shape": "제품형",
+      "axis_subject": "해피 버스데이 토퍼 (B 파티)",
+      "axis_color": "핑크-골드",
+      "label_ko": "해피 버스데이 토퍼",
+      "title_en": "Cute happy birthday cake topper illustration",
+      "title_ko": "귀여운 해피 버스데이 케이크 토퍼 일러스트",
+      "core_en": [
+        "birthday topper",
+        "cake topper",
+        "happy birthday",
+        "party topper",
+        "birthday sign",
+        "cake decoration"
+      ],
+      "core_ko": [
+        "버스데이 토퍼",
+        "케이크 토퍼",
+        "해피 버스데이",
+        "파티 토퍼",
+        "생일 사인",
+        "케이크 데코"
+      ],
+      "color_en": [
+        "pink",
+        "gold"
+      ],
+      "color_ko": [
+        "핑크",
+        "골드"
+      ],
+      "subject": "a happy birthday text topper with a wooden stick and two star accents isolated on a clean white background",
+      "detail": "playful rounded hand-drawn letters",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "candy pink",
+          "hex": "FFA6C1"
+        },
+        {
+          "name": "warm gold",
+          "hex": "E5B551"
+        }
+      ],
+      "copy_space": "clean space around the topper",
+      "style": "cute party topper illustration"
+    },
+    {
+      "n": 8,
+      "grp": "B",
+      "shape": "제품형",
+      "axis_subject": "축하 토퍼 (B 파티)",
+      "axis_color": "파스텔 컨페티",
+      "label_ko": "축하 케이크 토퍼",
+      "title_en": "Cute celebration cake topper with tiny confetti",
+      "title_ko": "작은 컨페티가 함께 있는 축하 케이크 토퍼",
+      "core_en": [
+        "celebration topper",
+        "confetti topper",
+        "party sign",
+        "cake pick",
+        "celebrate",
+        "cake decoration"
+      ],
+      "core_ko": [
+        "축하 토퍼",
+        "컨페티 토퍼",
+        "파티 사인",
+        "케이크 픽",
+        "셀레브레이트",
+        "케이크 데코"
+      ],
+      "color_en": [
+        "pastel",
+        "confetti"
+      ],
+      "color_ko": [
+        "파스텔",
+        "컨페티"
+      ],
+      "subject": "a celebrate text topper on a wooden stick with tiny pastel confetti around isolated on a clean white background",
+      "detail": "confetti scattered evenly",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel pink",
+          "hex": "FFC1D8"
+        },
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        },
+        {
+          "name": "pastel yellow",
+          "hex": "FFE9A8"
+        }
+      ],
+      "copy_space": "clean space around the topper",
+      "style": "cute party topper illustration"
+    },
+    {
+      "n": 9,
+      "grp": "B",
+      "shape": "제품형",
+      "axis_subject": "가랜드 배너 (B 파티)",
+      "axis_color": "파스텔 멀티컬러",
+      "label_ko": "가랜드 배너",
+      "title_en": "Cute triangular garland banner illustration",
+      "title_ko": "귀여운 삼각 가랜드 배너 일러스트",
+      "core_en": [
+        "garland",
+        "bunting",
+        "triangle banner",
+        "party banner",
+        "paper flags",
+        "hanging banner"
+      ],
+      "core_ko": [
+        "가랜드",
+        "버닝",
+        "삼각 배너",
+        "파티 배너",
+        "페이퍼 플래그",
+        "행잉 배너"
+      ],
+      "color_en": [
+        "pastel",
+        "multicolor"
+      ],
+      "color_ko": [
+        "파스텔",
+        "멀티컬러"
+      ],
+      "subject": "a garland of pastel triangular flags hanging on a soft string isolated on a clean white background",
+      "detail": "slight sag and gentle drop shadow",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel pink",
+          "hex": "FFC1D8"
+        },
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        },
+        {
+          "name": "pastel blue",
+          "hex": "B7D9F0"
+        }
+      ],
+      "copy_space": "clean space above and below the garland",
+      "style": "cute party topper illustration"
+    },
+    {
+      "n": 10,
+      "grp": "B",
+      "shape": "제품형",
+      "axis_subject": "파티 컨페티 (B 파티)",
+      "axis_color": "파스텔 멀티컬러",
+      "label_ko": "파티 콘페티",
+      "title_en": "Cute pastel party confetti scattered pieces",
+      "title_ko": "흩뿌려진 귀여운 파스텔 파티 컨페티",
+      "core_en": [
+        "confetti",
+        "party confetti",
+        "paper confetti",
+        "celebration",
+        "scattered pieces",
+        "party element"
+      ],
+      "core_ko": [
+        "컨페티",
+        "파티 컨페티",
+        "페이퍼 컨페티",
+        "셀레브레이션",
+        "흩뿌려진",
+        "파티 요소"
+      ],
+      "color_en": [
+        "pastel",
+        "multicolor"
+      ],
+      "color_ko": [
+        "파스텔",
+        "멀티컬러"
+      ],
+      "subject": "scattered pastel confetti pieces and thin curling ribbons isolated on a clean white background",
+      "detail": "airy composition with a light drop shadow",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel pink",
+          "hex": "FFC1D8"
+        },
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        },
+        {
+          "name": "pastel yellow",
+          "hex": "FFE9A8"
+        },
+        {
+          "name": "pastel blue",
+          "hex": "B7D9F0"
+        }
+      ],
+      "copy_space": "clean space between the pieces",
+      "style": "cute party topper illustration"
+    },
+    {
+      "n": 11,
+      "grp": "B",
+      "shape": "제품형",
+      "axis_subject": "풍선 클러스터 (B 파티)",
+      "axis_color": "파스텔 핑크-민트-옐로",
+      "label_ko": "파티 풍선 클러스터",
+      "title_en": "Cute pastel party balloon cluster illustration",
+      "title_ko": "귀여운 파스텔 파티 풍선 클러스터 일러스트",
+      "core_en": [
+        "balloon cluster",
+        "party balloons",
+        "pastel balloons",
+        "celebration balloons",
+        "floating balloons",
+        "bunch of balloons"
+      ],
+      "core_ko": [
+        "풍선 클러스터",
+        "파티 풍선",
+        "파스텔 풍선",
+        "축하 풍선",
+        "떠있는 풍선",
+        "풍선 다발"
+      ],
+      "color_en": [
+        "pastel pink",
+        "mint",
+        "yellow"
+      ],
+      "color_ko": [
+        "파스텔 핑크",
+        "민트",
+        "옐로"
+      ],
+      "subject": "a cluster of pastel round party balloons with thin strings isolated on a clean white background",
+      "detail": "soft highlight on each balloon",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel pink",
+          "hex": "FFC1D8"
+        },
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        },
+        {
+          "name": "pastel yellow",
+          "hex": "FFE9A8"
+        }
+      ],
+      "copy_space": "clean space around the cluster",
+      "style": "cute party topper illustration"
+    },
+    {
+      "n": 12,
+      "grp": "B",
+      "shape": "제품형",
+      "axis_subject": "리본 세트 (B 파티)",
+      "axis_color": "파스텔 핑크-민트",
+      "label_ko": "리본 세트",
+      "title_en": "Cute pastel gift ribbon and bow set",
+      "title_ko": "귀여운 파스텔 선물 리본과 보우 세트",
+      "core_en": [
+        "ribbon",
+        "bow",
+        "gift ribbon",
+        "present bow",
+        "decorative ribbon",
+        "ribbon set"
+      ],
+      "core_ko": [
+        "리본",
+        "보우",
+        "기프트 리본",
+        "선물 보우",
+        "장식 리본",
+        "리본 세트"
+      ],
+      "color_en": [
+        "pastel pink",
+        "mint"
+      ],
+      "color_ko": [
+        "파스텔 핑크",
+        "민트"
+      ],
+      "subject": "a set of pastel ribbons and bows in three shapes isolated on a clean white background",
+      "detail": "gentle folds and soft highlights",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel pink",
+          "hex": "FFC1D8"
+        },
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        }
+      ],
+      "copy_space": "clean space between the ribbons",
+      "style": "cute party topper illustration"
+    },
+    {
+      "n": 13,
+      "grp": "C",
+      "shape": "제품형",
+      "axis_subject": "가격 태그 (C 라벨)",
+      "axis_color": "크림-브라운",
+      "label_ko": "가격 태그",
+      "title_en": "Cute price tag label sticker",
+      "title_ko": "귀여운 가격 태그 라벨 스티커",
+      "core_en": [
+        "price tag",
+        "tag label",
+        "price sticker",
+        "hanging tag",
+        "product tag",
+        "shop tag"
+      ],
+      "core_ko": [
+        "가격 태그",
+        "태그 라벨",
+        "가격 스티커",
+        "행잉 태그",
+        "상품 태그",
+        "샵 태그"
+      ],
+      "color_en": [
+        "cream",
+        "brown"
+      ],
+      "color_ko": [
+        "크림",
+        "브라운"
+      ],
+      "subject": "a rounded rectangle price tag with a small hole and a warm string isolated on a clean white background",
+      "detail": "soft paper texture and clean edges",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "warm cream",
+          "hex": "F6E9D2"
+        },
+        {
+          "name": "kraft brown",
+          "hex": "9C6B45"
+        }
+      ],
+      "copy_space": "clean space around the tag",
+      "style": "cute label sticker illustration"
+    },
+    {
+      "n": 14,
+      "grp": "C",
+      "shape": "제품형",
+      "axis_subject": "원형 라벨 (C 라벨)",
+      "axis_color": "파스텔 핑크-화이트",
+      "label_ko": "동그란 라벨 뱃지",
+      "title_en": "Cute round label badge with a wavy edge",
+      "title_ko": "웨이브 엣지의 귀여운 원형 라벨 뱃지",
+      "core_en": [
+        "round label",
+        "badge",
+        "circle label",
+        "seal",
+        "wavy edge",
+        "stamp label"
+      ],
+      "core_ko": [
+        "원형 라벨",
+        "뱃지",
+        "서클 라벨",
+        "씰",
+        "웨이브 엣지",
+        "스탬프 라벨"
+      ],
+      "color_en": [
+        "pastel pink",
+        "white"
+      ],
+      "color_ko": [
+        "파스텔 핑크",
+        "화이트"
+      ],
+      "subject": "a round pastel label with a soft wavy edge and blank inner circle isolated on a clean white background",
+      "detail": "clean flat vector shape",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel pink",
+          "hex": "FFC1D8"
+        },
+        {
+          "name": "warm white",
+          "hex": "FFFAF5"
+        }
+      ],
+      "copy_space": "clean space around the label",
+      "style": "cute label sticker illustration"
+    },
+    {
+      "n": 15,
+      "grp": "C",
+      "shape": "제품형",
+      "axis_subject": "말풍선 라벨 (C 라벨)",
+      "axis_color": "민트-화이트",
+      "label_ko": "말풍선 라벨",
+      "title_en": "Cute speech bubble label with a soft outline",
+      "title_ko": "부드러운 아웃라인의 귀여운 말풍선 라벨",
+      "core_en": [
+        "speech bubble label",
+        "callout",
+        "chat bubble",
+        "dialog bubble",
+        "note bubble",
+        "talk label"
+      ],
+      "core_ko": [
+        "말풍선 라벨",
+        "콜아웃",
+        "채팅 버블",
+        "다이얼로그 버블",
+        "노트 버블",
+        "토크 라벨"
+      ],
+      "color_en": [
+        "mint",
+        "white"
+      ],
+      "color_ko": [
+        "민트",
+        "화이트"
+      ],
+      "subject": "a rounded pastel mint speech bubble with a blank inner area and a tail isolated on a clean white background",
+      "detail": "soft outline and drop shadow",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        },
+        {
+          "name": "warm white",
+          "hex": "FFFAF5"
+        }
+      ],
+      "copy_space": "clean space around the bubble",
+      "style": "cute label sticker illustration"
+    },
+    {
+      "n": 16,
+      "grp": "C",
+      "shape": "제품형",
+      "axis_subject": "리본 배너 (C 라벨)",
+      "axis_color": "코랄-크림",
+      "label_ko": "리본 배너 라벨",
+      "title_en": "Cute ribbon banner label with folded ends",
+      "title_ko": "접힌 끝단의 귀여운 리본 배너 라벨",
+      "core_en": [
+        "ribbon banner",
+        "banner label",
+        "title banner",
+        "folded ribbon",
+        "header banner",
+        "label ribbon"
+      ],
+      "core_ko": [
+        "리본 배너",
+        "배너 라벨",
+        "타이틀 배너",
+        "접힌 리본",
+        "헤더 배너",
+        "라벨 리본"
+      ],
+      "color_en": [
+        "coral",
+        "cream"
+      ],
+      "color_ko": [
+        "코랄",
+        "크림"
+      ],
+      "subject": "a coral ribbon banner with folded triangular ends and a blank center isolated on a clean white background",
+      "detail": "flat vector shape with gentle shading",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "coral",
+          "hex": "F58A75"
+        },
+        {
+          "name": "warm cream",
+          "hex": "FFF3E0"
+        }
+      ],
+      "copy_space": "clean space around the banner",
+      "style": "cute label sticker illustration"
+    },
+    {
+      "n": 17,
+      "grp": "C",
+      "shape": "제품형",
+      "axis_subject": "도장 뱃지 (C 라벨)",
+      "axis_color": "레드-크림",
+      "label_ko": "도장 스탬프 뱃지",
+      "title_en": "Cute stamp seal badge illustration",
+      "title_ko": "귀여운 도장 스탬프 뱃지 일러스트",
+      "core_en": [
+        "stamp seal",
+        "stamp badge",
+        "approval seal",
+        "circle stamp",
+        "seal illustration",
+        "confirmation seal"
+      ],
+      "core_ko": [
+        "도장 스탬프",
+        "스탬프 뱃지",
+        "승인 씰",
+        "원형 도장",
+        "씰 일러스트",
+        "확인 씰"
+      ],
+      "color_en": [
+        "red",
+        "cream"
+      ],
+      "color_ko": [
+        "레드",
+        "크림"
+      ],
+      "subject": "a round red stamp seal with a subtle grunge edge and blank center isolated on a clean white background",
+      "detail": "hand-stamped feel with light imperfections",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "stamp red",
+          "hex": "D24444"
+        },
+        {
+          "name": "warm cream",
+          "hex": "FFF3E0"
+        }
+      ],
+      "copy_space": "clean space around the stamp",
+      "style": "cute label sticker illustration"
+    },
+    {
+      "n": 18,
+      "grp": "C",
+      "shape": "제품형",
+      "axis_subject": "포스트잇 메모 (C 라벨)",
+      "axis_color": "옐로-핑크",
+      "label_ko": "포스트잇 메모",
+      "title_en": "Cute sticky note memo illustration",
+      "title_ko": "귀여운 포스트잇 메모 일러스트",
+      "core_en": [
+        "sticky note",
+        "post it",
+        "memo",
+        "paper note",
+        "note sticker",
+        "adhesive note"
+      ],
+      "core_ko": [
+        "포스트잇",
+        "포스트 잇",
+        "메모",
+        "페이퍼 노트",
+        "노트 스티커",
+        "점착 메모"
+      ],
+      "color_en": [
+        "yellow",
+        "pink"
+      ],
+      "color_ko": [
+        "옐로",
+        "핑크"
+      ],
+      "subject": "a small pastel yellow sticky note with a slightly curled corner and a soft shadow isolated on a clean white background",
+      "detail": "flat paper look with clean edges",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel yellow",
+          "hex": "FFE9A8"
+        },
+        {
+          "name": "pastel pink",
+          "hex": "FFC1D8"
+        }
+      ],
+      "copy_space": "clean space around the note",
+      "style": "cute label sticker illustration"
+    },
+    {
+      "n": 19,
+      "grp": "D",
+      "shape": "제품형",
+      "axis_subject": "한복 저고리 (D 시즌)",
+      "axis_color": "민트-핑크",
+      "label_ko": "한복 저고리",
+      "title_en": "Cute pastel hanbok jeogori top illustration",
+      "title_ko": "귀여운 파스텔 한복 저고리 일러스트",
+      "core_en": [
+        "hanbok",
+        "jeogori",
+        "korean traditional",
+        "korean clothing",
+        "hanbok illustration",
+        "traditional dress"
+      ],
+      "core_ko": [
+        "한복",
+        "저고리",
+        "한국 전통",
+        "한국 의상",
+        "한복 일러스트",
+        "전통 의상"
+      ],
+      "color_en": [
+        "mint",
+        "pink"
+      ],
+      "color_ko": [
+        "민트",
+        "핑크"
+      ],
+      "subject": "a cute simplified pastel hanbok jeogori top with a soft pink tie isolated on a clean white background",
+      "detail": "flat illustration with clean rounded lines",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        },
+        {
+          "name": "candy pink",
+          "hex": "FFA6C1"
+        }
+      ],
+      "copy_space": "clean space around the illustration",
+      "style": "cute seasonal decoration illustration"
+    },
+    {
+      "n": 20,
+      "grp": "D",
+      "shape": "제품형",
+      "axis_subject": "송편 접시 (D 시즌)",
+      "axis_color": "민트-크림",
+      "label_ko": "송편 접시",
+      "title_en": "Cute Chuseok songpyeon rice cake plate illustration",
+      "title_ko": "귀여운 추석 송편 접시 일러스트",
+      "core_en": [
+        "songpyeon",
+        "chuseok",
+        "korean rice cake",
+        "tteok",
+        "korean holiday",
+        "chuseok illustration"
+      ],
+      "core_ko": [
+        "송편",
+        "추석",
+        "한국 떡",
+        "떡",
+        "명절",
+        "추석 일러스트"
+      ],
+      "color_en": [
+        "mint",
+        "cream"
+      ],
+      "color_ko": [
+        "민트",
+        "크림"
+      ],
+      "subject": "a small plate of cute pastel songpyeon rice cakes with tiny leaves isolated on a clean white background",
+      "detail": "flat illustration with soft rounded shapes",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        },
+        {
+          "name": "warm cream",
+          "hex": "FFF3E0"
+        }
+      ],
+      "copy_space": "clean space around the plate",
+      "style": "cute seasonal decoration illustration"
+    },
+    {
+      "n": 21,
+      "grp": "D",
+      "shape": "제품형",
+      "axis_subject": "보름달 토끼 (D 시즌)",
+      "axis_color": "크림-네이비",
+      "label_ko": "보름달과 토끼",
+      "title_en": "Cute full moon with a tiny rabbit silhouette",
+      "title_ko": "작은 토끼 실루엣이 있는 귀여운 보름달",
+      "core_en": [
+        "full moon",
+        "chuseok moon",
+        "moon rabbit",
+        "harvest moon",
+        "lunar",
+        "moon illustration"
+      ],
+      "core_ko": [
+        "보름달",
+        "추석 달",
+        "달 토끼",
+        "하베스트 문",
+        "루나",
+        "달 일러스트"
+      ],
+      "color_en": [
+        "cream",
+        "navy"
+      ],
+      "color_ko": [
+        "크림",
+        "네이비"
+      ],
+      "subject": "a soft glowing cream full moon with a tiny cute rabbit silhouette inside isolated on a clean white background",
+      "detail": "gentle outer halo",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "warm cream",
+          "hex": "F6E9D2"
+        },
+        {
+          "name": "night navy",
+          "hex": "2C3663"
+        }
+      ],
+      "copy_space": "clean space around the moon",
+      "style": "cute seasonal decoration illustration"
+    },
+    {
+      "n": 22,
+      "grp": "D",
+      "shape": "제품형",
+      "axis_subject": "단풍잎 세트 (D 시즌)",
+      "axis_color": "오렌지-러스트",
+      "label_ko": "단풍잎 세트",
+      "title_en": "Cute autumn maple leaf set illustration",
+      "title_ko": "귀여운 가을 단풍잎 세트 일러스트",
+      "core_en": [
+        "maple leaf",
+        "autumn leaf",
+        "fall leaf",
+        "leaf set",
+        "seasonal leaf",
+        "autumn illustration"
+      ],
+      "core_ko": [
+        "단풍잎",
+        "가을 잎",
+        "폴 리프",
+        "잎 세트",
+        "시즌 리프",
+        "가을 일러스트"
+      ],
+      "color_en": [
+        "orange",
+        "rust"
+      ],
+      "color_ko": [
+        "오렌지",
+        "러스트"
+      ],
+      "subject": "a set of five cute simplified autumn maple leaves in warm tones isolated on a clean white background",
+      "detail": "flat illustration with soft rounded shapes",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "autumn orange",
+          "hex": "E8853A"
+        },
+        {
+          "name": "rust",
+          "hex": "B85C38"
+        }
+      ],
+      "copy_space": "clean space between the leaves",
+      "style": "cute seasonal decoration illustration"
+    },
+    {
+      "n": 23,
+      "grp": "D",
+      "shape": "제품형",
+      "axis_subject": "크리스마스 오너먼트 (D 시즌)",
+      "axis_color": "파스텔 레드-민트",
+      "label_ko": "크리스마스 오너먼트",
+      "title_en": "Cute pastel Christmas ornament set illustration",
+      "title_ko": "귀여운 파스텔 크리스마스 오너먼트 세트 일러스트",
+      "core_en": [
+        "christmas ornament",
+        "ornament",
+        "xmas",
+        "holiday decoration",
+        "christmas ball",
+        "holiday illustration"
+      ],
+      "core_ko": [
+        "크리스마스 오너먼트",
+        "오너먼트",
+        "엑스마스",
+        "홀리데이 데코",
+        "크리스마스 볼",
+        "홀리데이 일러스트"
+      ],
+      "color_en": [
+        "pastel red",
+        "mint"
+      ],
+      "color_ko": [
+        "파스텔 레드",
+        "민트"
+      ],
+      "subject": "three cute pastel Christmas ornaments with tiny strings isolated on a clean white background",
+      "detail": "soft round shapes with gentle highlights",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "pastel red",
+          "hex": "F49492"
+        },
+        {
+          "name": "pastel mint",
+          "hex": "C8ECD8"
+        }
+      ],
+      "copy_space": "clean space between the ornaments",
+      "style": "cute seasonal decoration illustration"
+    },
+    {
+      "n": 24,
+      "grp": "D",
+      "shape": "제품형",
+      "axis_subject": "벚꽃 브랜치 (D 시즌)",
+      "axis_color": "파스텔 핑크-브라운",
+      "label_ko": "벚꽃 브랜치",
+      "title_en": "Cute cherry blossom branch illustration",
+      "title_ko": "귀여운 벚꽃 가지 일러스트",
+      "core_en": [
+        "cherry blossom",
+        "sakura",
+        "spring blossom",
+        "blossom branch",
+        "pink flower",
+        "seasonal flower"
+      ],
+      "core_ko": [
+        "벚꽃",
+        "사쿠라",
+        "봄꽃",
+        "블로썸 가지",
+        "핑크 플라워",
+        "시즌 플라워"
+      ],
+      "color_en": [
+        "pastel pink",
+        "brown"
+      ],
+      "color_ko": [
+        "파스텔 핑크",
+        "브라운"
+      ],
+      "subject": "a small cherry blossom branch with a few soft pink blossoms isolated on a clean white background",
+      "detail": "flat illustration with delicate outlines",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {
+          "name": "cherry blossom pink",
+          "hex": "FFC1D8"
+        },
+        {
+          "name": "warm brown",
+          "hex": "8B5E3C"
+        }
+      ],
+      "copy_space": "clean space around the branch",
+      "style": "cute seasonal decoration illustration"
+    }
+  ]
+}

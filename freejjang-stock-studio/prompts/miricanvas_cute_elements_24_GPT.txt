@@ -1,0 +1,94 @@
+# 미리캔버스 귀여움 PNG 요소 24컷 — 리서치 기반, 카와이24와 겹치지 않는 스티커·토퍼·라벨 계열 (GPT용)
+# ─────────────────────────────────────────────────────────
+# 미캔 시그니처 유지: 밝은 톤 + 넉넉한 텍스트 여백 + 배경까지 선명
+# 사용자가 자기 한글 문구를 얹기 좋게 → 중앙 또는 여백 텍스트 자리 확보
+# HEX 팔레트 명시 → 색감 정확도 향상
+# ─────────────────────────────────────────────────────────
+
+# ══════════════════════════════════════════
+# 🌟 A. 칭찬 스티커·리워드 (CE-A)
+# ══════════════════════════════════════════
+
+--- 01 최고예요 별 스티커 ---
+a smiling cute star mascot with tiny thumbs up isolated on a clean white background, chubby rounded outline with a soft outer glow, camera: overhead flat, lighting: bright even studio light, palette: sunny yellow #FFD84C and candy pink #FFA6C1, clean space around the sticker, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute reward sticker illustration styling
+
+--- 02 참잘했어요 하트 ---
+a rounded glossy pink heart with a tiny sparkle isolated on a clean white background, soft highlight on the top edge, camera: overhead flat, lighting: bright even studio light, palette: candy pink #FF9EBB and warm cream #FFF3E0, clean space around the sticker, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute reward sticker illustration styling
+
+--- 03 치비 곰돌이 마스코트 ---
+a chubby chibi bear character waving one paw isolated on a clean white background, big head small body with soft rounded outline, camera: overhead flat, lighting: bright even studio light, palette: caramel #C89968 and warm cream #FFF1DC, clean space around the character, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute reward sticker illustration styling
+
+--- 04 치비 토끼 마스코트 ---
+a chubby chibi bunny with long ears and a big smile isolated on a clean white background, big head small body with soft rounded outline, camera: overhead flat, lighting: bright even studio light, palette: pastel pink #FFD1DA and warm white #FFFAF5, clean space around the character, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute reward sticker illustration styling
+
+--- 05 응원 메시지 말풍선 ---
+a rounded pastel mint speech bubble with a tiny heart inside isolated on a clean white background, soft drop shadow and clean outline, camera: overhead flat, lighting: bright even studio light, palette: pastel mint #B7EBD8 and warm white #FFFAF5, clean space around the bubble, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute reward sticker illustration styling
+
+--- 06 숫자 리워드 뱃지 세트 ---
+a row of rounded pastel number badges from 1 to 5 isolated on a clean white background, soft ribbon detail at the top of each badge, camera: overhead flat, lighting: bright even studio light, palette: pastel pink #FFC1D8 and pastel yellow #FFE9A8 and pastel mint #C8ECD8 and pastel blue #B7D9F0, clean space around the badges, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute reward sticker illustration styling
+
+# ══════════════════════════════════════════
+# 🎂 B. 파티·케이크 토퍼 (CE-B)
+# ══════════════════════════════════════════
+
+--- 07 해피 버스데이 토퍼 ---
+a happy birthday text topper with a wooden stick and two star accents isolated on a clean white background, playful rounded hand-drawn letters, camera: overhead flat, lighting: bright even studio light, palette: candy pink #FFA6C1 and warm gold #E5B551, clean space around the topper, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute party topper illustration styling
+
+--- 08 축하 케이크 토퍼 ---
+a celebrate text topper on a wooden stick with tiny pastel confetti around isolated on a clean white background, confetti scattered evenly, camera: overhead flat, lighting: bright even studio light, palette: pastel pink #FFC1D8 and pastel mint #C8ECD8 and pastel yellow #FFE9A8, clean space around the topper, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute party topper illustration styling
+
+--- 09 가랜드 배너 ---
+a garland of pastel triangular flags hanging on a soft string isolated on a clean white background, slight sag and gentle drop shadow, camera: overhead flat, lighting: bright even studio light, palette: pastel pink #FFC1D8 and pastel mint #C8ECD8 and pastel blue #B7D9F0, clean space above and below the garland, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute party topper illustration styling
+
+--- 10 파티 콘페티 ---
+scattered pastel confetti pieces and thin curling ribbons isolated on a clean white background, airy composition with a light drop shadow, camera: overhead flat, lighting: bright even studio light, palette: pastel pink #FFC1D8 and pastel mint #C8ECD8 and pastel yellow #FFE9A8 and pastel blue #B7D9F0, clean space between the pieces, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute party topper illustration styling
+
+--- 11 파티 풍선 클러스터 ---
+a cluster of pastel round party balloons with thin strings isolated on a clean white background, soft highlight on each balloon, camera: overhead flat, lighting: bright even studio light, palette: pastel pink #FFC1D8 and pastel mint #C8ECD8 and pastel yellow #FFE9A8, clean space around the cluster, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute party topper illustration styling
+
+--- 12 리본 세트 ---
+a set of pastel ribbons and bows in three shapes isolated on a clean white background, gentle folds and soft highlights, camera: overhead flat, lighting: bright even studio light, palette: pastel pink #FFC1D8 and pastel mint #C8ECD8, clean space between the ribbons, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute party topper illustration styling
+
+# ══════════════════════════════════════════
+# 🏷 C. 라벨·태그·뱃지 (CE-C)
+# ══════════════════════════════════════════
+
+--- 13 가격 태그 ---
+a rounded rectangle price tag with a small hole and a warm string isolated on a clean white background, soft paper texture and clean edges, camera: overhead flat, lighting: bright even studio light, palette: warm cream #F6E9D2 and kraft brown #9C6B45, clean space around the tag, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute label sticker illustration styling
+
+--- 14 동그란 라벨 뱃지 ---
+a round pastel label with a soft wavy edge and blank inner circle isolated on a clean white background, clean flat vector shape, camera: overhead flat, lighting: bright even studio light, palette: pastel pink #FFC1D8 and warm white #FFFAF5, clean space around the label, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute label sticker illustration styling
+
+--- 15 말풍선 라벨 ---
+a rounded pastel mint speech bubble with a blank inner area and a tail isolated on a clean white background, soft outline and drop shadow, camera: overhead flat, lighting: bright even studio light, palette: pastel mint #C8ECD8 and warm white #FFFAF5, clean space around the bubble, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute label sticker illustration styling
+
+--- 16 리본 배너 라벨 ---
+a coral ribbon banner with folded triangular ends and a blank center isolated on a clean white background, flat vector shape with gentle shading, camera: overhead flat, lighting: bright even studio light, palette: coral #F58A75 and warm cream #FFF3E0, clean space around the banner, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute label sticker illustration styling
+
+--- 17 도장 스탬프 뱃지 ---
+a round red stamp seal with a subtle grunge edge and blank center isolated on a clean white background, hand-stamped feel with light imperfections, camera: overhead flat, lighting: bright even studio light, palette: stamp red #D24444 and warm cream #FFF3E0, clean space around the stamp, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute label sticker illustration styling
+
+--- 18 포스트잇 메모 ---
+a small pastel yellow sticky note with a slightly curled corner and a soft shadow isolated on a clean white background, flat paper look with clean edges, camera: overhead flat, lighting: bright even studio light, palette: pastel yellow #FFE9A8 and pastel pink #FFC1D8, clean space around the note, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute label sticker illustration styling
+
+# ══════════════════════════════════════════
+# 🍁 D. 시즌·명절 장식 (CE-D)
+# ══════════════════════════════════════════
+
+--- 19 한복 저고리 ---
+a cute simplified pastel hanbok jeogori top with a soft pink tie isolated on a clean white background, flat illustration with clean rounded lines, camera: overhead flat, lighting: bright even studio light, palette: pastel mint #C8ECD8 and candy pink #FFA6C1, clean space around the illustration, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute seasonal decoration illustration styling
+
+--- 20 송편 접시 ---
+a small plate of cute pastel songpyeon rice cakes with tiny leaves isolated on a clean white background, flat illustration with soft rounded shapes, camera: overhead flat, lighting: bright even studio light, palette: pastel mint #C8ECD8 and warm cream #FFF3E0, clean space around the plate, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute seasonal decoration illustration styling
+
+--- 21 보름달과 토끼 ---
+a soft glowing cream full moon with a tiny cute rabbit silhouette inside isolated on a clean white background, gentle outer halo, camera: overhead flat, lighting: bright even studio light, palette: warm cream #F6E9D2 and night navy #2C3663, clean space around the moon, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute seasonal decoration illustration styling
+
+--- 22 단풍잎 세트 ---
+a set of five cute simplified autumn maple leaves in warm tones isolated on a clean white background, flat illustration with soft rounded shapes, camera: overhead flat, lighting: bright even studio light, palette: autumn orange #E8853A and rust #B85C38, clean space between the leaves, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute seasonal decoration illustration styling
+
+--- 23 크리스마스 오너먼트 ---
+three cute pastel Christmas ornaments with tiny strings isolated on a clean white background, soft round shapes with gentle highlights, camera: overhead flat, lighting: bright even studio light, palette: pastel red #F49492 and pastel mint #C8ECD8, clean space between the ornaments, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute seasonal decoration illustration styling
+
+--- 24 벚꽃 브랜치 ---
+a small cherry blossom branch with a few soft pink blossoms isolated on a clean white background, flat illustration with delicate outlines, camera: overhead flat, lighting: bright even studio light, palette: cherry blossom pink #FFC1D8 and warm brown #8B5E3C, clean space around the branch, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute seasonal decoration illustration styling
