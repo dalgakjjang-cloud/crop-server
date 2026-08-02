@@ -42,7 +42,7 @@
   - 배포: `https://dalgakjjang-cloud.github.io/crop-server/hub.html`
 - **SEO 키워드 거버넌스** — 스톡 메타데이터 정본·검사기.
   - `freejjang-stock-studio/seo/` (규칙: `keyword-governance.md`, 검사: `python3 seo/seo-check.py`)
-- **프롬프트 세트** — `freejjang-stock-studio/prompts/` (엔진별 4종). **기존 프롬프트 파일은 지우지 않는다. 새 프롬프트는 새 파일로 추가한다.**
+- **프롬프트 세트** — `freejjang-stock-studio/prompts/<adobe|miri|공통>/` (엔진별 4종, 목적 플랫폼별로 하위 폴더 분리). adobe/ = 어도비에 낼 것, miri/ = 미캔에만 낼 것, 공통/ = 배치 안에서 컷마다 목적지 갈리는 것. **기존 프롬프트 파일은 지우지 않는다. 새 프롬프트는 새 파일로 추가한다.**
 - **미드저니 배치 (MJ Batch)** — 프롬프트 txt를 미드저니에 자동 입력해 대량 생성하는 **로컬 파이썬 도구**.
   - 코드: `midjourney-batch/` (`mj_batch.py`) · 웹앱 아님(내 컴퓨터에서 실행) · 허브에는 "로컬 도구"로 표시, GitHub 폴더로 링크.
 

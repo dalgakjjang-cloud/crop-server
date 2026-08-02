@@ -9,10 +9,15 @@ description: 스톡 이미지 배치(컷 묶음)를 처음부터 끝까지 만�
 
 | 산출물 | 위치 |
 |---|---|
-| 프롬프트 4종 (MJ·GPT·GenSpark·clean) | `freejjang-stock-studio/prompts/` |
+| 프롬프트 4종 (MJ·GPT·GenSpark·clean) | `freejjang-stock-studio/prompts/<adobe\|miri\|공통>/` |
 | SEO 메타데이터 CSV | `freejjang-stock-studio/seo/metadata/<batch>.csv` |
 | signals 행 (컷당 1행) | `signals/signals.csv` |
 | 등록부 갱신 | `signals/README.md` 표 + `seo/keyword-governance.md` §7 |
+
+**프롬프트는 목적 플랫폼별 하위 폴더로 나뉜다** — 어도비 심사에 넣는 배치는 `adobe/`,
+미캔에만 올리는 배치는 `miri/`, 배치 안에서 컷마다 목적지가 갈리는 배치는 `공통/`.
+스크립트가 스펙의 `platform` 값을 보고 자동으로 알맞은 폴더에 쓴다
+(`어도비+미캔` → `adobe/`, `미캔전용` → `miri/`). 명시적으로 다르게 두려면 `prompt_dest`로 덮어쓴다.
 
 ## 일이 나뉘는 지점
 

@@ -42,6 +42,24 @@ PROMPTS_DIR = os.path.join(STUDIO, "prompts")
 METADATA_DIR = os.path.join(STUDIO, "seo", "metadata")
 SIGNALS_CSV = os.path.join(ROOT, "signals", "signals.csv")
 
+# 프롬프트 폴더는 목적 플랫폼별로 나뉘어 있다 — 어도비에 낼 것 / 미캔에만 낼 것 /
+# 배치 안에서 컷마다 목적지가 섞이는 것. 배치 스펙에 명시하지 않으면 platform 값에서
+# 추정하고, 어느 쪽인지 애매하면 공통/ 으로 안전하게 떨어뜨린다.
+PROMPT_DEST = {"adobe": "adobe", "miri": "miri", "공통": "공통", "common": "공통"}
+
+
+def prompt_subdir(spec):
+    """스펙의 prompt_dest 를 최우선으로 보고, 없으면 platform 값으로 추정한다."""
+    dest = spec.get("prompt_dest")
+    if dest:
+        return PROMPT_DEST.get(dest, dest)
+    platform = (spec.get("platform") or "").strip()
+    if platform == "미캔전용":
+        return "miri"
+    if platform == "어도비+미캔":
+        return "adobe"
+    return "공통"
+
 # ------------------------------------------------------- 우리 시그니처 기본값
 # 배치가 달라도 잘 안 변하는 값들. 스펙에서 덮어쓸 수 있다.
 DEFAULTS = {
@@ -236,9 +254,13 @@ def write_prompts(spec, dry_run):
         base + "_GenSpark.txt": build_prompt_file(spec, "genspark", hs["GenSpark"]),
         base + "_GenSpark_clean.txt": build_clean_file(spec),
     }
+    subdir = prompt_subdir(spec)
+    dest_dir = os.path.join(PROMPTS_DIR, subdir)
+    if not dry_run:
+        os.makedirs(dest_dir, exist_ok=True)
     written = []
     for name, body in files.items():
-        path = os.path.join(PROMPTS_DIR, name)
+        path = os.path.join(dest_dir, name)
         if os.path.exists(path):
             raise SystemExit(
                 "이미 있는 프롬프트 파일입니다: %s\n"
