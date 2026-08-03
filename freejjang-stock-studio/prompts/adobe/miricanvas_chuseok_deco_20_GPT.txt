@@ -1,0 +1,82 @@
+# 추석 명절 꾸밈 요소 20컷 — 한복 아이·토끼 캐릭터·전통놀이 소품·장식. 흰 배경 아이솔레이트(배경제거용) (2026-08-03 트렌드 기반) (GPT용)
+# ─────────────────────────────────────────────────────────
+# 미캔 시그니처 유지: 밝은 톤 + 넉넉한 텍스트 여백 + 배경까지 선명
+# 사용자가 자기 한글 문구를 얹기 좋게 → 중앙 또는 여백 텍스트 자리 확보
+# HEX 팔레트 명시 → 색감 정확도 향상
+# ─────────────────────────────────────────────────────────
+
+# ══════════════════════════════════════════
+# 👦 A. 한복 입은 아이들 (CD-A)
+# ══════════════════════════════════════════
+
+--- 01 세배하는 한복 남자아이 ---
+a cute little Korean boy in a navy and cream hanbok doing a deep new-year bow isolated on a clean white background, rounded chibi proportions with a friendly smile, camera: eye-level hero, lighting: bright even studio light, palette: hanbok navy #2C3A5E and warm cream #F3E8CE, clean space around the child, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+--- 02 인사하는 한복 여자아이 ---
+a cute little Korean girl in a coral and cream hanbok with hands folded in a polite greeting isolated on a clean white background, rounded chibi proportions with braided hair, camera: eye-level hero, lighting: bright even studio light, palette: coral red #C6472F and warm cream #F3E8CE, clean space around the child, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+--- 03 송편 접시 든 한복 아이 ---
+a cute Korean child in a mint hanbok holding a small plate of songpyeon rice cakes isolated on a clean white background, rounded chibi proportions with a cheerful face, camera: eye-level hero, lighting: bright even studio light, palette: soft mint #BFD9B0 and warm cream #F3E8CE, clean space around the child, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+--- 04 보름달 소원 비는 한복 아이 ---
+a cute Korean child in a navy hanbok with hands clasped looking up at a soft full moon isolated on a clean white background, rounded chibi proportions with a gentle expression, camera: eye-level hero, lighting: soft warm glow, palette: hanbok navy #2C3A5E and soft gold #C9A24B, clean space around the child, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+--- 05 한복 입은 남매 ---
+a cute Korean boy and girl standing side by side in coral and navy hanbok isolated on a clean white background, matching rounded chibi proportions with happy faces, camera: eye-level hero, lighting: bright even studio light, palette: coral red #C6472F and hanbok navy #2C3A5E, clean space around the children, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+--- 06 복주머니 든 한복 아이 ---
+a cute Korean child in hanbok holding up a navy lucky pouch with a gold tassel isolated on a clean white background, rounded chibi proportions with sparkling eyes, camera: eye-level hero, lighting: bright even studio light, palette: hanbok navy #2C3A5E and warm gold #C9A24B, clean space around the child, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+# ══════════════════════════════════════════
+# 🐰 B. 토끼 캐릭터 (CD-B)
+# ══════════════════════════════════════════
+
+--- 07 한복 입은 인사 토끼 ---
+a cute white rabbit wearing a small coral hanbok vest with paws folded in greeting isolated on a clean white background, chubby rounded body with long soft ears, camera: eye-level hero, lighting: bright even studio light, palette: soft cream #F3E8CE and coral red #C6472F, clean space around the rabbit, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+--- 08 방아 찧는 토끼 두 마리 ---
+two cute white rabbits pounding rice cake together with a wooden mortar and mallet isolated on a clean white background, playful poses with soft rounded outlines, camera: eye-level hero, lighting: bright even studio light, palette: soft cream #F3E8CE and night navy #2C3663, clean space around the rabbits, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+--- 09 보름달 안은 토끼 ---
+a cute white rabbit hugging a soft glowing full moon isolated on a clean white background, cozy pose with a gentle moon halo, camera: eye-level hero, lighting: soft warm glow, palette: moon cream #F3E8CE and soft gold #C9A24B, clean space around the rabbit, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+--- 10 송편 든 토끼 ---
+a cute white rabbit holding up a single mint songpyeon rice cake isolated on a clean white background, happy pose with rounded soft ears, camera: eye-level hero, lighting: bright even studio light, palette: soft mint #BFD9B0 and warm cream #F3E8CE, clean space around the rabbit, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+--- 11 복주머니 든 토끼 ---
+a cute white rabbit holding a small navy lucky pouch with a gold cord isolated on a clean white background, cheerful pose with soft rounded body, camera: eye-level hero, lighting: bright even studio light, palette: hanbok navy #2C3A5E and warm gold #C9A24B, clean space around the rabbit, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cute flat character illustration styling
+
+# ══════════════════════════════════════════
+# 🪁 C. 명절 소품·놀이 (CD-C)
+# ══════════════════════════════════════════
+
+--- 12 윷놀이 윷 세트 ---
+a set of four Korean yut nori wooden game sticks with rounded ends isolated on a clean white background, flat wood grain with clean simple shapes, camera: overhead flat, lighting: bright even studio light, palette: chestnut brown #8A5A34 and warm cream #F6ECD6, clean space around the sticks, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling
+
+--- 13 전통 방패연 ---
+a Korean traditional shield kite with a red circle center and blue accents and a long tail isolated on a clean white background, flat geometric panels with clean lines, camera: overhead flat, lighting: bright even studio light, palette: traditional blue #2E5A8A and traditional red #C63A2E, clean space around the kite, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling
+
+--- 14 전통 팽이 ---
+a Korean traditional wooden spinning top painted with red and navy rings isolated on a clean white background, simple rounded shape with concentric color bands, camera: overhead flat, lighting: bright even studio light, palette: traditional red #C63A2E and hanbok navy #2C3A5E, clean space around the top, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling
+
+--- 15 한과 모둠 접시 ---
+a plate of assorted Korean hangwa traditional sweets in warm honey tones isolated on a clean white background, neat arrangement with soft glossy highlights, camera: overhead flat, lighting: bright even studio light, palette: warm gold #C9A24B and warm cream #F6ECD6, clean space around the plate, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling
+
+--- 16 간소화한 차례상 ---
+a simplified Korean Chuseok ancestral offering table with a few dishes of fruit and rice cake isolated on a clean white background, clean flat top-down layout with tidy dishes, camera: overhead flat, lighting: bright even studio light, palette: chestnut brown #8A5A34 and warm cream #F6ECD6, clean space around the table, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling
+
+# ══════════════════════════════════════════
+# 🎗 D. 꾸밈 장식 (CD-D)
+# ══════════════════════════════════════════
+
+--- 17 구름과 별 장식 세트 ---
+a set of cute stylized Korean traditional clouds and small twinkling stars isolated on a clean white background, soft rounded curls with tiny star accents, camera: overhead flat, lighting: bright even studio light, palette: soft cream #F3E8CE and hanbok navy #2C3A5E, clean space between the elements, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling
+
+--- 18 전통 매듭 노리개 ---
+a Korean traditional norigae knot ornament with a red maedeup knot and a soft tassel isolated on a clean white background, symmetrical knot work with a hanging tassel, camera: overhead flat, lighting: bright even studio light, palette: coral red #C6472F and warm gold #C9A24B, clean space around the ornament, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling
+
+--- 19 단청 문양 장식 띠 ---
+a horizontal Korean dancheong pattern decorative band in teal and coral isolated on a clean white background, repeating symmetrical motif with clean lines, camera: overhead flat, lighting: bright even studio light, palette: dancheong teal #2E6A5E and coral red #C6472F, clean space above and below the band, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling
+
+--- 20 복 원형 장식 메달 ---
+a round navy Korean fortune medallion with a fine gold decorative ring and a traditional motif center isolated on a clean white background, clean symmetrical emblem with delicate detailing, camera: overhead flat, lighting: bright even studio light, palette: hanbok navy #2C3A5E and warm gold #C9A24B, clean space around the medallion, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling

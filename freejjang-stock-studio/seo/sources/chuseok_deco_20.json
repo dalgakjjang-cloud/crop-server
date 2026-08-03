@@ -1,0 +1,459 @@
+{
+  "batch": "chuseok_deco_20",
+  "signals_batch": "chuseok-deco-20",
+  "slug": "chuseok_deco",
+  "prefix": "cd",
+  "count": 20,
+  "header_note": "추석 명절 꾸밈 요소 20컷 — 한복 아이·토끼 캐릭터·전통놀이 소품·장식. 흰 배경 아이솔레이트(배경제거용) (2026-08-03 트렌드 기반)",
+  "platform": "어도비+미캔",
+  "pools": {
+    "usecase_en": ["clip art", "sticker", "greeting card", "social media", "template", "invitation"],
+    "usecase_ko": ["클립아트", "스티커", "카드", "소셜 미디어", "템플릿", "초대장"],
+    "group_en": {
+      "A": ["hanbok child", "korean child", "cute character", "holiday greeting", "traditional dress", "chuseok kid"],
+      "B": ["rabbit character", "cute bunny", "moon rabbit", "folk rabbit", "mascot", "holiday animal"],
+      "C": ["folk game", "traditional toy", "korean play", "holiday prop", "festive object", "traditional craft"],
+      "D": ["decorative element", "ornament", "korean pattern", "festive decoration", "accent motif", "traditional knot"]
+    },
+    "group_ko": {
+      "A": ["한복 아이", "한국 아이", "귀여운 캐릭터", "명절 인사", "전통 의상", "추석 아이"],
+      "B": ["토끼 캐릭터", "귀여운 토끼", "달토끼", "민속 토끼", "마스코트", "명절 동물"],
+      "C": ["민속놀이", "전통 장난감", "한국 놀이", "명절 소품", "명절 오브제", "전통 공예"],
+      "D": ["장식 요소", "오너먼트", "한국 문양", "명절 데코", "포인트 모티프", "전통 매듭"]
+    },
+    "universal_en": ["chuseok", "korean traditional", "transparent background", "isolated", "cute",
+                     "no people", "design element", "decoration", "flat illustration", "hand drawn",
+                     "hangawi", "harvest festival", "clipart element", "die cut"],
+    "universal_ko": ["추석", "한국 전통", "투명 배경", "아이솔레이티드", "귀여운",
+                     "사람 없음", "디자인 요소", "데코레이션", "플랫 일러스트", "손그림",
+                     "한가위", "명절", "클립아트 요소", "다이컷"]
+  },
+  "sections": [
+    {"title": "👦 A. 한복 입은 아이들 (CD-A)", "groups": ["A"]},
+    {"title": "🐰 B. 토끼 캐릭터 (CD-B)", "groups": ["B"]},
+    {"title": "🪁 C. 명절 소품·놀이 (CD-C)", "groups": ["C"]},
+    {"title": "🎗 D. 꾸밈 장식 (CD-D)", "groups": ["D"]}
+  ],
+  "cuts": [
+    {
+      "n": 1, "grp": "A", "shape": "제품형",
+      "axis_subject": "세배하는 남자아이 (A 아이)", "axis_color": "남색-크림",
+      "label_ko": "세배하는 한복 남자아이",
+      "title_en": "Cute Korean boy in hanbok bowing for Chuseok greeting",
+      "title_ko": "추석 세배하는 귀여운 한복 남자아이",
+      "core_en": ["hanbok boy", "korean bowing", "sebae", "chuseok child", "traditional greeting", "cute boy"],
+      "core_ko": ["한복 남자아이", "세배", "절하는 아이", "추석 아이", "명절 인사", "귀여운 소년"],
+      "color_en": ["navy", "cream"],
+      "color_ko": ["남색", "크림"],
+      "subject": "a cute little Korean boy in a navy and cream hanbok doing a deep new-year bow isolated on a clean white background",
+      "detail": "rounded chibi proportions with a friendly smile",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "hanbok navy", "hex": "2C3A5E"},
+        {"name": "warm cream", "hex": "F3E8CE"}
+      ],
+      "copy_space": "clean space around the child",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 2, "grp": "A", "shape": "제품형",
+      "axis_subject": "인사하는 여자아이 (A 아이)", "axis_color": "홍색-크림",
+      "label_ko": "인사하는 한복 여자아이",
+      "title_en": "Cute Korean girl in hanbok greeting for Chuseok",
+      "title_ko": "추석 인사하는 귀여운 한복 여자아이",
+      "core_en": ["hanbok girl", "korean girl", "holiday greeting", "chuseok child", "traditional dress", "cute girl"],
+      "core_ko": ["한복 여자아이", "한국 소녀", "명절 인사", "추석 아이", "전통 의상", "귀여운 소녀"],
+      "color_en": ["coral red", "cream"],
+      "color_ko": ["홍색", "크림"],
+      "subject": "a cute little Korean girl in a coral and cream hanbok with hands folded in a polite greeting isolated on a clean white background",
+      "detail": "rounded chibi proportions with braided hair",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "coral red", "hex": "C6472F"},
+        {"name": "warm cream", "hex": "F3E8CE"}
+      ],
+      "copy_space": "clean space around the child",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 3, "grp": "A", "shape": "제품형",
+      "axis_subject": "송편 든 아이 (A 아이)", "axis_color": "민트-크림",
+      "label_ko": "송편 접시 든 한복 아이",
+      "title_en": "Cute hanbok child holding a plate of songpyeon rice cakes",
+      "title_ko": "송편 접시를 든 귀여운 한복 아이",
+      "core_en": ["hanbok child", "holding songpyeon", "korean rice cake", "chuseok food", "cute kid", "holiday child"],
+      "core_ko": ["한복 아이", "송편 든 아이", "한국 떡", "추석 음식", "귀여운 아이", "명절 아이"],
+      "color_en": ["mint green", "cream"],
+      "color_ko": ["민트", "크림"],
+      "subject": "a cute Korean child in a mint hanbok holding a small plate of songpyeon rice cakes isolated on a clean white background",
+      "detail": "rounded chibi proportions with a cheerful face",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "soft mint", "hex": "BFD9B0"},
+        {"name": "warm cream", "hex": "F3E8CE"}
+      ],
+      "copy_space": "clean space around the child",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 4, "grp": "A", "shape": "제품형",
+      "axis_subject": "보름달 보는 아이 (A 아이)", "axis_color": "남색-금빛",
+      "label_ko": "보름달 소원 비는 한복 아이",
+      "title_en": "Cute hanbok child making a wish under the full moon",
+      "title_ko": "보름달 아래 소원 비는 귀여운 한복 아이",
+      "core_en": ["hanbok child", "full moon wish", "chuseok moon", "korean child", "praying child", "holiday kid"],
+      "core_ko": ["한복 아이", "보름달 소원", "추석 달", "한국 아이", "소원 비는 아이", "명절 아이"],
+      "color_en": ["navy", "warm gold"],
+      "color_ko": ["남색", "금빛"],
+      "subject": "a cute Korean child in a navy hanbok with hands clasped looking up at a soft full moon isolated on a clean white background",
+      "detail": "rounded chibi proportions with a gentle expression",
+      "camera": "eye-level hero shot",
+      "lighting": "soft warm glow",
+      "palette": [
+        {"name": "hanbok navy", "hex": "2C3A5E"},
+        {"name": "soft gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the child",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 5, "grp": "A", "shape": "제품형",
+      "axis_subject": "남매 한 쌍 (A 아이)", "axis_color": "홍청-크림",
+      "label_ko": "한복 입은 남매",
+      "title_en": "Cute Korean brother and sister in hanbok for Chuseok",
+      "title_ko": "추석 한복 입은 귀여운 남매",
+      "core_en": ["hanbok siblings", "korean children", "boy and girl", "chuseok kids", "traditional dress", "cute pair"],
+      "core_ko": ["한복 남매", "한국 아이들", "남자아이 여자아이", "추석 아이들", "전통 의상", "귀여운 커플"],
+      "color_en": ["coral", "navy"],
+      "color_ko": ["홍색", "청색"],
+      "subject": "a cute Korean boy and girl standing side by side in coral and navy hanbok isolated on a clean white background",
+      "detail": "matching rounded chibi proportions with happy faces",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "coral red", "hex": "C6472F"},
+        {"name": "hanbok navy", "hex": "2C3A5E"}
+      ],
+      "copy_space": "clean space around the children",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 6, "grp": "A", "shape": "제품형",
+      "axis_subject": "복주머니 든 아이 (A 아이)", "axis_color": "남색-금빛",
+      "label_ko": "복주머니 든 한복 아이",
+      "title_en": "Cute hanbok child holding a lucky pouch bokjumeoni",
+      "title_ko": "복주머니를 든 귀여운 한복 아이",
+      "core_en": ["hanbok child", "lucky pouch", "bokjumeoni", "chuseok child", "korean kid", "holiday greeting"],
+      "core_ko": ["한복 아이", "복주머니", "행운 주머니", "추석 아이", "한국 아이", "명절 인사"],
+      "color_en": ["navy", "gold"],
+      "color_ko": ["남색", "금색"],
+      "subject": "a cute Korean child in hanbok holding up a navy lucky pouch with a gold tassel isolated on a clean white background",
+      "detail": "rounded chibi proportions with sparkling eyes",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "hanbok navy", "hex": "2C3A5E"},
+        {"name": "warm gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the child",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 7, "grp": "B", "shape": "제품형",
+      "axis_subject": "한복 입은 토끼 (B 토끼)", "axis_color": "크림-홍색",
+      "label_ko": "한복 입은 인사 토끼",
+      "title_en": "Cute rabbit in hanbok greeting for Korean Chuseok",
+      "title_ko": "추석 인사하는 귀여운 한복 토끼",
+      "core_en": ["hanbok rabbit", "cute bunny", "greeting rabbit", "chuseok rabbit", "korean mascot", "holiday bunny"],
+      "core_ko": ["한복 토끼", "귀여운 토끼", "인사 토끼", "추석 토끼", "한국 마스코트", "명절 토끼"],
+      "color_en": ["cream", "coral"],
+      "color_ko": ["크림", "홍색"],
+      "subject": "a cute white rabbit wearing a small coral hanbok vest with paws folded in greeting isolated on a clean white background",
+      "detail": "chubby rounded body with long soft ears",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "soft cream", "hex": "F3E8CE"},
+        {"name": "coral red", "hex": "C6472F"}
+      ],
+      "copy_space": "clean space around the rabbit",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 8, "grp": "B", "shape": "제품형",
+      "axis_subject": "방아 찧는 토끼 두 마리 (B 토끼)", "axis_color": "크림-남색",
+      "label_ko": "방아 찧는 토끼 두 마리",
+      "title_en": "Two cute rabbits pounding rice cake for Chuseok",
+      "title_ko": "추석 방아 찧는 귀여운 토끼 두 마리",
+      "core_en": ["moon rabbit", "rice pounding", "two rabbits", "chuseok rabbit", "folk rabbit", "cute bunny"],
+      "core_ko": ["달토끼", "방아 찧기", "토끼 두 마리", "추석 토끼", "민속 토끼", "귀여운 토끼"],
+      "color_en": ["cream", "navy"],
+      "color_ko": ["크림", "남색"],
+      "subject": "two cute white rabbits pounding rice cake together with a wooden mortar and mallet isolated on a clean white background",
+      "detail": "playful poses with soft rounded outlines",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "soft cream", "hex": "F3E8CE"},
+        {"name": "night navy", "hex": "2C3663"}
+      ],
+      "copy_space": "clean space around the rabbits",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 9, "grp": "B", "shape": "제품형",
+      "axis_subject": "보름달 안은 토끼 (B 토끼)", "axis_color": "크림-금빛",
+      "label_ko": "보름달 안은 토끼",
+      "title_en": "Cute rabbit hugging a full harvest moon illustration",
+      "title_ko": "보름달을 안은 귀여운 토끼 일러스트",
+      "core_en": ["moon rabbit", "harvest moon", "hugging moon", "chuseok rabbit", "cute bunny", "lunar rabbit"],
+      "core_ko": ["달토끼", "한가위 달", "달 안은 토끼", "추석 토끼", "귀여운 토끼", "달 토끼"],
+      "color_en": ["cream", "warm gold"],
+      "color_ko": ["크림", "금빛"],
+      "subject": "a cute white rabbit hugging a soft glowing full moon isolated on a clean white background",
+      "detail": "cozy pose with a gentle moon halo",
+      "camera": "eye-level hero shot",
+      "lighting": "soft warm glow",
+      "palette": [
+        {"name": "moon cream", "hex": "F3E8CE"},
+        {"name": "soft gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the rabbit",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 10, "grp": "B", "shape": "제품형",
+      "axis_subject": "송편 든 토끼 (B 토끼)", "axis_color": "민트-크림",
+      "label_ko": "송편 든 토끼",
+      "title_en": "Cute rabbit holding songpyeon rice cake for Chuseok",
+      "title_ko": "추석 송편을 든 귀여운 토끼",
+      "core_en": ["cute rabbit", "holding songpyeon", "chuseok rabbit", "korean rice cake", "folk bunny", "holiday rabbit"],
+      "core_ko": ["귀여운 토끼", "송편 든 토끼", "추석 토끼", "한국 떡", "민속 토끼", "명절 토끼"],
+      "color_en": ["mint green", "cream"],
+      "color_ko": ["민트", "크림"],
+      "subject": "a cute white rabbit holding up a single mint songpyeon rice cake isolated on a clean white background",
+      "detail": "happy pose with rounded soft ears",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "soft mint", "hex": "BFD9B0"},
+        {"name": "warm cream", "hex": "F3E8CE"}
+      ],
+      "copy_space": "clean space around the rabbit",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 11, "grp": "B", "shape": "제품형",
+      "axis_subject": "복주머니 든 토끼 (B 토끼)", "axis_color": "남색-금빛",
+      "label_ko": "복주머니 든 토끼",
+      "title_en": "Cute rabbit holding a lucky pouch for Korean Chuseok",
+      "title_ko": "복주머니를 든 귀여운 추석 토끼",
+      "core_en": ["cute rabbit", "lucky pouch", "bokjumeoni", "chuseok rabbit", "fortune bunny", "holiday rabbit"],
+      "core_ko": ["귀여운 토끼", "복주머니", "행운 주머니", "추석 토끼", "복 토끼", "명절 토끼"],
+      "color_en": ["navy", "gold"],
+      "color_ko": ["남색", "금색"],
+      "subject": "a cute white rabbit holding a small navy lucky pouch with a gold cord isolated on a clean white background",
+      "detail": "cheerful pose with soft rounded body",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "hanbok navy", "hex": "2C3A5E"},
+        {"name": "warm gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the rabbit",
+      "style": "cute flat character illustration"
+    },
+    {
+      "n": 12, "grp": "C", "shape": "제품형",
+      "axis_subject": "윷놀이 윷 (C 소품)", "axis_color": "밤색-크림",
+      "label_ko": "윷놀이 윷 세트",
+      "title_en": "Korean yut nori traditional game sticks illustration",
+      "title_ko": "한국 윷놀이 전통 윷 세트 일러스트",
+      "core_en": ["yut nori", "yut sticks", "korean folk game", "traditional game", "chuseok game", "wooden sticks"],
+      "core_ko": ["윷놀이", "윷", "한국 민속놀이", "전통 놀이", "추석 놀이", "나무 윷"],
+      "color_en": ["chestnut brown", "cream"],
+      "color_ko": ["밤색", "크림"],
+      "subject": "a set of four Korean yut nori wooden game sticks with rounded ends isolated on a clean white background",
+      "detail": "flat wood grain with clean simple shapes",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "chestnut brown", "hex": "8A5A34"},
+        {"name": "warm cream", "hex": "F6ECD6"}
+      ],
+      "copy_space": "clean space around the sticks",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 13, "grp": "C", "shape": "제품형",
+      "axis_subject": "방패연 (C 소품)", "axis_color": "청홍-크림",
+      "label_ko": "전통 방패연",
+      "title_en": "Korean traditional shield kite illustration for autumn",
+      "title_ko": "한국 전통 방패연 가을 일러스트",
+      "core_en": ["korean kite", "shield kite", "traditional kite", "folk kite", "chuseok play", "paper kite"],
+      "core_ko": ["방패연", "전통 연", "한국 연", "민속 연", "추석 놀이", "종이 연"],
+      "color_en": ["traditional blue", "traditional red"],
+      "color_ko": ["청색", "홍색"],
+      "subject": "a Korean traditional shield kite with a red circle center and blue accents and a long tail isolated on a clean white background",
+      "detail": "flat geometric panels with clean lines",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "traditional blue", "hex": "2E5A8A"},
+        {"name": "traditional red", "hex": "C63A2E"}
+      ],
+      "copy_space": "clean space around the kite",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 14, "grp": "C", "shape": "제품형",
+      "axis_subject": "팽이 (C 소품)", "axis_color": "멀티-크림",
+      "label_ko": "전통 팽이",
+      "title_en": "Korean traditional spinning top toy illustration",
+      "title_ko": "한국 전통 팽이 장난감 일러스트",
+      "core_en": ["spinning top", "korean top", "traditional toy", "folk toy", "chuseok play", "wooden top"],
+      "core_ko": ["팽이", "한국 팽이", "전통 장난감", "민속 장난감", "추석 놀이", "나무 팽이"],
+      "color_en": ["red", "navy"],
+      "color_ko": ["빨강", "남색"],
+      "subject": "a Korean traditional wooden spinning top painted with red and navy rings isolated on a clean white background",
+      "detail": "simple rounded shape with concentric color bands",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "traditional red", "hex": "C63A2E"},
+        {"name": "hanbok navy", "hex": "2C3A5E"}
+      ],
+      "copy_space": "clean space around the top",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 15, "grp": "C", "shape": "제품형",
+      "axis_subject": "한과 접시 (C 소품)", "axis_color": "금빛-크림",
+      "label_ko": "한과 모둠 접시",
+      "title_en": "Korean traditional hangwa sweets plate illustration",
+      "title_ko": "한국 전통 한과 모둠 접시 일러스트",
+      "core_en": ["hangwa", "korean sweets", "traditional dessert", "chuseok food", "yakgwa", "festive treat"],
+      "core_ko": ["한과", "한국 과자", "전통 디저트", "추석 음식", "약과", "명절 먹거리"],
+      "color_en": ["warm gold", "cream"],
+      "color_ko": ["금빛", "크림"],
+      "subject": "a plate of assorted Korean hangwa traditional sweets in warm honey tones isolated on a clean white background",
+      "detail": "neat arrangement with soft glossy highlights",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "warm gold", "hex": "C9A24B"},
+        {"name": "warm cream", "hex": "F6ECD6"}
+      ],
+      "copy_space": "clean space around the plate",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 16, "grp": "C", "shape": "제품형",
+      "axis_subject": "간소 차례상 (C 소품)", "axis_color": "밤색-크림",
+      "label_ko": "간소화한 차례상",
+      "title_en": "Simplified Korean Chuseok ancestral table illustration",
+      "title_ko": "간소화한 추석 차례상 일러스트",
+      "core_en": ["chuseok table", "ancestral table", "charye", "holiday feast", "korean tradition", "festive spread"],
+      "core_ko": ["차례상", "제사상", "차례", "명절 상차림", "한국 전통", "명절 음식상"],
+      "color_en": ["chestnut brown", "cream"],
+      "color_ko": ["밤색", "크림"],
+      "subject": "a simplified Korean Chuseok ancestral offering table with a few dishes of fruit and rice cake isolated on a clean white background",
+      "detail": "clean flat top-down layout with tidy dishes",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "chestnut brown", "hex": "8A5A34"},
+        {"name": "warm cream", "hex": "F6ECD6"}
+      ],
+      "copy_space": "clean space around the table",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 17, "grp": "D", "shape": "제품형",
+      "axis_subject": "구름·별 세트 (D 장식)", "axis_color": "크림-남색",
+      "label_ko": "구름과 별 장식 세트",
+      "title_en": "Cute traditional cloud and star decoration set illustration",
+      "title_ko": "귀여운 전통 구름과 별 장식 세트 일러스트",
+      "core_en": ["cloud motif", "star element", "decoration set", "traditional cloud", "chuseok decoration", "night accent"],
+      "core_ko": ["구름 문양", "별 요소", "장식 세트", "전통 구름", "추석 장식", "밤 포인트"],
+      "color_en": ["cream", "navy"],
+      "color_ko": ["크림", "남색"],
+      "subject": "a set of cute stylized Korean traditional clouds and small twinkling stars isolated on a clean white background",
+      "detail": "soft rounded curls with tiny star accents",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "soft cream", "hex": "F3E8CE"},
+        {"name": "hanbok navy", "hex": "2C3A5E"}
+      ],
+      "copy_space": "clean space between the elements",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 18, "grp": "D", "shape": "제품형",
+      "axis_subject": "전통 매듭 노리개 (D 장식)", "axis_color": "홍색-금빛",
+      "label_ko": "전통 매듭 노리개",
+      "title_en": "Korean traditional norigae knot ornament illustration",
+      "title_ko": "한국 전통 매듭 노리개 일러스트",
+      "core_en": ["norigae", "korean knot", "maedeup", "traditional ornament", "tassel decoration", "folk craft"],
+      "core_ko": ["노리개", "매듭", "한국 매듭", "전통 장식", "술 장식", "민속 공예"],
+      "color_en": ["coral red", "gold"],
+      "color_ko": ["홍색", "금색"],
+      "subject": "a Korean traditional norigae knot ornament with a red maedeup knot and a soft tassel isolated on a clean white background",
+      "detail": "symmetrical knot work with a hanging tassel",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "coral red", "hex": "C6472F"},
+        {"name": "warm gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the ornament",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 19, "grp": "D", "shape": "제품형",
+      "axis_subject": "단청 문양 띠 (D 장식)", "axis_color": "청록-홍색",
+      "label_ko": "단청 문양 장식 띠",
+      "title_en": "Korean dancheong pattern decorative band illustration",
+      "title_ko": "한국 단청 문양 장식 띠 일러스트",
+      "core_en": ["dancheong", "korean pattern", "decorative band", "traditional motif", "temple pattern", "border strip"],
+      "core_ko": ["단청", "한국 문양", "장식 띠", "전통 모티프", "단청 무늬", "테두리 띠"],
+      "color_en": ["teal green", "coral red"],
+      "color_ko": ["청록", "홍색"],
+      "subject": "a horizontal Korean dancheong pattern decorative band in teal and coral isolated on a clean white background",
+      "detail": "repeating symmetrical motif with clean lines",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "dancheong teal", "hex": "2E6A5E"},
+        {"name": "coral red", "hex": "C6472F"}
+      ],
+      "copy_space": "clean space above and below the band",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 20, "grp": "D", "shape": "제품형",
+      "axis_subject": "복 글자 원형 장식 (D 장식)", "axis_color": "남색-금빛",
+      "label_ko": "복 원형 장식 메달",
+      "title_en": "Korean traditional fortune medallion decorative ornament",
+      "title_ko": "한국 전통 복 원형 장식 메달",
+      "core_en": ["fortune medallion", "round ornament", "traditional emblem", "lucky decoration", "chuseok ornament", "circular motif"],
+      "core_ko": ["복 메달", "원형 장식", "전통 엠블럼", "행운 장식", "추석 오너먼트", "원형 모티프"],
+      "color_en": ["navy", "gold"],
+      "color_ko": ["남색", "금색"],
+      "subject": "a round navy Korean fortune medallion with a fine gold decorative ring and a traditional motif center isolated on a clean white background",
+      "detail": "clean symmetrical emblem with delicate detailing",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "hanbok navy", "hex": "2C3A5E"},
+        {"name": "warm gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the medallion",
+      "style": "warm flat illustration"
+    }
+  ]
+}

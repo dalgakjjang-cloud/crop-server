@@ -122,7 +122,8 @@ python3 seo/seo-check.py kawaii_24  # 특정 배치만
 | chuseok_bg_8 | 8 | `metadata/chuseok_bg_8.csv` | photo | 28 | PASS |
 | chuseok_png_12 | 12 | `metadata/chuseok_png_12.csv` | photo | 28 | PASS |
 | chuseok_frame_6 | 6 | `metadata/chuseok_frame_6.csv` | photo | 28 | PASS |
-| **합계** | **199** | | | | **에러 0** |
+| chuseok_deco_20 | 20 | `metadata/chuseok_deco_20.csv` | photo | 28 | PASS |
+| **합계** | **219** | | | | **에러 0** |
 
 ## 8. 개정 이력
 
@@ -133,3 +134,4 @@ python3 seo/seo-check.py kawaii_24  # 특정 배치만
 | 1.2 | 2026-07-23 | 엑소좀 비디오 5컷 파일럿(`exosome_video_5.csv`) 추가 → 105행. 첫 `asset_type=video` 배치. |
 | 1.3 | 2026-08-02 | 어도비 트랙 3배치 확장 → 173행. `vivid_abstract_20`(2026 트렌드) + `autumn_bg_24`(가을 시즌 선점 배경) + `cute_elements_24`(귀여움 PNG 요소). `stock-batch` 스킬로 스펙 JSON에서 자동 생성. |
 | 1.4 | 2026-08-03 | 추석 시즌 선점 3배치 → 199행. `chuseok_bg_8`(아이보리 배경) + `chuseok_png_12`(전통 장식 PNG) + `chuseok_frame_6`(인사 프레임·배지). 미캔 분석기 추석 트렌드(노출후보 37건) → `template-spec` 명세 §6 부품 주문서에서 파생. 아이보리+남색으로 베이지·갈색 과밀 차별화. |
+| 1.5 | 2026-08-03 | 추석 꾸밈 요소 배치 `chuseok_deco_20` 추가 → 219행. 한복 아이·토끼 캐릭터·전통놀이 소품·장식 20컷. 흰 배경 아이솔레이트(배경제거용). |
