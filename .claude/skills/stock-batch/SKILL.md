@@ -13,6 +13,7 @@ description: 스톡 이미지 배치(컷 묶음)를 처음부터 끝까지 만�
 | SEO 메타데이터 CSV | `freejjang-stock-studio/seo/metadata/<batch>.csv` |
 | signals 행 (컷당 1행) | `signals/signals.csv` |
 | 등록부 갱신 | `signals/README.md` 표 + `seo/keyword-governance.md` §7 |
+| 콘택트시트 (제작 미리보기+수량 대조) | `freejjang-stock-studio/seo/previews/<batch>.html` |
 
 **프롬프트는 목적 플랫폼별 하위 폴더로 나뉜다** — 어도비 심사에 넣는 배치는 `adobe/`,
 미캔에만 올리는 배치는 `miri/`, 배치 안에서 컷마다 목적지가 갈리는 배치는 `공통/`.
@@ -28,11 +29,12 @@ CSV 쓰기)는 전부 기계적이라 스크립트가 처리한다.
 그래서 작업 순서는 이렇다:
 
 ```
-1. 축 설계        ← 창작. 여기에 시간을 쓴다.
-2. 스펙 JSON 작성  ← 1번을 구조화해서 옮겨적기
-3. 스크립트 실행   ← 자동
-4. seo-check      ← 자동 검증
-5. 등록부 갱신     ← 3줄 편집
+1. 축 설계         ← 창작. 여기에 시간을 쓴다.
+2. 스펙 JSON 작성   ← 1번을 구조화해서 옮겨적기
+3. 스크립트 실행    ← 자동
+4. seo-check       ← 자동 검증
+5. 등록부 갱신      ← 3줄 편집
+6. 콘택트시트 검수  ← 자동 (제작 미리보기 + 수량 4중 대조)
 ```
 
 **프롬프트 텍스트를 손으로 4번 쓰지 마라.** 엔진 간 차이는 전부 기계적(플래그 유무, 라벨 모양,
@@ -111,6 +113,25 @@ python3 freejjang-stock-studio/seo/seo-check.py <batch>
 1. `signals/README.md`의 등록 배치 표에 행 추가
 2. `seo/keyword-governance.md` §7 커버리지 표에 행 추가 + 합계 갱신
 3. `seo/keyword-governance.md` §8 개정 이력에 한 줄
+
+## 6단계 — 콘택트시트 검수 (제작 미리보기 + 수량 대조)
+
+배치를 만들면 **무엇을 몇 개 만들지**가 흩어진 파일에 담긴다. 이걸 한 장(HTML)으로 모아
+사람이 눈으로 보고, 수량을 대조한다. 이미지 생성 전에는 "제작 계획서",
+이미지를 다 뽑은 뒤에는 "다 나왔나 대조 체크리스트"로 같은 시트를 두 번 쓴다.
+
+```bash
+python3 .claude/skills/stock-batch/scripts/contact_sheet.py <batch> [<batch2> ...] \
+  --title "세트 이름" --out freejjang-stock-studio/seo/previews/<이름>.html
+```
+
+시트가 하는 일:
+- **미리보기** — 컷별 라벨·제목·형태·색칩. 색 팔레트가 의도대로 통일됐는지(예: 아이보리+남색) 눈으로 검수.
+- **수량 4중 대조** — `선언 count` vs `스펙 cuts` vs `메타데이터 CSV 행` vs `clean 프롬프트 줄 수`.
+  하나라도 어긋나면 빨갛게 표시된다. 이 대조가 "26을 86으로 착각" 같은 수량 사고를 막는 마지막 관문이다.
+
+여러 배치를 한 세트로 묶어 넘기면(예: 배경+PNG+프레임) 상단에 총합과 배치별 대조가 함께 나온다.
+사람에게 보고할 때 이 HTML을 그대로 보여주면 경로 나열보다 훨씬 잘 전달된다.
 
 ---
 
