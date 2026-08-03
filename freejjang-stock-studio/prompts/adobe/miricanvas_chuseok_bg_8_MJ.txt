@@ -1,0 +1,28 @@
+# 추석 아이보리 배경 8컷 — 아이보리 바탕+남색/짙은녹색 포인트로 베이지·갈색 과밀 회피 (2026-08-03 트렌드 기반) (MJ용)
+# --raw --s 200 --v 8.2 (전 컷 공통)
+# 한글 텍스트는 렌더하지 않음 — 여백 확보만, 사용자가 미캔에서 자기 문구 얹기
+# HEX 팔레트 명시 → 색감 정확도 향상
+
+# ══════════════════════════════════════════
+# 🌕 A. 보름달·밤하늘 (CB-A)
+# ══════════════════════════════════════════
+
+cb-01) a serene ivory and deep navy night sky with a soft glowing full moon and generous empty space, gentle gradient sky with a faint halo around the moon, eye-level composed shot, soft moonlight glow, palette warm ivory hex F5EFE0 and deep navy hex 2C3A5E with a soft cream moon, generous clean copy space in the lower half, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cb-02) a minimal ivory background with a softly lit white moon jar silhouette to one side, subtle ink-wash shadow and calm empty field, eye-level composed shot, soft directional studio light, palette warm ivory hex F5EFE0 and ink gray hex 4A4A48, generous clean copy space on the right, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cb-03) a warm ivory sky with delicate silver grass silhouettes along the bottom and a soft full moon above, fine backlit grass strands swaying gently, eye-level composed shot, warm backlight glow, palette warm ivory hex F5EFE0 and soft gold hex C9A24B, generous clean copy space in the upper area, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cb-04) a deep navy night sky scattered with a few soft cream stars and a slim crescent moon, calm even sky with tiny twinkles, eye-level composed shot, soft night ambience, palette deep navy hex 26315A and soft cream hex F3E8CE, generous clean copy space in the center, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+# ══════════════════════════════════════════
+# 🍂 B. 전통 문양·한지 (CB-B)
+# ══════════════════════════════════════════
+
+cb-05) an ivory background framed by a subtle navy Korean traditional geometric border with a wide open center, clean symmetrical pattern with fine line work, overhead flat shot, bright even studio light, palette warm ivory hex F5EFE0 and deep navy hex 2C3A5E, generous clean copy space in the open center, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cb-06) a warm ivory hanji paper texture background with a few softly scattered autumn leaves in the corners, fine fibrous paper grain with gentle shadows, overhead flat shot, soft even daylight, palette warm ivory hex F3EBDA and muted rust hex A6603C, generous clean copy space in the center, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cb-07) a clean ivory background with a single delicate persimmon branch and two ripe persimmons in one corner, simple line-drawn branch with soft color fill, overhead flat shot, bright even studio light, palette warm ivory hex F5EFE0 and persimmon orange hex D8813A, generous clean copy space across the rest of the frame, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cb-08) a serene ivory background with softly painted oriental ink mountains and gentle clouds along the lower edge, loose brush strokes with airy negative space, eye-level composed shot, soft even daylight, palette warm ivory hex F5EFE0 and deep teal hex 2E4A47, generous clean copy space in the upper two thirds, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody

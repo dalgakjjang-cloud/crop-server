@@ -1,0 +1,32 @@
+# 추석 인사 프레임·배지 6컷 — 남색 포인트 프레임/리본/도장, 흰 배경 아이솔레이트 (2026-08-03 트렌드 기반) (GPT용)
+# ─────────────────────────────────────────────────────────
+# 미캔 시그니처 유지: 밝은 톤 + 넉넉한 텍스트 여백 + 배경까지 선명
+# 사용자가 자기 한글 문구를 얹기 좋게 → 중앙 또는 여백 텍스트 자리 확보
+# HEX 팔레트 명시 → 색감 정확도 향상
+# ─────────────────────────────────────────────────────────
+
+# ══════════════════════════════════════════
+# 🖼 A. 인사 프레임 (CF-A)
+# ══════════════════════════════════════════
+
+--- 01 원형 전통 인사 프레임 ---
+a round navy Korean traditional frame with a fine gold inner line and a blank open center isolated on a clean white background, clean symmetrical border with subtle traditional corner motifs, camera: overhead flat, lighting: bright even studio light, palette: deep navy #2C3A5E and warm gold #C9A24B, generous clean copy space in the open center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling
+
+--- 02 보름달 원형 인사 프레임 ---
+a soft cream full moon circle framed by a thin navy ring with small clouds at the edges and a blank center isolated on a clean white background, gentle glow with delicate cloud accents, camera: overhead flat, lighting: bright even studio light, palette: moon cream #F3E8CE and deep navy #2C3A5E, generous clean copy space in the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling
+
+--- 03 낙엽 코너 인사 프레임 ---
+a rectangular greeting frame with autumn maple and ginkgo leaves clustered in two opposite corners and a blank center isolated on a clean white background, warm leaves with a thin navy keyline, camera: overhead flat, lighting: bright even studio light, palette: autumn rust #B05A34 and deep navy #2C3A5E, generous clean copy space in the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling
+
+# ══════════════════════════════════════════
+# 🎗 B. 배지·리본 (CF-B)
+# ══════════════════════════════════════════
+
+--- 04 한가위 리본 배너 ---
+a navy ribbon banner with folded triangular ends and a fine gold edge with a blank center isolated on a clean white background, flat vector shape with gentle shading, camera: overhead flat, lighting: bright even studio light, palette: deep navy #2C3A5E and warm gold #C9A24B, generous clean copy space in the banner center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling
+
+--- 05 원형 한가위 도장 배지 ---
+a round navy seal badge with a small full moon motif and a fine decorative ring and a blank center isolated on a clean white background, clean emblem shape with subtle traditional detailing, camera: overhead flat, lighting: bright even studio light, palette: deep navy #2C3A5E and soft cream #F3E8CE, clean space around the badge, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling
+
+--- 06 추석 인사 라벨 태그 ---
+a rounded ivory hanji-textured label tag with a small hole and a navy string and a blank center isolated on a clean white background, soft paper texture with a thin navy border, camera: overhead flat, lighting: bright even studio light, palette: warm ivory #F3EBDA and deep navy #2C3A5E, generous clean copy space in the tag center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling

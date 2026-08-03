@@ -1,0 +1,40 @@
+# 추석 전통 장식 PNG 요소 12컷 — 먹거리·자연·소품, 흰 배경 아이솔레이트(배경제거용) (2026-08-03 트렌드 기반) (MJ용)
+# --raw --s 200 --v 8.2 (전 컷 공통)
+# 한글 텍스트는 렌더하지 않음 — 여백 확보만, 사용자가 미캔에서 자기 문구 얹기
+# HEX 팔레트 명시 → 색감 정확도 향상
+
+# ══════════════════════════════════════════
+# 🍡 A. 명절 먹거리 (CP-A)
+# ══════════════════════════════════════════
+
+cp-01) a small plate of pastel songpyeon half-moon rice cakes with tiny pine leaves isolated on a clean white background, soft rounded shapes with gentle shading, overhead flat shot, bright even studio light, palette soft mint hex BFD9B0 and warm cream hex F6ECD6, clean space around the plate, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cp-02) two glossy ripe persimmons with a small green leaf isolated on a clean white background, soft highlight and simple flat fill, overhead flat shot, bright even studio light, palette persimmon orange hex E07B3A and leaf green hex 5E7A45, clean space around the fruit, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cp-03) a small cluster of glossy brown chestnuts isolated on a clean white background, smooth rounded shells with soft shading, overhead flat shot, bright even studio light, palette chestnut brown hex 8A5A34 and warm cream hex F6ECD6, clean space around the chestnuts, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cp-04) a grouped set of a red apple, a golden Korean pear and a persimmon isolated on a clean white background, simple flat fruits with soft highlights, overhead flat shot, bright even studio light, palette apple red hex C6472F and pear gold hex C9A24B, clean space around the fruit set, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+# ══════════════════════════════════════════
+# 🌕 B. 자연·달 (CP-B)
+# ══════════════════════════════════════════
+
+cp-05) a soft glowing cream full moon with a faint halo isolated on a clean white background, gentle gradient surface with subtle craters, overhead flat shot, bright even studio light, palette moon cream hex F3E8CE and soft navy hex 3A4770, clean space around the moon, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cp-06) a set of autumn maple and ginkgo leaves in warm tones isolated on a clean white background, flat leaves with clean simple veins, overhead flat shot, bright even studio light, palette autumn red hex B84A2E and golden yellow hex D8A93A, clean space between the leaves, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cp-07) a slender bunch of soft silver grass plumes isolated on a clean white background, fine feathery strands with airy shading, overhead flat shot, bright even studio light, palette soft beige hex D8C9A8 and warm gold hex C9A24B, clean space around the grass, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cp-08) a cute white rabbit pounding rice cake with a small wooden mortar isolated on a clean white background, rounded friendly character with soft outline, overhead flat shot, bright even studio light, palette soft cream hex F3E8CE and night navy hex 2C3663, clean space around the rabbit, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+# ══════════════════════════════════════════
+# 🎁 C. 전통 소품 (CP-C)
+# ══════════════════════════════════════════
+
+cp-09) a plump navy silk lucky pouch with a gold drawstring and tassel isolated on a clean white background, soft fabric folds with a small embroidered accent, overhead flat shot, bright even studio light, palette deep navy hex 2C3A5E and warm gold hex C9A24B, clean space around the pouch, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cp-10) a rounded white Korean moon jar with soft shading isolated on a clean white background, smooth glaze with a gentle highlight, eye-level hero shot, soft directional studio light, palette ivory white hex F0EBDE and ink gray hex 4A4A48, clean space around the jar, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cp-11) a gift bundle wrapped in navy bojagi cloth tied with a neat knot on top isolated on a clean white background, soft cloth folds with a subtle pattern, eye-level hero shot, bright even studio light, palette deep navy hex 2C3A5E and warm gold hex C9A24B, clean space around the bundle, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cp-12) a Korean traditional cheongsachorong lantern with blue and red silk panels and a small tassel isolated on a clean white background, clean geometric frame with soft glow, eye-level hero shot, soft warm glow, palette traditional blue hex 2E5A8A and traditional red hex C63A2E, clean space around the lantern, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, warm flat illustration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody

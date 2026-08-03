@@ -1,0 +1,159 @@
+{
+  "batch": "chuseok_frame_6",
+  "signals_batch": "chuseok-frame-6",
+  "slug": "chuseok_frame",
+  "prefix": "cf",
+  "count": 6,
+  "header_note": "추석 인사 프레임·배지 6컷 — 남색 포인트 프레임/리본/도장, 흰 배경 아이솔레이트 (2026-08-03 트렌드 기반)",
+  "platform": "어도비+미캔",
+  "pools": {
+    "usecase_en": ["greeting card", "social media", "banner", "template", "invitation", "label"],
+    "usecase_ko": ["카드", "소셜 미디어", "배너", "템플릿", "초대장", "라벨"],
+    "group_en": {
+      "A": ["frame", "border", "text frame", "greeting frame", "decorative frame", "copy space frame"],
+      "B": ["badge", "ribbon banner", "label tag", "seal", "title banner", "emblem"]
+    },
+    "group_ko": {
+      "A": ["프레임", "테두리", "텍스트 프레임", "인사 프레임", "장식 프레임", "여백 프레임"],
+      "B": ["배지", "리본 배너", "라벨 태그", "씰", "타이틀 배너", "엠블럼"]
+    },
+    "universal_en": ["chuseok", "korean traditional", "greeting", "no people", "design element",
+                     "decoration", "transparent background", "isolated", "elegant", "navy accent",
+                     "flat illustration", "text space", "harvest festival", "hangawi"],
+    "universal_ko": ["추석", "한국 전통", "인사", "사람 없음", "디자인 요소",
+                     "데코레이션", "투명 배경", "아이솔레이티드", "우아한", "남색 포인트",
+                     "플랫 일러스트", "텍스트 공간", "한가위", "명절"]
+  },
+  "sections": [
+    {"title": "🖼 A. 인사 프레임 (CF-A)", "groups": ["A"]},
+    {"title": "🎗 B. 배지·리본 (CF-B)", "groups": ["B"]}
+  ],
+  "cuts": [
+    {
+      "n": 1, "grp": "A", "shape": "설명형",
+      "axis_subject": "원형 전통 프레임 (A 프레임)", "axis_color": "남색-금빛",
+      "label_ko": "원형 전통 인사 프레임",
+      "title_en": "Round Korean traditional Chuseok greeting frame with navy border",
+      "title_ko": "남색 테두리의 원형 추석 인사 프레임",
+      "core_en": ["round frame", "greeting frame", "chuseok frame", "traditional border", "circle frame", "copy space frame"],
+      "core_ko": ["원형 프레임", "인사 프레임", "추석 프레임", "전통 테두리", "서클 프레임", "여백 프레임"],
+      "color_en": ["navy", "gold"],
+      "color_ko": ["남색", "금색"],
+      "subject": "a round navy Korean traditional frame with a fine gold inner line and a blank open center isolated on a clean white background",
+      "detail": "clean symmetrical border with subtle traditional corner motifs",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "deep navy", "hex": "2C3A5E"},
+        {"name": "warm gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "generous clean copy space in the open center",
+      "style": "elegant traditional decoration"
+    },
+    {
+      "n": 2, "grp": "A", "shape": "설명형",
+      "axis_subject": "보름달 원형 프레임 (A 프레임)", "axis_color": "크림-남색",
+      "label_ko": "보름달 원형 인사 프레임",
+      "title_en": "Full moon circular greeting frame for Korean Chuseok",
+      "title_ko": "추석 보름달 원형 인사 프레임",
+      "core_en": ["moon frame", "circle greeting frame", "chuseok frame", "harvest moon border", "round text frame", "lunar frame"],
+      "core_ko": ["보름달 프레임", "원형 인사 프레임", "추석 프레임", "한가위 달 테두리", "원형 텍스트 프레임", "달 프레임"],
+      "color_en": ["cream", "navy"],
+      "color_ko": ["크림", "남색"],
+      "subject": "a soft cream full moon circle framed by a thin navy ring with small clouds at the edges and a blank center isolated on a clean white background",
+      "detail": "gentle glow with delicate cloud accents",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "moon cream", "hex": "F3E8CE"},
+        {"name": "deep navy", "hex": "2C3A5E"}
+      ],
+      "copy_space": "generous clean copy space in the center",
+      "style": "elegant traditional decoration"
+    },
+    {
+      "n": 3, "grp": "A", "shape": "설명형",
+      "axis_subject": "낙엽 코너 프레임 (A 프레임)", "axis_color": "단풍-남색",
+      "label_ko": "낙엽 코너 인사 프레임",
+      "title_en": "Autumn leaf corner greeting frame for Chuseok card",
+      "title_ko": "추석 카드용 낙엽 코너 인사 프레임",
+      "core_en": ["corner frame", "autumn leaf frame", "greeting frame", "chuseok frame", "leaf border", "text corner"],
+      "core_ko": ["코너 프레임", "낙엽 프레임", "인사 프레임", "추석 프레임", "잎 테두리", "텍스트 코너"],
+      "color_en": ["autumn rust", "navy"],
+      "color_ko": ["단풍색", "남색"],
+      "subject": "a rectangular greeting frame with autumn maple and ginkgo leaves clustered in two opposite corners and a blank center isolated on a clean white background",
+      "detail": "warm leaves with a thin navy keyline",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "autumn rust", "hex": "B05A34"},
+        {"name": "deep navy", "hex": "2C3A5E"}
+      ],
+      "copy_space": "generous clean copy space in the center",
+      "style": "elegant traditional decoration"
+    },
+    {
+      "n": 4, "grp": "B", "shape": "설명형",
+      "axis_subject": "한가위 리본 배너 (B 배지)", "axis_color": "남색-금빛",
+      "label_ko": "한가위 리본 배너",
+      "title_en": "Hangawi Chuseok ribbon banner with folded ends",
+      "title_ko": "접힌 끝단의 한가위 추석 리본 배너",
+      "core_en": ["ribbon banner", "title banner", "chuseok banner", "hangawi ribbon", "folded ribbon", "header banner"],
+      "core_ko": ["리본 배너", "타이틀 배너", "추석 배너", "한가위 리본", "접힌 리본", "헤더 배너"],
+      "color_en": ["navy", "gold"],
+      "color_ko": ["남색", "금색"],
+      "subject": "a navy ribbon banner with folded triangular ends and a fine gold edge with a blank center isolated on a clean white background",
+      "detail": "flat vector shape with gentle shading",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "deep navy", "hex": "2C3A5E"},
+        {"name": "warm gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "generous clean copy space in the banner center",
+      "style": "elegant traditional decoration"
+    },
+    {
+      "n": 5, "grp": "B", "shape": "설명형",
+      "axis_subject": "한가위 도장 배지 (B 배지)", "axis_color": "남색-크림",
+      "label_ko": "원형 한가위 도장 배지",
+      "title_en": "Round Chuseok seal badge with traditional motif",
+      "title_ko": "전통 문양의 원형 추석 도장 배지",
+      "core_en": ["seal badge", "round badge", "chuseok badge", "stamp seal", "emblem", "greeting seal"],
+      "core_ko": ["도장 배지", "원형 배지", "추석 배지", "스탬프 씰", "엠블럼", "인사 씰"],
+      "color_en": ["navy", "cream"],
+      "color_ko": ["남색", "크림"],
+      "subject": "a round navy seal badge with a small full moon motif and a fine decorative ring and a blank center isolated on a clean white background",
+      "detail": "clean emblem shape with subtle traditional detailing",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "deep navy", "hex": "2C3A5E"},
+        {"name": "soft cream", "hex": "F3E8CE"}
+      ],
+      "copy_space": "clean space around the badge",
+      "style": "elegant traditional decoration"
+    },
+    {
+      "n": 6, "grp": "B", "shape": "설명형",
+      "axis_subject": "추석 인사 라벨 태그 (B 배지)", "axis_color": "아이보리-남색",
+      "label_ko": "추석 인사 라벨 태그",
+      "title_en": "Chuseok greeting label tag with hanji texture",
+      "title_ko": "한지 질감의 추석 인사 라벨 태그",
+      "core_en": ["label tag", "hanging tag", "chuseok tag", "greeting label", "gift tag", "text label"],
+      "core_ko": ["라벨 태그", "행잉 태그", "추석 태그", "인사 라벨", "선물 태그", "텍스트 라벨"],
+      "color_en": ["ivory", "navy"],
+      "color_ko": ["아이보리", "남색"],
+      "subject": "a rounded ivory hanji-textured label tag with a small hole and a navy string and a blank center isolated on a clean white background",
+      "detail": "soft paper texture with a thin navy border",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "warm ivory", "hex": "F3EBDA"},
+        {"name": "deep navy", "hex": "2C3A5E"}
+      ],
+      "copy_space": "generous clean copy space in the tag center",
+      "style": "elegant traditional decoration"
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+# 추석 인사 프레임·배지 6컷 — 남색 포인트 프레임/리본/도장, 흰 배경 아이솔레이트 (2026-08-03 트렌드 기반) (MJ용)
+# --raw --s 200 --v 8.2 (전 컷 공통)
+# 한글 텍스트는 렌더하지 않음 — 여백 확보만, 사용자가 미캔에서 자기 문구 얹기
+# HEX 팔레트 명시 → 색감 정확도 향상
+
+# ══════════════════════════════════════════
+# 🖼 A. 인사 프레임 (CF-A)
+# ══════════════════════════════════════════
+
+cf-01) a round navy Korean traditional frame with a fine gold inner line and a blank open center isolated on a clean white background, clean symmetrical border with subtle traditional corner motifs, overhead flat shot, bright even studio light, palette deep navy hex 2C3A5E and warm gold hex C9A24B, generous clean copy space in the open center, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cf-02) a soft cream full moon circle framed by a thin navy ring with small clouds at the edges and a blank center isolated on a clean white background, gentle glow with delicate cloud accents, overhead flat shot, bright even studio light, palette moon cream hex F3E8CE and deep navy hex 2C3A5E, generous clean copy space in the center, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cf-03) a rectangular greeting frame with autumn maple and ginkgo leaves clustered in two opposite corners and a blank center isolated on a clean white background, warm leaves with a thin navy keyline, overhead flat shot, bright even studio light, palette autumn rust hex B05A34 and deep navy hex 2C3A5E, generous clean copy space in the center, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+# ══════════════════════════════════════════
+# 🎗 B. 배지·리본 (CF-B)
+# ══════════════════════════════════════════
+
+cf-04) a navy ribbon banner with folded triangular ends and a fine gold edge with a blank center isolated on a clean white background, flat vector shape with gentle shading, overhead flat shot, bright even studio light, palette deep navy hex 2C3A5E and warm gold hex C9A24B, generous clean copy space in the banner center, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cf-05) a round navy seal badge with a small full moon motif and a fine decorative ring and a blank center isolated on a clean white background, clean emblem shape with subtle traditional detailing, overhead flat shot, bright even studio light, palette deep navy hex 2C3A5E and soft cream hex F3E8CE, clean space around the badge, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
+
+cf-06) a rounded ivory hanji-textured label tag with a small hole and a navy string and a blank center isolated on a clean white background, soft paper texture with a thin navy border, overhead flat shot, bright even studio light, palette warm ivory hex F3EBDA and deep navy hex 2C3A5E, generous clean copy space in the tag center, tack-sharp front-to-back, deep depth of field, everything in focus, plain unlettered unbranded surface, one continuous scene, elegant traditional decoration styling --raw --s 200 --v 8.2 --no text, letters, words, numbers, logo, watermark, brand, signature, shallow depth of field, soft focus, motion blur, dark, moody
