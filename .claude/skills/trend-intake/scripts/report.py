@@ -6,9 +6,13 @@
 사람 언어로 뽑아낸다. 리포트는 templates/reports/ 에 날짜별로 저장.
 
 핵심 관점 3개:
-1. 이번 수집의 검색 키워드 TOP N — 상위 순위·최다 등장
-2. 스테디셀러 후보 — 승인 오래됐는데 순위 앞줄인 것 (다음 배치 방향의 힌트)
-3. 최근 승인 신작 — 지난 N일 안에 승인된 것 (지금 뜨는 결)
+1. 이번 수집의 검색 키워드 TOP N — 노출 순서·최다 등장
+2. 검색 노출 기반 후보 — 썸네일날짜 오래됐는데 순위 앞줄인 것 (판매 증거 아님, 방향 힌트)
+3. 최근 썸네일 기준 신규 — 지난 N일 안 날짜 신호가 최신인 것 (지금 뜨는 결)
+
+주의 (GPT 지적 반영): '썸네일날짜'는 코드상 승인일로 검증된 값이 아니다.
+'순위'는 세션마다 달라질 수 있는 노출 순서다. 그래서 어디서도 '승인일·판매·스테디셀러'로
+단정하지 않고 '날짜 신호 / 노출 기반 후보'로만 표기한다.
 """
 import argparse
 import csv
@@ -51,7 +55,7 @@ def as_int(x):
 
 
 def top_keywords(rows, limit=15):
-    """검색키워드별로: 등장 템플릿 수 · 상위 순위(중앙값) · 스테디 수 · 프리미엄 비율."""
+    """검색키워드별로: 등장 템플릿 수 · 노출 순서(중앙값) · 노출후보 수 · 프리미엄 비율."""
     by_kw = defaultdict(list)
     for r in rows:
         kw = (r.get("검색키워드") or "").strip()
@@ -62,11 +66,11 @@ def top_keywords(rows, limit=15):
     for kw, rs in by_kw.items():
         ranks = sorted([as_int(r.get("순위")) for r in rs if as_int(r.get("순위")) is not None])
         median = ranks[len(ranks) // 2] if ranks else None
-        steady = sum(1 for r in rs if r.get("스테디플래그") == "O")
+        exposure = sum(1 for r in rs if r.get("노출후보플래그") == "O")
         prem = sum(1 for r in rs if r.get("프리미엄") == "O")
         out.append({
             "keyword": kw, "count": len(rs),
-            "median_rank": median, "steady": steady,
+            "median_rank": median, "exposure": exposure,
             "premium_pct": round(100 * prem / len(rs)) if rs else 0,
         })
     # 노출 많고 순위 앞쪽인 순서
@@ -74,26 +78,26 @@ def top_keywords(rows, limit=15):
     return out[:limit]
 
 
-def top_steady(rows, limit=20):
-    """스테디 플래그 O 인 것 중 순위 앞쪽·페이지 많은 순서."""
-    steady = [r for r in rows if r.get("스테디플래그") == "O"]
+def top_exposure(rows, limit=20):
+    """노출후보 플래그 O 인 것 중 순위 앞쪽·페이지 많은 순서 (판매 아님, 노출 기반)."""
+    picked = [r for r in rows if r.get("노출후보플래그") == "O"]
     def key(r):
         rank = as_int(r.get("순위")) or 999
         pages = as_int(r.get("페이지수")) or 0
         return (rank, -pages)
-    steady.sort(key=key)
-    return steady[:limit]
+    picked.sort(key=key)
+    return picked[:limit]
 
 
 def top_new(rows, days=7, limit=20):
-    """수집일 기준 최근 승인 신작. 승인일 최신순."""
+    """수집일 기준 최근 신규. 썸네일날짜 최신순 (승인일로 검증된 값 아님)."""
     today = datetime.now()
     cutoff = today - timedelta(days=days)
     new = []
     for r in rows:
-        approve = r.get("승인일") or ""
+        thumb_date = r.get("썸네일날짜") or ""
         try:
-            d = datetime.strptime(approve, "%Y-%m-%d")
+            d = datetime.strptime(thumb_date, "%Y-%m-%d")
         except ValueError:
             continue
         if d >= cutoff:
@@ -113,13 +117,13 @@ def top_new(rows, days=7, limit=20):
 def kw_line(k):
     md_rank = k["median_rank"] if k["median_rank"] is not None else "-"
     return "| %s | %d | %s | %d | %d%% |" % (
-        k["keyword"], k["count"], md_rank, k["steady"], k["premium_pct"])
+        k["keyword"], k["count"], md_rank, k["exposure"], k["premium_pct"])
 
 
 def cut_line(r):
     name = (r.get("이름") or "(이름 없음)").replace("|", "／")
     return "| %s | %s | %s | %s | %s | %s |" % (
-        r.get("승인일", ""), name[:40], r.get("카테고리", ""),
+        r.get("썸네일날짜", ""), name[:40], r.get("카테고리", ""),
         r.get("페이지수", ""), r.get("검색키워드", ""), r.get("순위", ""))
 
 
@@ -132,6 +136,9 @@ def build_report(rows, days_new):
     lines = []
     lines.append("# 미캔 템플릿 트렌드 리포트 — %s" % now)
     lines.append("")
+    lines.append("> **이 리포트는 승인·매출 데이터가 아니라, 수집 시점의 공개 노출 신호 기반 분석입니다.**")
+    lines.append("> 날짜는 썸네일 기준 신호이고 순위는 세션별 노출 순서라, 인기·판매의 확정 근거가 아닙니다.")
+    lines.append("")
     lines.append("수집일 기록: %s ~ %s · 총 %d행 · 고유 템플릿 %d개"
                  % (imports[0] if imports else "?", imports[-1] if imports else "?",
                     total, templates))
@@ -141,7 +148,7 @@ def build_report(rows, days_new):
 
     lines.append("## 1. 검색 키워드 TOP")
     lines.append("")
-    lines.append("| 키워드 | 노출 템플릿 수 | 순위 중앙값 | 스테디 수 | 프리미엄 비율 |")
+    lines.append("| 키워드 | 노출 템플릿 수 | 노출 순서 중앙값 | 노출후보 수 | 프리미엄 비율 |")
     lines.append("|---|---:|---:|---:|---:|")
     kws = top_keywords(rows)
     if kws:
@@ -152,28 +159,33 @@ def build_report(rows, days_new):
         lines.append("")
         lines.append("> 아직 검색 키워드 데이터가 없어요. 분석기에서 **검색창에 키워드를 넣고** 수집하면 채워져요.")
     lines.append("")
+    lines.append("> ⚠️ '노출 순서'는 그 화면에서 처음 발견된 순서라 세션마다 달라질 수 있어요. "
+                 "확정 인기순위가 아니라 참고용 신호입니다.")
+    lines.append("")
 
-    lines.append("## 2. 스테디셀러 후보 (승인 30일↑ · 순위 20위 이내)")
+    lines.append("## 2. 검색 노출 기반 후보 (썸네일날짜 30일↑ · 순위 20위 이내)")
     lines.append("")
-    lines.append("> 오래 살아남으면서 아직도 앞줄에 노출되는 결. **다음 배치의 중심축 후보**.")
+    lines.append("> 날짜 신호가 오래됐는데도 검색 앞줄에 계속 보이는 결. **다음 배치 방향의 힌트**.")
+    lines.append("> ⚠️ '판매·수익'이 증명된 게 아니라 **검색 노출이 오래/앞줄**이라는 신호일 뿐입니다.")
     lines.append("")
-    lines.append("| 승인일 | 이름 | 카테고리 | 페이지 | 검색어 | 순위 |")
+    lines.append("| 썸네일날짜 | 이름 | 카테고리 | 페이지 | 검색어 | 순위 |")
     lines.append("|---|---|---|---:|---|---:|")
-    steady = top_steady(rows)
-    if steady:
-        for r in steady:
+    exposure = top_exposure(rows)
+    if exposure:
+        for r in exposure:
             lines.append(cut_line(r))
     else:
         lines.append("| — | — | — | — | — | — |")
         lines.append("")
-        lines.append("> 스테디셀러 조건에 걸린 템플릿이 아직 없어요.")
+        lines.append("> 노출 기반 후보 조건에 걸린 템플릿이 아직 없어요.")
     lines.append("")
 
-    lines.append("## 3. 최근 %d일 승인 신작" % days_new)
+    lines.append("## 3. 최근 %d일 신규 (썸네일 기준 날짜)" % days_new)
     lines.append("")
-    lines.append("> 지금 심사를 뚫고 있는 결. **어떤 결이 지금 통과되나** 확인용.")
+    lines.append("> 날짜 신호가 최신인 결. **어떤 결이 지금 올라오나** 확인용.")
+    lines.append("> ⚠️ '썸네일날짜'는 코드상 승인일로 검증된 값이 아니라 날짜 신호입니다.")
     lines.append("")
-    lines.append("| 승인일 | 이름 | 카테고리 | 페이지 | 검색어 | 순위 |")
+    lines.append("| 썸네일날짜 | 이름 | 카테고리 | 페이지 | 검색어 | 순위 |")
     lines.append("|---|---|---|---:|---|---:|")
     fresh = top_new(rows, days=days_new)
     if fresh:
