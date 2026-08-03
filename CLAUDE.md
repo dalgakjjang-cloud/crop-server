@@ -45,6 +45,19 @@
 - **프롬프트 세트** — `freejjang-stock-studio/prompts/<adobe|miri|공통>/` (엔진별 4종, 목적 플랫폼별로 하위 폴더 분리). adobe/ = 어도비에 낼 것, miri/ = 미캔에만 낼 것, 공통/ = 배치 안에서 컷마다 목적지 갈리는 것. **기존 프롬프트 파일은 지우지 않는다. 새 프롬프트는 새 파일로 추가한다.**
 - **미드저니 배치 (MJ Batch)** — 프롬프트 txt를 미드저니에 자동 입력해 대량 생성하는 **로컬 파이썬 도구**.
   - 코드: `midjourney-batch/` (`mj_batch.py`) · 웹앱 아님(내 컴퓨터에서 실행) · 허브에는 "로컬 도구"로 표시, GitHub 폴더로 링크.
+- **템플릿 소득 라인 (`templates/`)** — 미캔 템플릿을 직접 만들어 파는 수익 라인. 스톡(컷 한 장)과 별개로 "바로 쓰는 세트(템플릿)"를 만든다.
+  - 데이터: `templates/trends.csv`(승인 템플릿 신호 누적), `templates/reports/`(주간 트렌드), `templates/specs/`(기획 명세서), `templates/imports/`(분석기 JSON 원본).
+  - 원칙: 승인≠수익 / 베끼지 않음(결만 참고) / 낱장보다 가족(세트).
+
+## 🛠 스킬 (`.claude/skills/`)
+
+세션마다 자동 로드된다. 관련 작업이 오면 스킬이 먼저다.
+
+- **stock-batch** — 주제+컷수 → 프롬프트 4엔진 + SEO 메타 + signals 한 번에. 스펙 JSON에서 파생.
+- **trend-intake** — 미캔 분석기 JSON → `templates/trends.csv` 병합 + 주간 리포트. 스테디셀러 자동 판정.
+- **template-spec** — 트렌드 신호 → 템플릿 기획 명세서(`templates/specs/`). §6 부품 주문서가 stock-batch로 이어짐.
+
+> 파이프라인: 분석기 → **trend-intake** → **template-spec** → **stock-batch** → 미캔 등록.
 
 ### 형제 도구들 (다른 곳에 배포됨)
 | 도구 | 주소 |
