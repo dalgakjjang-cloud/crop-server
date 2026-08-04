@@ -2255,9 +2255,9 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
                 <ExternalLink className="w-3 h-3" /> 자동크롭 <span className="text-teal-500/70">↗</span>
               </a>
               <a href="https://canva-bulk-converter.pages.dev/" target="_blank" rel="noopener noreferrer"
-                title="캔바 자동업로드 — 이미지를 캔바에 자동 대량 업로드 후 캔바에서 바로 편집 (새 탭 · 사이트 비밀번호 있음)"
+                title="캔바대량 — 이미지를 캔바에 자동 대량 업로드 후 캔바에서 바로 편집 (새 탭 · 사이트 비밀번호 있음)"
                 className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition">
-                <ExternalLink className="w-3 h-3" /> 캔바 <span className="text-cyan-500/70">↗</span>
+                <ExternalLink className="w-3 h-3" /> 캔바대량 <span className="text-cyan-500/70">↗</span>
               </a>
               <button onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
                 title={theme === "dark" ? "밝은 테마로 전환" : "어두운 테마로 전환"}
