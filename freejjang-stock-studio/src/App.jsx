@@ -5,9 +5,7 @@ import {
   Layers, Key, Settings2, CornerDownLeft, FileText, ClipboardCheck,
   ShieldAlert, CircleDollarSign, ChevronRight, Ban, FolderOpen, Sun, Moon, Upload, ExternalLink
 } from "lucide-react";
-import * as XLSX from "xlsx";
-import JSZip from "jszip";
-import Pica from "pica";
+/* xlsx·jszip·pica는 제출팩/업스케일 시점에만 동적 로드 — 첫 화면 번들 축소 */
 
 /* ═══════════════════════════════════════════════════════════
    FreeJJang STOCK STUDIO — 최종판 (다크 · 2중 두뇌)
@@ -549,7 +547,9 @@ async function genOpenAI(key, prompt, aspect, quality) {
 }
 /* ── 해상도 유틸: 어도비 최소 4MP — 저해상도 감지 + ZIP 저장 시 자동 업스케일(Lanczos+샤픈) ── */
 const ADOBE_MIN_MP = 4e6;
-const picaInst = new Pica();
+/* pica는 업스케일 첫 사용 시 1회만 로드 */
+let picaP = null;
+const getPica = () => (picaP ??= import("pica").then((m) => new m.default()));
 const loadImgEl = (dataUrl) => new Promise((resolve, reject) => {
   const i = new Image();
   i.onload = () => resolve(i);
@@ -577,9 +577,45 @@ async function upscaleForAdobe(dataUrl) {
   const dst = document.createElement("canvas");
   dst.width = Math.round(img.width * factor);
   dst.height = Math.round(img.height * factor);
-  await picaInst.resize(src, dst, { unsharpAmount: 55, unsharpRadius: 0.6, unsharpThreshold: 2 });
+  await (await getPica()).resize(src, dst, { unsharpAmount: 55, unsharpRadius: 0.6, unsharpThreshold: 2 });
   return { jpeg: dst.toDataURL("image/jpeg", 0.92), w: dst.width, h: dst.height, factor };
 }
+
+/* ── 듀얼 규격: 한 장에서 미캔용 1:1 중앙 재단 (API 호출 없음 · 토큰 0) ── */
+const DUAL_SAFE_FRAME = "composition must survive both a wide and a square crop: main subject centered with generous breathing room on all four sides, no essential detail near the left or right edges";
+async function centerCropSquare(dataUrl) {
+  const img = await loadImgEl(dataUrl);
+  if (img.width === img.height) return dataUrl;
+  const side = Math.min(img.width, img.height);
+  const c = document.createElement("canvas");
+  c.width = side; c.height = side;
+  c.getContext("2d").drawImage(img, (img.width - side) / 2, (img.height - side) / 2, side, side, 0, 0, side, side);
+  return c.toDataURL("image/png");
+}
+
+/* ── 세션 자동백업 (IndexedDB) — 생성한 이미지가 새로고침·튕김에도 살아남게 ──
+   localStorage는 용량이 작아 이미지 dataURL을 못 담는다 → IndexedDB 사용 */
+const IDB_NAME = "freejjang_studio", IDB_STORE = "session", IDB_KEY = "last-session";
+const idbOpen = () => new Promise((res, rej) => {
+  const r = indexedDB.open(IDB_NAME, 1);
+  r.onupgradeneeded = () => r.result.createObjectStore(IDB_STORE);
+  r.onsuccess = () => res(r.result);
+  r.onerror = () => rej(r.error);
+});
+const idbTx = async (fn) => {
+  const db = await idbOpen();
+  try {
+    return await new Promise((res, rej) => {
+      const tx = db.transaction(IDB_STORE, "readwrite");
+      const req = fn(tx.objectStore(IDB_STORE));
+      tx.oncomplete = () => res(req?.result);
+      tx.onerror = () => rej(tx.error);
+    });
+  } finally { db.close(); }
+};
+const idbSave = (val) => idbTx((st) => st.put(val, IDB_KEY));
+const idbLoad = () => idbTx((st) => st.get(IDB_KEY));
+const idbClear = () => idbTx((st) => st.delete(IDB_KEY));
 
 /* ── 무료 엔진 C: Pollinations (Flux · 가입/키 불필요 · 과금 없음) ──
    무료(익명) 티어는 긴 변을 ~1024px로 제한한다. 이보다 큰 값을 요청하면 작게 생성한 뒤
@@ -1017,6 +1053,7 @@ export default function App() {
         if (typeof s.autoFallback === "boolean") setAutoFallback(s.autoFallback);
         if (s.refTone) setRefTone(s.refTone);
         if (s.refPeople) setRefPeople(s.refPeople);
+        if (typeof s.dualSpec === "boolean") setDualSpec(s.dualSpec);
       }
       /* 작업 필드(주제·우선 키워드·팁)도 복원 — 에러·새로고침 후 "제목만 남고 키워드가 사라지는" 문제 방지.
          비우고 싶으면 Start Fresh를 쓰면 됨 */
@@ -1035,10 +1072,10 @@ export default function App() {
     if (!settingsLoaded.current) return;
     try {
       localStorage.setItem("freejjang_settings", JSON.stringify({
-        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, geminiImgModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality,
+        openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, geminiImgModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality, dualSpec,
       }));
     } catch { /* 저장 불가 환경 무시 */ }
-  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, geminiImgModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality]);
+  }, [openaiKey, googleKey, brain, provider, quality, aspect, gptModel, geminiModel, geminiImgModel, autoFallback, refTone, refPeople, ecoTwoPass, finalQuality, dualSpec]);
 
   /* ── Start Fresh: 파이프라인만 초기화 (키·설정은 유지) ── */
   const startFresh = () => {
@@ -1048,6 +1085,8 @@ export default function App() {
     setPhase("idle"); setProg(null); setAutoQcProg(null); setAutoQcBusy(false);
     setMaxMin(""); setLog([]); setNotice(null); deadlineRef.current = Infinity;
     setModeAuto(true); setMode("commercial");
+    setResumeSaved(null);
+    idbClear().catch(() => {}); // 자동백업도 함께 비움
   };
   const clearSavedKeys = () => {
     setOpenaiKey(""); setGoogleKey("");
@@ -1056,6 +1095,37 @@ export default function App() {
   };
   const [phase, setPhase] = useState("idle"); // idle | drafting | review | generating | qc | done
   const [slots, setSlots] = useState([]);
+  const [dualSpec, setDualSpec] = useState(false); // 듀얼 규격: 1생성 → 어도비(원본비율)+미캔(1:1) 자동 재단
+  /* ── 세션 자동백업: 슬롯이 바뀔 때마다 IndexedDB에 저장 (디바운스 800ms) ── */
+  const [resumeSaved, setResumeSaved] = useState(null); // 시작 시 발견된 지난 작업
+  const backupTimer = useRef(null);
+  useEffect(() => {
+    idbLoad().then((v) => {
+      if (v && Array.isArray(v.slots) && v.slots.some((s) => s.dataUrl)) setResumeSaved(v);
+    }).catch(() => { /* IndexedDB 미지원 환경 무시 */ });
+  }, []);
+  useEffect(() => {
+    if (slots.length === 0) return;
+    clearTimeout(backupTimer.current);
+    backupTimer.current = setTimeout(() => {
+      idbSave({ v: 1, savedAt: Date.now(), topic, mode, phase, slots }).catch(() => {});
+    }, 800);
+    return () => clearTimeout(backupTimer.current);
+  }, [slots, phase, topic, mode]);
+  const resumeSession = () => {
+    if (!resumeSaved) return;
+    /* 저장 당시 '생성 중'이던 슬롯은 대기로 되돌려 재생성 가능하게 */
+    const restored = resumeSaved.slots.map((s) => (s.status === "generating" ? { ...s, status: "pending" } : s));
+    setSlots(restored);
+    if (resumeSaved.topic) onTopicChange(resumeSaved.topic);
+    if (resumeSaved.mode) { setModeAuto(false); setMode(resumeSaved.mode); }
+    setPhase(resumeSaved.phase === "generating" || resumeSaved.phase === "drafting" ? "review" : resumeSaved.phase || "review");
+    setResumeSaved(null);
+    const nImg = restored.filter((s) => s.dataUrl).length;
+    addLog(`[이어하기] 지난 작업 복원 — 슬롯 ${restored.length}개 · 이미지 ${nImg}장 (재생성 불필요)`);
+    setNotice(`↩️ 지난 작업을 복원했습니다: 슬롯 ${restored.length}개 · 이미지 ${nImg}장. 끊긴 곳부터 이어서 진행하세요.`);
+  };
+  const discardResume = () => { idbClear().catch(() => {}); setResumeSaved(null); };
   const [prog, setProg] = useState(null);
   const [qcRejects, setQcRejects] = useState({}); // {index: true}
   const [qcReason, setQcReason] = useState("");
@@ -1193,6 +1263,9 @@ export default function App() {
     }
     throw lastErr;
   };
+
+  /* 듀얼 규격 ON이면 어떤 재단에도 살아남는 안전 구도를 프롬프트에 강제 */
+  const withDualFrame = (fp) => (dualSpec ? `${fp}, ${DUAL_SAFE_FRAME}` : fp);
 
   /* ═══ 두뇌 라우터 — 선택 두뇌 먼저 → 키 등록된 다른 두뇌로 폴백 ═══ */
   const brainUsable = (b) => (b === "gpt" ? !!openaiKey.trim() : b === "gemini" ? !!googleKey.trim() : false);
@@ -1560,7 +1633,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
       if (timeUp()) { addLog(`[시간 상한] 예산 초과 — ${newMade}장 생성 후 중단 ('미완료·수정 슬롯 생성' 버튼은 시간 무시하고 강제 실행됩니다)`); break; }
       setProg({ done: newMade, total: targets.length, stage: `슬롯 ${t.index} 생성 중` });
       /* 프롬프트를 먼저 확정해 슬롯에 깔아둔다 — 생성되는 동안 카드에서 프롬프트 확인 가능 */
-      const fp = buildSlotPrompt(t, mode, refTone, refPeople, wantKoreanCast(), refHands);
+      const fp = withDualFrame(buildSlotPrompt(t, mode, refTone, refPeople, wantKoreanCast(), refHands));
       setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating", finalPrompt: fp } : s)));
       try {
         if (t.qcNote) addLog(`[교정 ${t.index}] 이전 거절 사유 반영: ${t.qcNote}`);
@@ -1574,7 +1647,7 @@ Rewrite the scene so it: (1) contains ZERO readable written content — no prese
           try {
             const fix = await repairSlot(t, err.message);
             const t2 = { ...t, ...fix, repaired: true };
-            const fp2 = buildSlotPrompt(t2, mode, refTone, refPeople, wantKoreanCast(), refHands);
+            const fp2 = withDualFrame(buildSlotPrompt(t2, mode, refTone, refPeople, wantKoreanCast(), refHands));
             setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, ...fix, repaired: true, finalPrompt: fp2 } : s)));
             const dataUrl2 = await generateImage(fp2, draftQ);
             await markSuccess(t.index, dataUrl2, fp2);
@@ -1870,7 +1943,8 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
   const assetBaseName = (s) => `${s.index}-${cleanName(topic, 15)}-${s.slug}`;
   /* ── 미리캔버스 업로드 XLSX 생성 (통합 팩·미캔 전용 팩 공용 단일 소스) ──
      반환: { buf, rows } — rows[i].fileName 은 확장자 없는 파일명(이미지와 1:1로 대조 가능) */
-  const buildMiriXlsx = (ok) => {
+  const buildMiriXlsx = async (ok) => {
+    const XLSX = await import("xlsx"); // 제출 시점에만 로드
     const rows = ok.map((s) => ({
       fileName: `${assetBaseName(s)}_miri`,
       elementName: [(s.title_kr || "").substring(0, 8), s.title].filter(Boolean).join(" "),
@@ -1898,7 +1972,8 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const ok = src.filter((s) => s.status === "success" && s.dataUrl);
     if (ok.length === 0) { setNotice("미리캔버스로 내보낼 성공 이미지가 없습니다."); return; }
     const base = cleanName(topic, 20) || "freejjang";
-    addLog(`[미캔 팩] 미리캔버스 전용 ZIP 생성 시작 — 성공 이미지 ${ok.length}장 (어도비 규격 제외)`);
+    addLog(`[미캔 팩] 미리캔버스 전용 ZIP 생성 시작 — 성공 이미지 ${ok.length}장 (어도비 규격 제외)${dualSpec ? " · 듀얼 규격: 1:1 재단" : ""}`);
+    const { default: JSZip } = await import("jszip"); // 제출 시점에만 로드
     const zip = new JSZip();
     const imgNames = new Set(); // 실제 ZIP에 담긴 이미지 파일명(확장자 제외) — XLSX와 대조용
     for (let i = 0; i < ok.length; i++) {
@@ -1906,7 +1981,8 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       const nameBase = `${assetBaseName(s)}_miri`;
       setProg({ done: i, total: ok.length, stage: `미캔 슬롯 ${s.index} 고해상 변환` });
       try {
-        const up = await upscaleForAdobe(s.dataUrl); // 미캔도 고해상일수록 승인·품질 유리
+        const srcUrl = dualSpec ? await centerCropSquare(s.dataUrl) : s.dataUrl; // 듀얼 규격: 미캔은 1:1 중앙 재단
+        const up = await upscaleForAdobe(srcUrl); // 미캔도 고해상일수록 승인·품질 유리
         zip.file(`images/${nameBase}.jpg`, dataUrlToU8(up.jpeg));
         imgNames.add(nameBase);
         if (up.factor > 1) addLog(`[미캔 업스케일 ${s.index}] ${s.px ? `${s.px.w}×${s.px.h}` : "원본"} → ${up.w}×${up.h}`);
@@ -1918,7 +1994,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     }
     setProg(null);
     /* 미캔 XLSX (이미지와 동일 소스로 생성) */
-    const { buf, rows } = buildMiriXlsx(ok);
+    const { buf, rows } = await buildMiriXlsx(ok);
     zip.file(`${base}-miricanvas.xlsx`, buf);
     zip.file(`${base}-prompts-full.txt`, buildPromptsFullText(ok));
     /* ── 이중 체크: 이미지 ↔ XLSX ↔ 성공 슬롯이 1:1로 정확히 맞는지 누락 검증 ── */
@@ -1962,14 +2038,24 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     const base = cleanName(topic, 20) || "freejjang";
     addLog(`[제출 팩] ZIP 생성 중 — 총 ${ok.length}장 · 어도비 적격 ${adobeOk.length} · 미캔 전용 ${miriOnly.length}`);
     if (miriOnly.length) addLog(`[라우팅] 다크·글로우·야간·컨셉 ${miriOnly.length}장은 어도비 CSV에서 제외 → 미캔 전용(승인율 보호). 슬롯: ${miriOnly.map((s) => s.index).join(", ")}`);
+    const { default: JSZip } = await import("jszip"); // 제출 시점에만 로드
     const zip = new JSZip();
-    /* 이미지: adobe/ = 어도비 적격만 4MP+ 자동 업스케일 JPEG (CSV 파일명과 일치), miri/ = 전량 원본 PNG */
-    addLog(`[제출 팩] 어도비 적격 ${adobeOk.length}장 규격(4MP+) 업스케일 중…`);
+    /* 이미지: adobe/ = 어도비 적격만 4MP+ 업스케일 JPEG (CSV 파일명 일치),
+       miri/ = 전량 4MP+ 업스케일 JPEG — 미캔 전용 팩과 동일 규격(팩 간 화질 어긋남 방지).
+       듀얼 규격 ON이면 miri/는 같은 이미지의 1:1 중앙 재단본 (추가 생성 없음 · 토큰 0) */
+    addLog(`[제출 팩] 어도비 적격 ${adobeOk.length}장 + 미캔 ${ok.length}장 규격(4MP+) 변환 중…${dualSpec ? " · 듀얼 규격: 미캔 1:1 재단" : ""}`);
     for (let i = 0; i < ok.length; i++) {
       const s = ok[i];
       const name = assetBaseName(s);
       setProg({ done: i, total: ok.length, stage: `슬롯 ${s.index} 업스케일·압축` });
-      zip.file(`images/miri/${name}_miri.png`, dataUrlToU8(s.dataUrl)); // 미캔: 전량
+      try { // 미캔: 전량 (미캔 전용 팩과 같은 고해상 JPG 규격)
+        const miriSrc = dualSpec ? await centerCropSquare(s.dataUrl) : s.dataUrl;
+        const upM = await upscaleForAdobe(miriSrc);
+        zip.file(`images/miri/${name}_miri.jpg`, dataUrlToU8(upM.jpeg));
+      } catch (e) {
+        zip.file(`images/miri/${name}_miri.png`, dataUrlToU8(s.dataUrl));
+        addLog(`[미캔 변환 실패 ${s.index}] 원본 PNG 동봉 — ${e.message}`);
+      }
       if (!isAdobeEligible(s, mode, refTone)) continue;                 // 어도비 부적격은 adobe/에 넣지 않음
       try {
         const up = await upscaleForAdobe(s.dataUrl);
@@ -1991,7 +2077,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
       [`${s.index}-${cleanName(topic, 15)}-${s.slug}_adobe.jpg`, s.title, normKeywords(s.keywords, ADOBE_MAX_KEYWORDS), s.category, "", "Yes"].map(esc).join(","));
     zip.file(`${base}-adobe-metadata.csv`, "﻿" + [header.map(esc).join(","), ...rows].join("\r\n"));
     /* MiriCanvas XLSX — 전량(ok). 미캔 전용 팩과 동일 소스(buildMiriXlsx)로 생성해 팩 간 어긋남 방지 */
-    const { buf } = buildMiriXlsx(ok);
+    const { buf } = await buildMiriXlsx(ok);
     zip.file(`${base}-miricanvas.xlsx`, buf);
     /* 라우팅 요약 — 어느 컷이 어디로 갔는지 (제출 워크플로 추적용) */
     const routing =
@@ -2028,7 +2114,7 @@ Reject (pass=false) if ANY of these appear: (1) visible text, letters, numbers, 
     if (phase === "generating") return;
     /* 거절/플래그 사유가 있으면 교정 지시로 주입 (같은 실수 반복 차단) — 프롬프트를 먼저 깔고 생성 */
     const note = t.qcNote || t.autoFlag || "";
-    const fp = buildSlotPrompt({ ...t, qcNote: note }, mode, refTone, refPeople, wantKoreanCast(), refHands);
+    const fp = withDualFrame(buildSlotPrompt({ ...t, qcNote: note }, mode, refTone, refPeople, wantKoreanCast(), refHands));
     setSlots((p) => p.map((s) => (s.index === t.index ? { ...s, status: "generating", finalPrompt: fp, dataUrl: "" } : s)));
     addLog(`[재생성 ${t.index}] ${CAMERA_ANGLES[t.angle]?.label || "자동"} · 시작`);
     try {
@@ -2239,26 +2325,34 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
                 className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-amber-500/30 bg-amber-500/10 text-amber-300 hover:bg-amber-500/20 transition">
                 <ExternalLink className="w-3 h-3" /> 허브 <span className="text-amber-500/70">↗</span>
               </a>
-              <a href="https://free-atelier.pages.dev" target="_blank" rel="noopener noreferrer"
-                title="벡터 아뜰리에 — 생성한 요소 이미지를 배경 제거·벡터로 따내는 편집기 (새 탭)"
-                className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-violet-500/30 bg-violet-500/10 text-violet-300 hover:bg-violet-500/20 transition">
-                <ExternalLink className="w-3 h-3" /> 벡터 아뜰리에 <span className="text-violet-500/70">↗</span>
-              </a>
-              <a href="https://dalgakjjang-cloud.github.io/logo-gongbang/" target="_blank" rel="noopener noreferrer"
-                title="로고공방 — 상호명·기획의도로 음식 로고 프롬프트 세트 생성 (새 탭)"
-                className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-orange-500/30 bg-orange-500/10 text-orange-300 hover:bg-orange-500/20 transition">
-                <ExternalLink className="w-3 h-3" /> 로고공방 <span className="text-orange-500/70">↗</span>
-              </a>
-              <a href="https://autocrop-tool.hopot13.workers.dev/" target="_blank" rel="noopener noreferrer"
-                title="자동크롭 — 이미지 배경·여백 자동 감지 후 일괄 크롭 (새 탭)"
-                className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-teal-500/30 bg-teal-500/10 text-teal-300 hover:bg-teal-500/20 transition">
-                <ExternalLink className="w-3 h-3" /> 자동크롭 <span className="text-teal-500/70">↗</span>
-              </a>
-              <a href="https://canva-bulk-converter.pages.dev/" target="_blank" rel="noopener noreferrer"
-                title="캔바대량 — 이미지를 캔바에 자동 대량 업로드 후 캔바에서 바로 편집 (새 탭 · 사이트 비밀번호 있음)"
-                className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 hover:bg-cyan-500/20 transition">
-                <ExternalLink className="w-3 h-3" /> 캔바대량 <span className="text-cyan-500/70">↗</span>
-              </a>
+              {/* 형제 도구 — 좁은 화면 줄넘침 방지를 위해 접이식 메뉴로 통합 */}
+              <details className="relative">
+                <summary className="list-none cursor-pointer flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-neutral-600 bg-neutral-800/60 text-neutral-200 hover:bg-neutral-700/60 transition select-none">
+                  🔗 형제 도구 <span className="text-neutral-500">▾</span>
+                </summary>
+                <div className="absolute right-0 mt-1 w-52 z-50 rounded-lg border border-neutral-700 bg-neutral-950 shadow-xl p-1.5 flex flex-col gap-1">
+                  <a href="https://free-atelier.pages.dev" target="_blank" rel="noopener noreferrer"
+                    title="벡터 아뜰리에 — 생성한 요소 이미지를 배경 제거·벡터로 따내는 편집기 (새 탭)"
+                    className="flex items-center gap-1.5 text-[11px] font-bold px-2 py-1.5 rounded text-violet-300 hover:bg-violet-500/15 transition">
+                    🖼 벡터 아뜰리에 <span className="ml-auto text-violet-500/70">↗</span>
+                  </a>
+                  <a href="https://dalgakjjang-cloud.github.io/logo-gongbang/" target="_blank" rel="noopener noreferrer"
+                    title="로고공방 — 상호명·기획의도로 음식 로고 프롬프트 세트 생성 (새 탭)"
+                    className="flex items-center gap-1.5 text-[11px] font-bold px-2 py-1.5 rounded text-orange-300 hover:bg-orange-500/15 transition">
+                    🎨 로고공방 <span className="ml-auto text-orange-500/70">↗</span>
+                  </a>
+                  <a href="https://autocrop-tool.hopot13.workers.dev/" target="_blank" rel="noopener noreferrer"
+                    title="자동크롭 — 이미지 배경·여백 자동 감지 후 일괄 크롭 (새 탭)"
+                    className="flex items-center gap-1.5 text-[11px] font-bold px-2 py-1.5 rounded text-teal-300 hover:bg-teal-500/15 transition">
+                    ✂️ 자동크롭 <span className="ml-auto text-teal-500/70">↗</span>
+                  </a>
+                  <a href="https://canva-bulk-converter.pages.dev/" target="_blank" rel="noopener noreferrer"
+                    title="캔바대량 — 이미지를 캔바에 자동 대량 업로드 후 캔바에서 바로 편집 (새 탭 · 사이트 비밀번호 있음)"
+                    className="flex items-center gap-1.5 text-[11px] font-bold px-2 py-1.5 rounded text-cyan-300 hover:bg-cyan-500/15 transition">
+                    📤 캔바대량 <span className="ml-auto text-cyan-500/70">↗</span>
+                  </a>
+                </div>
+              </details>
               <button onClick={() => setTheme(t => t === "dark" ? "light" : "dark")}
                 title={theme === "dark" ? "밝은 테마로 전환" : "어두운 테마로 전환"}
                 className="flex items-center gap-1 text-[11px] font-bold px-2 py-1.5 rounded border border-neutral-700 text-neutral-300 hover:text-neutral-100 transition">
@@ -2371,6 +2465,14 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
                   </select>
                 </div>
               )}
+              <div>
+                <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">듀얼 규격 (토큰 ½)</label>
+                <button onClick={() => setDualSpec(!dualSpec)}
+                  title="한 장만 생성하고 제출팩에서 자동 재단: 어도비=원본 비율, 미캔=1:1 정사각 중앙 재단. 같은 주제를 비율 바꿔 두 번 생성할 필요가 없어져 생성 토큰이 절반. ON이면 프롬프트에 '재단 안전 구도'가 자동 추가됩니다"
+                  className={`${fieldCls} font-bold ${dualSpec ? "text-cyan-300 border-cyan-500/50" : "text-neutral-500"}`}>
+                  {dualSpec ? "ON · 1생성→어도비+미캔1:1" : "OFF · 원본 비율 그대로"}
+                </button>
+              </div>
               <div>
                 <label className="block text-[10px] font-semibold text-neutral-400 mb-0.5">종횡비</label>
                 <select value={aspect} onChange={(e) => setAspect(e.target.value)} className={`${fieldCls} font-mono`}>
@@ -3235,6 +3337,20 @@ Each block content = one short Korean sentence. ABSOLUTE NO-BLUR RULE: even if t
           </div>
         );
       })()}
+
+      {/* 이어하기 배너 — 지난 세션 자동백업이 발견되면 표시 (새 작업 시작 전까지) */}
+      {resumeSaved && slots.length === 0 && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 bg-neutral-950 border border-emerald-500/40 text-neutral-100 text-xs px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 max-w-lg z-50">
+          <RefreshCw className="w-4 h-4 text-emerald-400 shrink-0" />
+          <span className="leading-relaxed">
+            지난 작업이 남아 있어요 — <b>{resumeSaved.topic || "제목 없음"}</b> · 이미지 {resumeSaved.slots.filter((s) => s.dataUrl).length}장
+            ({new Date(resumeSaved.savedAt).toLocaleString("ko-KR", { month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit" })} 자동저장).
+            이어서 하면 <b>재생성 비용이 들지 않아요.</b>
+          </span>
+          <button onClick={resumeSession} className="shrink-0 font-bold text-emerald-300 border border-emerald-500/40 bg-emerald-500/10 hover:bg-emerald-500/20 px-2.5 py-1.5 rounded transition">이어하기</button>
+          <button onClick={discardResume} title="백업을 지우고 새로 시작" className="shrink-0 text-neutral-400 hover:text-white"><X className="w-4 h-4" /></button>
+        </div>
+      )}
 
       {/* 토스트 */}
       {notice && (
