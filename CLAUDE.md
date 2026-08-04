@@ -52,6 +52,7 @@
 | 🎨 로고공방 | `https://dalgakjjang-cloud.github.io/logo-gongbang/` (repo: logo-gongbang) |
 | 🖼 벡터 아뜰리에 (Free.Atelier, 움짤 포함) | `https://free-atelier.pages.dev` (repo 없음 · 로컬 폴더 → wrangler 배포) |
 | ✂️ 자동크롭 | `https://autocrop-tool.hopot13.workers.dev/` (Cloudflare Workers) |
+| 📤 캔바대량 (Canva Bulk Converter) | `https://canva-bulk-converter.pages.dev/` (Cloudflare Pages · 사이트 비밀번호 있음 · 캔바 자동 대량 업로드 후 편집) |
 
 이 도구들은 서로 헤더 바로가기 + 허브로 연결돼 있다.
 
