@@ -1,0 +1,81 @@
+{
+  "exportedAt": "2026-08-03T09:30:00.000Z",
+  "total": 5,
+  "templates": [
+    {
+      "id": "abc001",
+      "name": "화이트 미니멀 홍보 카드",
+      "thumb": "https://example.com/template_thumb/2026/07/29/12/34/abc001/thumb",
+      "thumbDate": "2026-07-29 12:34",
+      "pages": "1",
+      "premium": false,
+      "category": "cardnews [검색:홍보]",
+      "firstSeen": "2026-08-01",
+      "lastSeen": "2026-08-03",
+      "seenCount": 2,
+      "w": 800,
+      "h": 1000,
+      "kwr": {"홍보": 4}
+    },
+    {
+      "id": "abc002",
+      "name": "가을 세일 프로모션 5장 세트",
+      "thumb": "https://example.com/template_thumb/2026/07/31/10/00/abc002/thumb",
+      "thumbDate": "2026-07-31 10:00",
+      "pages": "5",
+      "premium": true,
+      "category": "cardnews [검색:가을세일] | cardnews [검색:프로모션]",
+      "firstSeen": "2026-08-02",
+      "lastSeen": "2026-08-03",
+      "seenCount": 1,
+      "w": 800,
+      "h": 1000,
+      "kwr": {"가을세일": 2, "프로모션": 8}
+    },
+    {
+      "id": "abc003",
+      "name": "베이지 감성 인스타 카드",
+      "thumb": "https://example.com/template_thumb/2026/06/15/09/22/abc003/thumb",
+      "thumbDate": "2026-06-15 09:22",
+      "pages": "3",
+      "premium": true,
+      "category": "sns [검색:인스타]",
+      "firstSeen": "2026-07-20",
+      "lastSeen": "2026-08-03",
+      "seenCount": 5,
+      "w": 1080,
+      "h": 1080,
+      "kwr": {"인스타": 6}
+    },
+    {
+      "id": "abc004",
+      "name": "레트로 감성 오래된 카드",
+      "thumb": "https://example.com/template_thumb/2026/03/10/14/00/abc004/thumb",
+      "thumbDate": "2026-03-10 14:00",
+      "pages": "2",
+      "premium": false,
+      "category": "cardnews [검색:레트로]",
+      "firstSeen": "2026-04-01",
+      "lastSeen": "2026-08-03",
+      "seenCount": 12,
+      "w": 800,
+      "h": 1000,
+      "kwr": {"레트로": 3}
+    },
+    {
+      "id": "abc005",
+      "name": "카테고리 브라우징으로만 잡힌 컷",
+      "thumb": "https://example.com/template_thumb/2026/08/01/11/00/abc005/thumb",
+      "thumbDate": "2026-08-01 11:00",
+      "pages": "1",
+      "premium": false,
+      "category": "presentation",
+      "firstSeen": "2026-08-03",
+      "lastSeen": "2026-08-03",
+      "seenCount": 1,
+      "w": 1920,
+      "h": 1080,
+      "kwr": {}
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+# 추석 아이보리 배경 8컷 — 아이보리 바탕+남색/짙은녹색 포인트로 베이지·갈색 과밀 회피 (2026-08-03 트렌드 기반) (GPT용)
+# ─────────────────────────────────────────────────────────
+# 미캔 시그니처 유지: 밝은 톤 + 넉넉한 텍스트 여백 + 배경까지 선명
+# 사용자가 자기 한글 문구를 얹기 좋게 → 중앙 또는 여백 텍스트 자리 확보
+# HEX 팔레트 명시 → 색감 정확도 향상
+# ─────────────────────────────────────────────────────────
+
+# ══════════════════════════════════════════
+# 🌕 A. 보름달·밤하늘 (CB-A)
+# ══════════════════════════════════════════
+
+--- 01 아이보리 보름달 밤하늘 배경 ---
+a serene ivory and deep navy night sky with a soft glowing full moon and generous empty space, gentle gradient sky with a faint halo around the moon, camera: eye-level composed, lighting: soft moonlight glow, palette: warm ivory #F5EFE0 and deep navy #2C3A5E with a soft cream moon, generous clean copy space in the lower half, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling
+
+--- 02 달항아리 은은한 달빛 배경 ---
+a minimal ivory background with a softly lit white moon jar silhouette to one side, subtle ink-wash shadow and calm empty field, camera: eye-level composed, lighting: soft directional studio light, palette: warm ivory #F5EFE0 and ink gray #4A4A48, generous clean copy space on the right, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling
+
+--- 03 억새와 보름달 실루엣 배경 ---
+a warm ivory sky with delicate silver grass silhouettes along the bottom and a soft full moon above, fine backlit grass strands swaying gently, camera: eye-level composed, lighting: warm backlight glow, palette: warm ivory #F5EFE0 and soft gold #C9A24B, generous clean copy space in the upper area, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling
+
+--- 04 남색 밤하늘 별과 달 미니멀 배경 ---
+a deep navy night sky scattered with a few soft cream stars and a slim crescent moon, calm even sky with tiny twinkles, camera: eye-level composed, lighting: soft night ambience, palette: deep navy #26315A and soft cream #F3E8CE, generous clean copy space in the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling
+
+# ══════════════════════════════════════════
+# 🍂 B. 전통 문양·한지 (CB-B)
+# ══════════════════════════════════════════
+
+--- 05 아이보리 전통 문양 여백 배경 ---
+an ivory background framed by a subtle navy Korean traditional geometric border with a wide open center, clean symmetrical pattern with fine line work, camera: overhead flat, lighting: bright even studio light, palette: warm ivory #F5EFE0 and deep navy #2C3A5E, generous clean copy space in the open center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling
+
+--- 06 한지 질감 낙엽 배경 ---
+a warm ivory hanji paper texture background with a few softly scattered autumn leaves in the corners, fine fibrous paper grain with gentle shadows, camera: overhead flat, lighting: soft even daylight, palette: warm ivory #F3EBDA and muted rust #A6603C, generous clean copy space in the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling
+
+--- 07 감나무 가지 미니멀 배경 ---
+a clean ivory background with a single delicate persimmon branch and two ripe persimmons in one corner, simple line-drawn branch with soft color fill, camera: overhead flat, lighting: bright even studio light, palette: warm ivory #F5EFE0 and persimmon orange #D8813A, generous clean copy space across the rest of the frame, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling
+
+--- 08 동양화풍 산과 구름 배경 ---
+a serene ivory background with softly painted oriental ink mountains and gentle clouds along the lower edge, loose brush strokes with airy negative space, camera: eye-level composed, lighting: soft even daylight, palette: warm ivory #F5EFE0 and deep teal #2E4A47, generous clean copy space in the upper two thirds, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, elegant oriental minimal styling

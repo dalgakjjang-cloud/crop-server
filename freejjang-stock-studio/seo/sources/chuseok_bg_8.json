@@ -1,0 +1,202 @@
+{
+  "batch": "chuseok_bg_8",
+  "signals_batch": "chuseok-bg-8",
+  "slug": "chuseok_bg",
+  "prefix": "cb",
+  "count": 8,
+  "header_note": "추석 아이보리 배경 8컷 — 아이보리 바탕+남색/짙은녹색 포인트로 베이지·갈색 과밀 회피 (2026-08-03 트렌드 기반)",
+  "platform": "어도비+미캔",
+  "pools": {
+    "usecase_en": ["greeting card", "banner", "poster", "social media", "template", "invitation"],
+    "usecase_ko": ["카드", "배너", "포스터", "소셜 미디어", "템플릿", "초대장"],
+    "group_en": {
+      "A": ["full moon", "night sky", "moonlight", "harvest moon", "serene", "starry"],
+      "B": ["traditional pattern", "hanji paper", "oriental art", "korean pattern", "autumn", "warm elegant"]
+    },
+    "group_ko": {
+      "A": ["보름달", "밤하늘", "달빛", "한가위 달", "고요한", "별빛"],
+      "B": ["전통 문양", "한지", "동양화", "한국 전통 패턴", "가을", "따뜻한"]
+    },
+    "universal_en": ["background", "copy space", "korean traditional", "chuseok", "harvest festival",
+                     "no people", "design element", "elegant", "minimal", "oriental", "asian",
+                     "backdrop", "text space", "wallpaper"],
+    "universal_ko": ["배경", "여백", "한국 전통", "추석", "한가위",
+                     "사람 없음", "디자인 요소", "우아한", "미니멀", "동양적",
+                     "아시안", "배경 이미지", "텍스트 공간", "월페이퍼"]
+  },
+  "sections": [
+    {"title": "🌕 A. 보름달·밤하늘 (CB-A)", "groups": ["A"]},
+    {"title": "🍂 B. 전통 문양·한지 (CB-B)", "groups": ["B"]}
+  ],
+  "cuts": [
+    {
+      "n": 1, "grp": "A", "shape": "배경형",
+      "axis_subject": "보름달 밤하늘 배경 (A 달)", "axis_color": "아이보리-남색",
+      "label_ko": "아이보리 보름달 밤하늘 배경",
+      "title_en": "Serene ivory full moon night sky background for Korean Chuseok greeting",
+      "title_ko": "추석 인사용 아이보리 보름달 밤하늘 배경",
+      "core_en": ["full moon", "night sky", "chuseok background", "harvest moon", "moonlit sky", "korean holiday"],
+      "core_ko": ["보름달", "밤하늘", "추석 배경", "한가위 달", "달빛 하늘", "명절"],
+      "color_en": ["ivory", "deep navy"],
+      "color_ko": ["아이보리", "남색"],
+      "subject": "a serene ivory and deep navy night sky with a soft glowing full moon and generous empty space",
+      "detail": "gentle gradient sky with a faint halo around the moon",
+      "camera": "eye-level composed shot",
+      "lighting": "soft moonlight glow",
+      "palette": [
+        {"name": "warm ivory", "hex": "F5EFE0"},
+        {"name": "deep navy", "hex": "2C3A5E"}
+      ],
+      "palette_tail": "with a soft cream moon",
+      "copy_space": "generous clean copy space in the lower half",
+      "style": "elegant oriental minimal"
+    },
+    {
+      "n": 2, "grp": "A", "shape": "배경형",
+      "axis_subject": "달항아리 달빛 배경 (A 달)", "axis_color": "아이보리-먹색",
+      "label_ko": "달항아리 은은한 달빛 배경",
+      "title_en": "Minimal ivory moon jar and moonlight Chuseok background",
+      "title_ko": "미니멀 아이보리 달항아리 달빛 추석 배경",
+      "core_en": ["moon jar", "korean pottery", "chuseok background", "moonlight", "traditional ceramic", "still elegance"],
+      "core_ko": ["달항아리", "한국 도자기", "추석 배경", "달빛", "전통 도자", "고요한 우아함"],
+      "color_en": ["ivory", "ink gray"],
+      "color_ko": ["아이보리", "먹색"],
+      "subject": "a minimal ivory background with a softly lit white moon jar silhouette to one side",
+      "detail": "subtle ink-wash shadow and calm empty field",
+      "camera": "eye-level composed shot",
+      "lighting": "soft directional studio light",
+      "palette": [
+        {"name": "warm ivory", "hex": "F5EFE0"},
+        {"name": "ink gray", "hex": "4A4A48"}
+      ],
+      "copy_space": "generous clean copy space on the right",
+      "style": "elegant oriental minimal"
+    },
+    {
+      "n": 3, "grp": "A", "shape": "배경형",
+      "axis_subject": "억새 보름달 배경 (A 달)", "axis_color": "아이보리-금빛",
+      "label_ko": "억새와 보름달 실루엣 배경",
+      "title_en": "Ivory silver grass and full moon autumn silhouette background",
+      "title_ko": "아이보리 억새와 보름달 가을 실루엣 배경",
+      "core_en": ["silver grass", "pampas silhouette", "autumn field", "full moon", "chuseok background", "reeds"],
+      "core_ko": ["억새", "팜파스 실루엣", "가을 들판", "보름달", "추석 배경", "갈대"],
+      "color_en": ["ivory", "warm gold"],
+      "color_ko": ["아이보리", "금빛"],
+      "subject": "a warm ivory sky with delicate silver grass silhouettes along the bottom and a soft full moon above",
+      "detail": "fine backlit grass strands swaying gently",
+      "camera": "eye-level composed shot",
+      "lighting": "warm backlight glow",
+      "palette": [
+        {"name": "warm ivory", "hex": "F5EFE0"},
+        {"name": "soft gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "generous clean copy space in the upper area",
+      "style": "elegant oriental minimal"
+    },
+    {
+      "n": 4, "grp": "A", "shape": "배경형",
+      "axis_subject": "남색 별·달 미니멀 배경 (A 달)", "axis_color": "남색-크림",
+      "label_ko": "남색 밤하늘 별과 달 미니멀 배경",
+      "title_en": "Deep navy starry sky with crescent moon minimal Chuseok background",
+      "title_ko": "남색 별밤과 초승달 미니멀 추석 배경",
+      "core_en": ["starry night", "crescent moon", "navy sky", "chuseok background", "minimal stars", "lunar"],
+      "core_ko": ["별밤", "초승달", "남색 하늘", "추석 배경", "미니멀 별", "루나"],
+      "color_en": ["navy", "cream"],
+      "color_ko": ["남색", "크림"],
+      "subject": "a deep navy night sky scattered with a few soft cream stars and a slim crescent moon",
+      "detail": "calm even sky with tiny twinkles",
+      "camera": "eye-level composed shot",
+      "lighting": "soft night ambience",
+      "palette": [
+        {"name": "deep navy", "hex": "26315A"},
+        {"name": "soft cream", "hex": "F3E8CE"}
+      ],
+      "copy_space": "generous clean copy space in the center",
+      "style": "elegant oriental minimal"
+    },
+    {
+      "n": 5, "grp": "B", "shape": "배경형",
+      "axis_subject": "전통 문양 여백 배경 (B 문양)", "axis_color": "아이보리-남색",
+      "label_ko": "아이보리 전통 문양 여백 배경",
+      "title_en": "Ivory Korean traditional pattern border background with open center",
+      "title_ko": "가운데 여백이 있는 아이보리 한국 전통 문양 배경",
+      "core_en": ["korean traditional pattern", "dancheong", "border pattern", "chuseok background", "oriental motif", "geometric border"],
+      "core_ko": ["전통 문양", "단청", "테두리 문양", "추석 배경", "동양 모티프", "기하 테두리"],
+      "color_en": ["ivory", "navy"],
+      "color_ko": ["아이보리", "남색"],
+      "subject": "an ivory background framed by a subtle navy Korean traditional geometric border with a wide open center",
+      "detail": "clean symmetrical pattern with fine line work",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "warm ivory", "hex": "F5EFE0"},
+        {"name": "deep navy", "hex": "2C3A5E"}
+      ],
+      "copy_space": "generous clean copy space in the open center",
+      "style": "elegant oriental minimal"
+    },
+    {
+      "n": 6, "grp": "B", "shape": "배경형",
+      "axis_subject": "한지 낙엽 배경 (B 문양)", "axis_color": "아이보리-단풍",
+      "label_ko": "한지 질감 낙엽 배경",
+      "title_en": "Ivory hanji paper texture background with soft autumn leaves",
+      "title_ko": "은은한 낙엽이 있는 아이보리 한지 질감 배경",
+      "core_en": ["hanji paper", "paper texture", "autumn leaves", "chuseok background", "korean paper", "warm texture"],
+      "core_ko": ["한지", "종이 질감", "낙엽", "추석 배경", "한국 종이", "따뜻한 질감"],
+      "color_en": ["ivory", "muted rust"],
+      "color_ko": ["아이보리", "단풍색"],
+      "subject": "a warm ivory hanji paper texture background with a few softly scattered autumn leaves in the corners",
+      "detail": "fine fibrous paper grain with gentle shadows",
+      "camera": "overhead flat shot",
+      "lighting": "soft even daylight",
+      "palette": [
+        {"name": "warm ivory", "hex": "F3EBDA"},
+        {"name": "muted rust", "hex": "A6603C"}
+      ],
+      "copy_space": "generous clean copy space in the center",
+      "style": "elegant oriental minimal"
+    },
+    {
+      "n": 7, "grp": "B", "shape": "배경형",
+      "axis_subject": "감나무 가지 배경 (B 문양)", "axis_color": "아이보리-감빛",
+      "label_ko": "감나무 가지 미니멀 배경",
+      "title_en": "Minimal ivory persimmon branch autumn background",
+      "title_ko": "미니멀 아이보리 감나무 가지 가을 배경",
+      "core_en": ["persimmon branch", "autumn fruit", "korean autumn", "chuseok background", "minimal branch", "harvest"],
+      "core_ko": ["감나무 가지", "가을 과일", "한국의 가을", "추석 배경", "미니멀 가지", "수확"],
+      "color_en": ["ivory", "persimmon orange"],
+      "color_ko": ["아이보리", "감빛"],
+      "subject": "a clean ivory background with a single delicate persimmon branch and two ripe persimmons in one corner",
+      "detail": "simple line-drawn branch with soft color fill",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "warm ivory", "hex": "F5EFE0"},
+        {"name": "persimmon orange", "hex": "D8813A"}
+      ],
+      "copy_space": "generous clean copy space across the rest of the frame",
+      "style": "elegant oriental minimal"
+    },
+    {
+      "n": 8, "grp": "B", "shape": "배경형",
+      "axis_subject": "동양화 산·구름 배경 (B 문양)", "axis_color": "아이보리-청록",
+      "label_ko": "동양화풍 산과 구름 배경",
+      "title_en": "Ivory oriental ink mountain and cloud Chuseok background",
+      "title_ko": "아이보리 동양화풍 산과 구름 추석 배경",
+      "core_en": ["oriental ink art", "mountain landscape", "cloud motif", "chuseok background", "korean painting", "serene scenery"],
+      "core_ko": ["동양화", "산 풍경", "구름 문양", "추석 배경", "한국화", "고요한 풍경"],
+      "color_en": ["ivory", "deep teal"],
+      "color_ko": ["아이보리", "청록"],
+      "subject": "a serene ivory background with softly painted oriental ink mountains and gentle clouds along the lower edge",
+      "detail": "loose brush strokes with airy negative space",
+      "camera": "eye-level composed shot",
+      "lighting": "soft even daylight",
+      "palette": [
+        {"name": "warm ivory", "hex": "F5EFE0"},
+        {"name": "deep teal", "hex": "2E4A47"}
+      ],
+      "copy_space": "generous clean copy space in the upper two thirds",
+      "style": "elegant oriental minimal"
+    }
+  ]
+}

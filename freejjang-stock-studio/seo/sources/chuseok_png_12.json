@@ -1,0 +1,288 @@
+{
+  "batch": "chuseok_png_12",
+  "signals_batch": "chuseok-png-12",
+  "slug": "chuseok_png",
+  "prefix": "cp",
+  "count": 12,
+  "header_note": "추석 전통 장식 PNG 요소 12컷 — 먹거리·자연·소품, 흰 배경 아이솔레이트(배경제거용) (2026-08-03 트렌드 기반)",
+  "platform": "어도비+미캔",
+  "pools": {
+    "usecase_en": ["clip art", "sticker", "greeting card", "social media", "template", "invitation"],
+    "usecase_ko": ["클립아트", "스티커", "카드", "소셜 미디어", "템플릿", "초대장"],
+    "group_en": {
+      "A": ["korean food", "holiday food", "harvest food", "traditional dish", "festive treat", "autumn harvest"],
+      "B": ["nature element", "autumn nature", "moon", "seasonal motif", "folk symbol", "harvest symbol"],
+      "C": ["traditional object", "folk craft", "korean craft", "gift wrap", "ornament", "decorative object"]
+    },
+    "group_ko": {
+      "A": ["한국 음식", "명절 음식", "수확 음식", "전통 요리", "명절 먹거리", "가을 수확"],
+      "B": ["자연 요소", "가을 자연", "달", "시즌 모티프", "민속 상징", "수확 상징"],
+      "C": ["전통 소품", "민속 공예", "한국 공예", "선물 포장", "오너먼트", "장식 오브제"]
+    },
+    "universal_en": ["transparent background", "isolated", "chuseok", "korean traditional",
+                     "no people", "design element", "decoration", "cut out", "flat illustration",
+                     "hand drawn", "autumn", "harvest festival", "clipart element", "die cut"],
+    "universal_ko": ["투명 배경", "아이솔레이티드", "추석", "한국 전통",
+                     "사람 없음", "디자인 요소", "데코레이션", "누끼", "플랫 일러스트",
+                     "손그림", "가을", "한가위", "클립아트 요소", "다이컷"]
+  },
+  "sections": [
+    {"title": "🍡 A. 명절 먹거리 (CP-A)", "groups": ["A"]},
+    {"title": "🌕 B. 자연·달 (CP-B)", "groups": ["B"]},
+    {"title": "🎁 C. 전통 소품 (CP-C)", "groups": ["C"]}
+  ],
+  "cuts": [
+    {
+      "n": 1, "grp": "A", "shape": "제품형",
+      "axis_subject": "송편 접시 (A 먹거리)", "axis_color": "민트-크림",
+      "label_ko": "송편 한 접시",
+      "title_en": "Korean Chuseok songpyeon rice cakes on a small plate illustration",
+      "title_ko": "작은 접시에 담긴 추석 송편 일러스트",
+      "core_en": ["songpyeon", "korean rice cake", "chuseok food", "tteok", "half moon rice cake", "holiday dessert"],
+      "core_ko": ["송편", "한국 떡", "추석 음식", "떡", "반달 떡", "명절 디저트"],
+      "color_en": ["mint green", "cream"],
+      "color_ko": ["민트 그린", "크림"],
+      "subject": "a small plate of pastel songpyeon half-moon rice cakes with tiny pine leaves isolated on a clean white background",
+      "detail": "soft rounded shapes with gentle shading",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "soft mint", "hex": "BFD9B0"},
+        {"name": "warm cream", "hex": "F6ECD6"}
+      ],
+      "copy_space": "clean space around the plate",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 2, "grp": "A", "shape": "제품형",
+      "axis_subject": "홍시 감 (A 먹거리)", "axis_color": "감빛-초록",
+      "label_ko": "홍시 감",
+      "title_en": "Ripe Korean persimmon fruit illustration for autumn harvest",
+      "title_ko": "가을 수확 잘 익은 감 일러스트",
+      "core_en": ["persimmon", "ripe persimmon", "autumn fruit", "korean fruit", "harvest fruit", "sweet persimmon"],
+      "core_ko": ["감", "홍시", "가을 과일", "한국 과일", "수확 과일", "단감"],
+      "color_en": ["persimmon orange", "leaf green"],
+      "color_ko": ["감빛 주황", "잎사귀 초록"],
+      "subject": "two glossy ripe persimmons with a small green leaf isolated on a clean white background",
+      "detail": "soft highlight and simple flat fill",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "persimmon orange", "hex": "E07B3A"},
+        {"name": "leaf green", "hex": "5E7A45"}
+      ],
+      "copy_space": "clean space around the fruit",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 3, "grp": "A", "shape": "제품형",
+      "axis_subject": "밤 (A 먹거리)", "axis_color": "밤색-크림",
+      "label_ko": "알밤 세트",
+      "title_en": "Roasted chestnut set illustration for Korean autumn harvest",
+      "title_ko": "한국 가을 수확 알밤 세트 일러스트",
+      "core_en": ["chestnut", "korean chestnut", "autumn nut", "harvest nut", "roasted chestnut", "fall food"],
+      "core_ko": ["밤", "알밤", "가을 견과", "수확 견과", "군밤", "가을 음식"],
+      "color_en": ["chestnut brown", "cream"],
+      "color_ko": ["밤색", "크림"],
+      "subject": "a small cluster of glossy brown chestnuts isolated on a clean white background",
+      "detail": "smooth rounded shells with soft shading",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "chestnut brown", "hex": "8A5A34"},
+        {"name": "warm cream", "hex": "F6ECD6"}
+      ],
+      "copy_space": "clean space around the chestnuts",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 4, "grp": "A", "shape": "제품형",
+      "axis_subject": "과일 선물세트 (A 먹거리)", "axis_color": "멀티-크림",
+      "label_ko": "추석 과일 세트",
+      "title_en": "Korean Chuseok harvest fruit gift set illustration",
+      "title_ko": "추석 수확 과일 선물세트 일러스트",
+      "core_en": ["fruit set", "harvest fruit", "chuseok gift", "apple and pear", "fruit basket", "holiday gift"],
+      "core_ko": ["과일 세트", "수확 과일", "추석 선물", "사과와 배", "과일 바구니", "명절 선물"],
+      "color_en": ["apple red", "pear gold"],
+      "color_ko": ["사과 빨강", "배 금색"],
+      "subject": "a grouped set of a red apple, a golden Korean pear and a persimmon isolated on a clean white background",
+      "detail": "simple flat fruits with soft highlights",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "apple red", "hex": "C6472F"},
+        {"name": "pear gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the fruit set",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 5, "grp": "B", "shape": "제품형",
+      "axis_subject": "보름달 (B 자연)", "axis_color": "크림-남색",
+      "label_ko": "보름달",
+      "title_en": "Glowing full harvest moon illustration for Korean Chuseok",
+      "title_ko": "추석 한가위 은은한 보름달 일러스트",
+      "core_en": ["full moon", "harvest moon", "chuseok moon", "glowing moon", "lunar", "round moon"],
+      "core_ko": ["보름달", "한가위 달", "추석 달", "빛나는 달", "루나", "둥근 달"],
+      "color_en": ["cream", "soft navy"],
+      "color_ko": ["크림", "남색"],
+      "subject": "a soft glowing cream full moon with a faint halo isolated on a clean white background",
+      "detail": "gentle gradient surface with subtle craters",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "moon cream", "hex": "F3E8CE"},
+        {"name": "soft navy", "hex": "3A4770"}
+      ],
+      "copy_space": "clean space around the moon",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 6, "grp": "B", "shape": "제품형",
+      "axis_subject": "단풍잎 세트 (B 자연)", "axis_color": "단풍-금빛",
+      "label_ko": "단풍잎 세트",
+      "title_en": "Autumn maple and ginkgo leaf set illustration",
+      "title_ko": "가을 단풍과 은행잎 세트 일러스트",
+      "core_en": ["maple leaf", "ginkgo leaf", "autumn leaves", "fall foliage", "leaf set", "seasonal leaf"],
+      "core_ko": ["단풍잎", "은행잎", "가을 낙엽", "가을 단풍", "잎 세트", "시즌 리프"],
+      "color_en": ["autumn red", "golden yellow"],
+      "color_ko": ["단풍 빨강", "황금 노랑"],
+      "subject": "a set of autumn maple and ginkgo leaves in warm tones isolated on a clean white background",
+      "detail": "flat leaves with clean simple veins",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "autumn red", "hex": "B84A2E"},
+        {"name": "golden yellow", "hex": "D8A93A"}
+      ],
+      "copy_space": "clean space between the leaves",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 7, "grp": "B", "shape": "제품형",
+      "axis_subject": "억새 (B 자연)", "axis_color": "베이지-금빛",
+      "label_ko": "억새 다발",
+      "title_en": "Autumn silver grass pampas bunch illustration",
+      "title_ko": "가을 억새 팜파스 다발 일러스트",
+      "core_en": ["silver grass", "pampas grass", "autumn reeds", "eulalia", "seasonal plant", "fall grass"],
+      "core_ko": ["억새", "팜파스", "가을 갈대", "은빛 억새", "시즌 식물", "가을 풀"],
+      "color_en": ["soft beige", "warm gold"],
+      "color_ko": ["베이지", "금빛"],
+      "subject": "a slender bunch of soft silver grass plumes isolated on a clean white background",
+      "detail": "fine feathery strands with airy shading",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "soft beige", "hex": "D8C9A8"},
+        {"name": "warm gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the grass",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 8, "grp": "B", "shape": "제품형",
+      "axis_subject": "달토끼 (B 자연)", "axis_color": "크림-남색",
+      "label_ko": "방아 찧는 달토끼",
+      "title_en": "Cute moon rabbit pounding rice cake illustration for Chuseok",
+      "title_ko": "추석 방아 찧는 귀여운 달토끼 일러스트",
+      "core_en": ["moon rabbit", "chuseok rabbit", "rice cake pounding", "folk rabbit", "cute bunny", "lunar rabbit"],
+      "core_ko": ["달토끼", "추석 토끼", "방아 찧기", "민속 토끼", "귀여운 토끼", "달 토끼"],
+      "color_en": ["soft cream", "navy"],
+      "color_ko": ["크림", "남색"],
+      "subject": "a cute white rabbit pounding rice cake with a small wooden mortar isolated on a clean white background",
+      "detail": "rounded friendly character with soft outline",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "soft cream", "hex": "F3E8CE"},
+        {"name": "night navy", "hex": "2C3663"}
+      ],
+      "copy_space": "clean space around the rabbit",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 9, "grp": "C", "shape": "제품형",
+      "axis_subject": "복주머니 (C 소품)", "axis_color": "남색-금빛",
+      "label_ko": "복주머니",
+      "title_en": "Korean traditional lucky pouch bokjumeoni illustration",
+      "title_ko": "한국 전통 복주머니 일러스트",
+      "core_en": ["lucky pouch", "bokjumeoni", "korean traditional", "fortune bag", "folk craft", "good luck charm"],
+      "core_ko": ["복주머니", "행운 주머니", "한국 전통", "복 주머니", "민속 공예", "행운 부적"],
+      "color_en": ["deep navy", "gold"],
+      "color_ko": ["남색", "금색"],
+      "subject": "a plump navy silk lucky pouch with a gold drawstring and tassel isolated on a clean white background",
+      "detail": "soft fabric folds with a small embroidered accent",
+      "camera": "overhead flat shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "deep navy", "hex": "2C3A5E"},
+        {"name": "warm gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the pouch",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 10, "grp": "C", "shape": "제품형",
+      "axis_subject": "달항아리 (C 소품)", "axis_color": "아이보리-먹색",
+      "label_ko": "달항아리",
+      "title_en": "White Korean moon jar traditional pottery illustration",
+      "title_ko": "한국 전통 백자 달항아리 일러스트",
+      "core_en": ["moon jar", "korean pottery", "white porcelain", "traditional ceramic", "dalhangari", "folk craft"],
+      "core_ko": ["달항아리", "한국 도자기", "백자", "전통 도자", "달 항아리", "민속 공예"],
+      "color_en": ["ivory white", "ink gray"],
+      "color_ko": ["아이보리 화이트", "먹색"],
+      "subject": "a rounded white Korean moon jar with soft shading isolated on a clean white background",
+      "detail": "smooth glaze with a gentle highlight",
+      "camera": "eye-level hero shot",
+      "lighting": "soft directional studio light",
+      "palette": [
+        {"name": "ivory white", "hex": "F0EBDE"},
+        {"name": "ink gray", "hex": "4A4A48"}
+      ],
+      "copy_space": "clean space around the jar",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 11, "grp": "C", "shape": "제품형",
+      "axis_subject": "보자기 선물보따리 (C 소품)", "axis_color": "남색-금빛",
+      "label_ko": "보자기 선물 보따리",
+      "title_en": "Korean bojagi wrapping cloth gift bundle illustration",
+      "title_ko": "한국 보자기 선물 보따리 일러스트",
+      "core_en": ["bojagi", "wrapping cloth", "gift bundle", "korean traditional", "holiday gift", "wrapped present"],
+      "core_ko": ["보자기", "보따리", "선물 보따리", "한국 전통", "명절 선물", "포장 선물"],
+      "color_en": ["navy", "gold"],
+      "color_ko": ["남색", "금색"],
+      "subject": "a gift bundle wrapped in navy bojagi cloth tied with a neat knot on top isolated on a clean white background",
+      "detail": "soft cloth folds with a subtle pattern",
+      "camera": "eye-level hero shot",
+      "lighting": "bright even studio light",
+      "palette": [
+        {"name": "deep navy", "hex": "2C3A5E"},
+        {"name": "warm gold", "hex": "C9A24B"}
+      ],
+      "copy_space": "clean space around the bundle",
+      "style": "warm flat illustration"
+    },
+    {
+      "n": 12, "grp": "C", "shape": "제품형",
+      "axis_subject": "청사초롱 (C 소품)", "axis_color": "청-홍",
+      "label_ko": "청사초롱 전통등",
+      "title_en": "Korean traditional cheongsachorong lantern illustration",
+      "title_ko": "한국 전통 청사초롱 등 일러스트",
+      "core_en": ["korean lantern", "cheongsachorong", "traditional lantern", "folk lantern", "festival light", "paper lantern"],
+      "core_ko": ["청사초롱", "전통 등", "한국 등", "민속 등", "축제 조명", "종이 등"],
+      "color_en": ["blue", "red"],
+      "color_ko": ["청색", "홍색"],
+      "subject": "a Korean traditional cheongsachorong lantern with blue and red silk panels and a small tassel isolated on a clean white background",
+      "detail": "clean geometric frame with soft glow",
+      "camera": "eye-level hero shot",
+      "lighting": "soft warm glow",
+      "palette": [
+        {"name": "traditional blue", "hex": "2E5A8A"},
+        {"name": "traditional red", "hex": "C63A2E"}
+      ],
+      "copy_space": "clean space around the lantern",
+      "style": "warm flat illustration"
+    }
+  ]
+}

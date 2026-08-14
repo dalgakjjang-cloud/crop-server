@@ -107,7 +107,7 @@ K-beauty·Pink·Gold 등 **모노톤 세트**에는 HEX가 훨씬 유효할 것�
 **우리 채택 결정:**
 미캔에서 "예쁨·귀여움" 축이 아직 요소·템플릿에서 잘 팔린다는 실측 판단에 따라,
 공냥킷의 TP9 · TP7 · TP6 세 패턴을 미캔 밝은 화이트톤·한국형 스타일로 재해석해서
-**`prompts/miricanvas_typo_kawaii_24_*.txt`** 로 별도 프롬프트 세트 신설.
+**`prompts/miri/miricanvas_typo_kawaii_24_*.txt`** 로 별도 프롬프트 세트 신설.
 
 24컷 구성:
 - TP9 인플레이터블 8컷 (풍선 3D 하트·리본·꽃·별 등)

@@ -1,0 +1,64 @@
+{
+  "_읽을것": "필드 설명은 references/spec-format.md 참고. _ 로 시작하는 키는 무시된다.",
+
+  "batch": "TODO_batch_20",
+  "signals_batch": "TODO-batch-20",
+  "slug": "TODO_batch",
+  "prefix": "miri-TODO",
+  "count": 20,
+  "header_note": "TODO 배치 설명 — 프롬프트 파일 헤더 첫 줄에 들어감",
+  "platform": "어도비+미캔",
+
+  "pools": {
+    "_주석": "병합 순서 = core → color → usecase → group → universal. 앞일수록 검색 가중치가 크다.",
+    "usecase_en": ["background", "banner", "template", "social media", "presentation"],
+    "usecase_ko": ["배경", "배너", "템플릿", "소셜 미디어", "프레젠테이션"],
+
+    "group_en": {
+      "A": ["TODO", "TODO", "TODO", "TODO", "TODO", "TODO", "TODO"],
+      "B": ["TODO", "TODO", "TODO", "TODO", "TODO", "TODO", "TODO"]
+    },
+    "group_ko": {
+      "A": ["TODO", "TODO", "TODO", "TODO", "TODO"],
+      "B": ["TODO", "TODO", "TODO", "TODO", "TODO"]
+    },
+
+    "universal_en": ["design element", "copy space", "modern", "minimal", "no people",
+                     "abstract", "contemporary", "clean"],
+    "universal_ko": ["디자인 요소", "여백", "모던", "미니멀", "사람 없음",
+                     "추상", "현대적", "깨끗한"]
+  },
+
+  "sections": [
+    {"title": "🅰 TODO 축 이름 (A)", "groups": ["A"]},
+    {"title": "🅱 TODO 축 이름 (B)", "groups": ["B"]}
+  ],
+
+  "cuts": [
+    {
+      "n": 1,
+      "grp": "A",
+      "shape": "배경형",
+      "axis_subject": "TODO 주제축",
+      "axis_color": "TODO 색축",
+      "label_ko": "TODO 한글 라벨",
+      "title_en": "TODO natural sentence title, no keyword stuffing",
+      "title_ko": "TODO 한글 제목",
+      "core_en": ["TODO", "TODO", "TODO", "TODO", "TODO", "TODO"],
+      "core_ko": ["TODO", "TODO", "TODO", "TODO", "TODO"],
+      "color_en": ["TODO", "TODO"],
+      "color_ko": ["TODO", "TODO"],
+      "subject": "TODO what and where — 프롬프트 첫 절",
+      "detail": "TODO 형태·질감 보충",
+      "camera": "eye-level hero shot",
+      "lighting": "bright soft studio daylight",
+      "palette": [
+        {"name": "TODO color name", "hex": "FFFFFF"},
+        {"name": "TODO color name", "hex": "000000"}
+      ],
+      "palette_tail": "",
+      "copy_space": "generous clean copy space around the subject",
+      "style": "TODO style tag"
+    }
+  ]
+}

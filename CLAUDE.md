@@ -42,21 +42,47 @@
   - 배포: `https://dalgakjjang-cloud.github.io/crop-server/hub.html`
 - **SEO 키워드 거버넌스** — 스톡 메타데이터 정본·검사기.
   - `freejjang-stock-studio/seo/` (규칙: `keyword-governance.md`, 검사: `python3 seo/seo-check.py`)
-- **프롬프트 세트** — `freejjang-stock-studio/prompts/` (엔진별 4종). **기존 프롬프트 파일은 지우지 않는다. 새 프롬프트는 새 파일로 추가한다.**
+- **프롬프트 세트** — `freejjang-stock-studio/prompts/<adobe|miri|공통>/` (엔진별 4종, 목적 플랫폼별로 하위 폴더 분리). adobe/ = 어도비에 낼 것, miri/ = 미캔에만 낼 것, 공통/ = 배치 안에서 컷마다 목적지 갈리는 것. **기존 프롬프트 파일은 지우지 않는다. 새 프롬프트는 새 파일로 추가한다.**
 - **미드저니 배치 (MJ Batch)** — 프롬프트 txt를 미드저니에 자동 입력해 대량 생성하는 **로컬 파이썬 도구**.
   - 코드: `midjourney-batch/` (`mj_batch.py`) · 웹앱 아님(내 컴퓨터에서 실행) · 허브에는 "로컬 도구"로 표시, GitHub 폴더로 링크.
 - **어도비 업스케일 (Upscale Tool)** — GPT·MJ로 뽑은 작은 그림을 어도비 최소선(400만 화소↑)으로 키우는 **로컬 파이썬 도구**.
   - 코드: `upscale-tool/` (`upscale_adobe.py` + `어도비업스케일.bat`) · 그림 폴더에 복사 후 bat 더블클릭 · 결과는 `upscaled/`에, 원본은 보존. 후처리 담당(생성 → 업스케일 → 어도비 업로드).
+- **템플릿 소득 라인 (`templates/`)** — 미캔 템플릿을 직접 만들어 파는 수익 라인. 스톡(컷 한 장)과 별개로 "바로 쓰는 세트(템플릿)"를 만든다.
+  - 데이터: `templates/trends.csv`(승인 템플릿 신호 누적), `templates/reports/`(주간 트렌드), `templates/specs/`(기획 명세서), `templates/imports/`(분석기 JSON 원본).
+  - 원칙: 승인≠수익 / 베끼지 않음(결만 참고) / 낱장보다 가족(세트).
+
+## 🛠 스킬 (`.claude/skills/`)
+
+세션마다 자동 로드된다. 관련 작업이 오면 스킬이 먼저다.
+
+- **stock-batch** — 주제+컷수 → 프롬프트 4엔진 + SEO 메타 + signals 한 번에. 스펙 JSON에서 파생.
+- **trend-intake** — 미캔 분석기 JSON → `templates/trends.csv` 병합 + 주간 리포트. 스테디셀러 자동 판정.
+- **template-spec** — 트렌드 신호 → 템플릿 기획 명세서(`templates/specs/`). §6 부품 주문서가 stock-batch로 이어짐.
+
+> 파이프라인: 분석기 → **trend-intake** → **template-spec** → **stock-batch** → 미캔 등록.
 
 ### 형제 도구들 (다른 곳에 배포됨)
 | 도구 | 주소 |
 |---|---|
 | 🎨 로고공방 | `https://dalgakjjang-cloud.github.io/logo-gongbang/` (repo: logo-gongbang) |
-| 🖼 벡터 아뜰리에 (Free.Atelier, 움짤 포함) | `https://free-atelier.pages.dev` (repo 없음 · 로컬 폴더 → wrangler 배포) |
+| 🖼 벡터 아뜰리에 (Free.Atelier, 움짤 포함) | `https://free-atelier.pages.dev` (repo 없음 · wrangler 배포) · **로컬 경로**: `C:\Users\COM\조롱이-배포` · 비밀번호 잠금: `functions/auth.js` (`const PASSWORD`) · **배포**: `cd "C:\Users\COM\조롱이-배포"` → `wrangler pages deploy . --project-name=free-atelier` |
 | ✂️ 자동크롭 | `https://autocrop-tool.hopot13.workers.dev/` (Cloudflare Workers) |
 | 📤 캔바대량 (Canva Bulk Converter) | `https://canva-bulk-converter.pages.dev/` (Cloudflare Pages · 사이트 비밀번호 있음 · 캔바 자동 대량 업로드 후 편집) |
 
 이 도구들은 서로 헤더 바로가기 + 허브로 연결돼 있다.
+
+### 💻 내 컴퓨터 로컬 폴더 경로 (사용자 PC = COM)
+> 세션마다 다시 물어보지 않기 위해 고정한다. 작업 요청이 오면 여기부터 본다.
+
+| 무엇 | 로컬 경로 | 비고 |
+|---|---|---|
+| 양산공장 코드 (crop-server 저장소) | `C:\Users\COM\crop-server` | git 저장소. GitHub Pages 자동 배포 |
+| 양산공장 작업 폴더 | `C:\Users\COM\Documents\이미지 양산공장` | outputs·work·MJ 배치 실행 결과 |
+| 아뜰리에 배포 폴더 (조롱이-배포) | `C:\Users\COM\조롱이-배포` | `functions/auth.js`에 비번 · `wrangler pages deploy . --project-name=free-atelier` |
+| 로고공방 | **로컬 폴더 없음** (2026-07-31 검색 확인) | GitHub(logo-gongbang) 웹에서 관리로 추정 |
+| 자동크롭 | **로컬 폴더 없음** (2026-07-31 검색 확인) | Cloudflare 대시보드에서 관리로 추정 |
+
+> 참고: `C:\Users\COM\crop-server2` 폴더도 있음 — crop-server의 복사본/백업으로 추정. 작업은 `crop-server`(2 없는 쪽)에서 한다.
 
 ---
 

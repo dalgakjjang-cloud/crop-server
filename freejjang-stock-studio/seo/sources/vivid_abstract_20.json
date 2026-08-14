@@ -1,0 +1,1251 @@
+{
+  "batch": "vivid_abstract_20",
+  "signals_batch": "vivid-abstract-20",
+  "slug": "vivid_abstract",
+  "prefix": "va",
+  "count": 20,
+  "header_note": "미리캔버스 비비드 추상 20컷 — 어도비 2026 트렌드 반영",
+  "platform": "어도비+미캔",
+  "pools": {
+    "usecase_en": [
+      "banner",
+      "template",
+      "social media",
+      "presentation",
+      "poster"
+    ],
+    "usecase_ko": [
+      "배너",
+      "템플릿",
+      "소셜 미디어",
+      "프레젠테이션",
+      "포스터"
+    ],
+    "group_en": {
+      "A": [
+        "fluid art",
+        "liquid",
+        "flowing",
+        "swirl",
+        "marble",
+        "organic",
+        "dynamic"
+      ],
+      "B": [
+        "3d render",
+        "gradient",
+        "blob",
+        "glossy",
+        "smooth",
+        "three dimensional",
+        "mesh gradient"
+      ],
+      "C": [
+        "texture",
+        "tactile",
+        "macro",
+        "surface",
+        "material",
+        "close up",
+        "sensory"
+      ],
+      "D": [
+        "geometric",
+        "shape",
+        "bauhaus",
+        "composition",
+        "flat design",
+        "graphic",
+        "pattern"
+      ],
+      "E": [
+        "surreal",
+        "dreamy",
+        "playful",
+        "imaginative",
+        "whimsical",
+        "floating",
+        "fantasy"
+      ]
+    },
+    "group_ko": {
+      "A": [
+        "유동적",
+        "리퀴드",
+        "흐름",
+        "소용돌이",
+        "마블",
+        "유기적",
+        "다이내믹"
+      ],
+      "B": [
+        "3d 렌더",
+        "그라데이션",
+        "블롭",
+        "광택",
+        "부드러운",
+        "입체",
+        "메시 그라데이션"
+      ],
+      "C": [
+        "텍스처",
+        "촉감",
+        "매크로",
+        "표면",
+        "재질",
+        "클로즈업",
+        "감각적"
+      ],
+      "D": [
+        "기하학",
+        "도형",
+        "바우하우스",
+        "구성",
+        "플랫 디자인",
+        "그래픽",
+        "패턴"
+      ],
+      "E": [
+        "초현실",
+        "몽환적",
+        "플레이풀",
+        "상상",
+        "위트",
+        "부유",
+        "판타지"
+      ]
+    },
+    "universal_en": [
+      "abstract",
+      "background",
+      "copy space",
+      "design element",
+      "vivid",
+      "saturated",
+      "colorful",
+      "modern",
+      "contemporary",
+      "no people",
+      "wallpaper",
+      "digital art",
+      "creative",
+      "bold"
+    ],
+    "universal_ko": [
+      "추상",
+      "배경",
+      "여백",
+      "디자인 요소",
+      "비비드",
+      "채도 높은",
+      "컬러풀",
+      "모던",
+      "현대적",
+      "사람 없음",
+      "월페이퍼",
+      "디지털 아트",
+      "크리에이티브",
+      "볼드"
+    ]
+  },
+  "sections": [
+    {
+      "title": "🌀 A. 리퀴드·플루이드 추상 (VA-A)",
+      "groups": [
+        "A"
+      ]
+    },
+    {
+      "title": "🫧 B. 3D 그라디언트·블롭 (VA-B)",
+      "groups": [
+        "B"
+      ]
+    },
+    {
+      "title": "🧶 C. 감각 텍스처 · All the Feels (VA-C)",
+      "groups": [
+        "C"
+      ]
+    },
+    {
+      "title": "🔺 D. 기하 추상 · 바우하우스/리소 (VA-D)",
+      "groups": [
+        "D"
+      ]
+    },
+    {
+      "title": "✨ E. 초현실·플레이풀 · Surreal Silliness (VA-E)",
+      "groups": [
+        "E"
+      ]
+    }
+  ],
+  "cuts": [
+    {
+      "n": 1,
+      "grp": "A",
+      "shape": "배경형",
+      "axis_subject": "잉크 블룸 (A 리퀴드)",
+      "axis_color": "비비드 마젠타-시안",
+      "label_ko": "잉크 블룸 (물속 확산)",
+      "title_en": "Vivid liquid ink blooming and diffusing in clear water",
+      "title_ko": "맑은 물속에서 퍼지는 비비드 잉크 블룸",
+      "core_en": [
+        "ink",
+        "ink bloom",
+        "diffusion",
+        "water",
+        "swirl",
+        "liquid ink"
+      ],
+      "core_ko": [
+        "잉크",
+        "잉크 블룸",
+        "확산",
+        "물",
+        "소용돌이",
+        "리퀴드 잉크"
+      ],
+      "color_en": [
+        "magenta",
+        "cyan",
+        "lime"
+      ],
+      "color_ko": [
+        "마젠타",
+        "시안",
+        "라임"
+      ],
+      "subject": "swirling liquid ink blooming and diffusing in clear water",
+      "camera": "macro abstract",
+      "lighting": "high saturation with luminous glow",
+      "palette": [
+        {
+          "name": "vivid magenta",
+          "hex": "FF2FB9"
+        },
+        {
+          "name": "electric cyan",
+          "hex": "00E5FF"
+        },
+        {
+          "name": "acid lime",
+          "hex": "B6FF3C"
+        }
+      ],
+      "copy_space": "generous clean copy space on one side",
+      "style": "vivid saturated fluid art"
+    },
+    {
+      "n": 2,
+      "grp": "A",
+      "shape": "배경형",
+      "axis_subject": "리퀴드 메탈 리본 (A 리퀴드)",
+      "axis_color": "비비드 크롬 이리데센트",
+      "label_ko": "리퀴드 메탈 리본",
+      "title_en": "Glossy liquid metal flowing in smooth iridescent ribbons",
+      "title_ko": "매끄러운 리본으로 흐르는 광택 리퀴드 메탈",
+      "core_en": [
+        "liquid metal",
+        "chrome",
+        "ribbon",
+        "metallic",
+        "iridescent",
+        "molten"
+      ],
+      "core_ko": [
+        "리퀴드 메탈",
+        "크롬",
+        "리본",
+        "메탈릭",
+        "이리데센트",
+        "용융"
+      ],
+      "color_en": [
+        "hot pink",
+        "cyan",
+        "gold"
+      ],
+      "color_ko": [
+        "핫핑크",
+        "시안",
+        "골드"
+      ],
+      "subject": "glossy liquid metal flowing in smooth ribbons",
+      "camera": "abstract macro",
+      "lighting": "studio reflection",
+      "palette": [
+        {
+          "name": "iridescent vivid chrome shifting hot pink",
+          "hex": "FF2FB9"
+        },
+        {
+          "name": "cyan",
+          "hex": "00E5FF"
+        },
+        {
+          "name": "gold",
+          "hex": "FFD400"
+        }
+      ],
+      "copy_space": "generous clean copy space above",
+      "style": "vivid saturated fluid art"
+    },
+    {
+      "n": 3,
+      "grp": "A",
+      "shape": "배경형",
+      "axis_subject": "아크릴 푸어 (A 리퀴드)",
+      "axis_color": "비비드 탠저린-바이올렛",
+      "label_ko": "아크릴 페인트 푸어",
+      "title_en": "Thick acrylic paint pour with blooming cells and lacing",
+      "title_ko": "셀과 레이싱이 피어난 두꺼운 아크릴 페인트 푸어",
+      "core_en": [
+        "acrylic pour",
+        "paint",
+        "fluid painting",
+        "paint cells",
+        "pouring",
+        "abstract painting"
+      ],
+      "core_ko": [
+        "아크릴 푸어",
+        "페인트",
+        "플루이드 페인팅",
+        "셀",
+        "푸어링",
+        "추상화"
+      ],
+      "color_en": [
+        "tangerine",
+        "ultraviolet",
+        "yellow"
+      ],
+      "color_ko": [
+        "탠저린",
+        "울트라바이올렛",
+        "옐로"
+      ],
+      "subject": "thick acrylic paint pour with blooming cells and lacing",
+      "camera": "top-down abstract macro",
+      "lighting": "saturated and glossy",
+      "palette": [
+        {
+          "name": "bold vivid tangerine",
+          "hex": "FF7A18"
+        },
+        {
+          "name": "ultraviolet",
+          "hex": "7A2BFF"
+        },
+        {
+          "name": "sunny yellow",
+          "hex": "FFD400"
+        }
+      ],
+      "copy_space": "generous clean copy space in one corner",
+      "style": "vivid saturated fluid art"
+    },
+    {
+      "n": 4,
+      "grp": "A",
+      "shape": "배경형",
+      "axis_subject": "오일 버블 (A 리퀴드)",
+      "axis_color": "비비드 코랄-틸",
+      "label_ko": "오일 버블 매크로",
+      "title_en": "Macro of colorful oil and water bubbles and droplets",
+      "title_ko": "컬러풀한 오일 앤 워터 버블 매크로",
+      "core_en": [
+        "oil bubble",
+        "droplet",
+        "bubble",
+        "water drop",
+        "oil and water",
+        "macro bubble"
+      ],
+      "core_ko": [
+        "오일 버블",
+        "물방울",
+        "버블",
+        "워터 드롭",
+        "오일 앤 워터",
+        "매크로 버블"
+      ],
+      "color_en": [
+        "coral",
+        "teal",
+        "magenta"
+      ],
+      "color_ko": [
+        "코랄",
+        "틸",
+        "마젠타"
+      ],
+      "subject": "macro of colorful oil-and-water bubbles and droplets",
+      "camera": "abstract macro",
+      "lighting": "glowing translucent",
+      "palette": [
+        {
+          "name": "saturated candy hot coral",
+          "hex": "FF4D6D"
+        },
+        {
+          "name": "teal",
+          "hex": "12C4B6"
+        },
+        {
+          "name": "magenta",
+          "hex": "FF2FB9"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated fluid art"
+    },
+    {
+      "n": 5,
+      "grp": "B",
+      "shape": "배경형",
+      "axis_subject": "소프트 3D 블롭 (B 그라디언트)",
+      "axis_color": "비비드 마젠타-탠저린",
+      "label_ko": "소프트 3D 블롭",
+      "title_en": "Soft matte 3D blob shapes floating in a dreamy space",
+      "title_ko": "몽환적 공간에 떠 있는 소프트 매트 3D 블롭",
+      "core_en": [
+        "blob",
+        "3d shape",
+        "matte",
+        "floating shape",
+        "soft shape",
+        "abstract form"
+      ],
+      "core_ko": [
+        "블롭",
+        "3d 도형",
+        "매트",
+        "부유 도형",
+        "소프트 셰이프",
+        "추상 형태"
+      ],
+      "color_en": [
+        "magenta",
+        "tangerine"
+      ],
+      "color_ko": [
+        "마젠타",
+        "탠저린"
+      ],
+      "subject": "soft matte 3D blob shapes floating in a dreamy space",
+      "camera": "studio abstract",
+      "lighting": "soft with gentle shadows",
+      "palette": [
+        {
+          "name": "vivid gradient magenta",
+          "hex": "FF2FB9"
+        },
+        {
+          "name": "tangerine",
+          "hex": "FF7A18"
+        }
+      ],
+      "copy_space": "generous clean copy space around the blobs",
+      "style": "vivid saturated 3D render"
+    },
+    {
+      "n": 6,
+      "grp": "B",
+      "shape": "배경형",
+      "axis_subject": "그라디언트 오브 (B 그라디언트)",
+      "axis_color": "비비드 블루-바이올렛",
+      "label_ko": "그라디언트 오브 클러스터",
+      "title_en": "A cluster of glossy gradient sphere orbs",
+      "title_ko": "광택 그라데이션 구체 오브 클러스터",
+      "core_en": [
+        "orb",
+        "sphere",
+        "ball",
+        "glossy sphere",
+        "gradient orb",
+        "cluster"
+      ],
+      "core_ko": [
+        "오브",
+        "구체",
+        "볼",
+        "광택 구체",
+        "그라데이션 오브",
+        "클러스터"
+      ],
+      "color_en": [
+        "electric blue",
+        "ultraviolet",
+        "pink"
+      ],
+      "color_ko": [
+        "일렉트릭 블루",
+        "울트라바이올렛",
+        "핑크"
+      ],
+      "subject": "a cluster of glossy gradient sphere orbs",
+      "camera": "studio abstract",
+      "lighting": "soft ambient shadows",
+      "palette": [
+        {
+          "name": "vivid electric blue",
+          "hex": "2E6BFF"
+        },
+        {
+          "name": "ultraviolet",
+          "hex": "7A2BFF"
+        },
+        {
+          "name": "pink",
+          "hex": "FF2FB9"
+        }
+      ],
+      "copy_space": "generous clean copy space on one side",
+      "style": "vivid saturated 3D render"
+    },
+    {
+      "n": 7,
+      "grp": "B",
+      "shape": "배경형",
+      "axis_subject": "메쉬 웨이브 (B 그라디언트)",
+      "axis_color": "비비드 코랄-인디고",
+      "label_ko": "그라디언트 메쉬 웨이브",
+      "title_en": "A smooth flowing gradient mesh wave in vivid sunset tones",
+      "title_ko": "비비드 선셋 톤의 부드러운 그라데이션 메쉬 웨이브",
+      "core_en": [
+        "mesh gradient",
+        "wave",
+        "flowing wave",
+        "curve",
+        "silk",
+        "smooth wave"
+      ],
+      "core_ko": [
+        "메시 그라데이션",
+        "웨이브",
+        "흐르는 물결",
+        "곡선",
+        "실크",
+        "부드러운 웨이브"
+      ],
+      "color_en": [
+        "coral",
+        "magenta",
+        "indigo"
+      ],
+      "color_ko": [
+        "코랄",
+        "마젠타",
+        "인디고"
+      ],
+      "subject": "a smooth flowing gradient mesh wave",
+      "camera": "abstract",
+      "lighting": "silky and luminous",
+      "palette": [
+        {
+          "name": "vivid sunset coral",
+          "hex": "FF4D6D"
+        },
+        {
+          "name": "magenta",
+          "hex": "FF2FB9"
+        },
+        {
+          "name": "indigo",
+          "hex": "2B1B6B"
+        }
+      ],
+      "copy_space": "generous clean copy space in the upper area",
+      "style": "vivid saturated 3D render"
+    },
+    {
+      "n": 8,
+      "grp": "B",
+      "shape": "배경형",
+      "axis_subject": "홀로그래픽 리본 (B 그라디언트)",
+      "axis_color": "비비드 홀로그래픽",
+      "label_ko": "홀로그래픽 리본 루프",
+      "title_en": "A twisted glossy 3D holographic ribbon loop floating",
+      "title_ko": "떠 있는 홀로그래픽 3D 리본 루프",
+      "core_en": [
+        "ribbon",
+        "loop",
+        "holographic",
+        "twisted ribbon",
+        "3d ribbon",
+        "iridescent"
+      ],
+      "core_ko": [
+        "리본",
+        "루프",
+        "홀로그래픽",
+        "꼬인 리본",
+        "3d 리본",
+        "이리데센트"
+      ],
+      "color_en": [
+        "cyan",
+        "pink",
+        "lime"
+      ],
+      "color_ko": [
+        "시안",
+        "핑크",
+        "라임"
+      ],
+      "subject": "a twisted glossy 3D ribbon loop floating",
+      "camera": "studio abstract",
+      "lighting": "soft studio",
+      "palette": [
+        {
+          "name": "vivid holographic cyan",
+          "hex": "00E5FF"
+        },
+        {
+          "name": "pink",
+          "hex": "FF2FB9"
+        },
+        {
+          "name": "lime",
+          "hex": "B6FF3C"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated 3D render"
+    },
+    {
+      "n": 9,
+      "grp": "C",
+      "shape": "배경형",
+      "axis_subject": "벨벳 주름 (C 텍스처)",
+      "axis_color": "비비드 바이올렛-마젠타",
+      "label_ko": "벨벳 주름 매크로",
+      "title_en": "Extreme macro of soft velvet fabric folds with deep sheen",
+      "title_ko": "깊은 광택의 벨벳 원단 주름 익스트림 매크로",
+      "core_en": [
+        "velvet",
+        "fabric",
+        "fold",
+        "drape",
+        "textile",
+        "plush"
+      ],
+      "core_ko": [
+        "벨벳",
+        "원단",
+        "주름",
+        "드레이프",
+        "텍스타일",
+        "플러시"
+      ],
+      "color_en": [
+        "ultraviolet",
+        "magenta"
+      ],
+      "color_ko": [
+        "울트라바이올렛",
+        "마젠타"
+      ],
+      "subject": "extreme macro of soft velvet fabric folds",
+      "camera": "extreme macro",
+      "lighting": "soft tactile raking light",
+      "palette": [
+        {
+          "name": "vivid ultraviolet",
+          "hex": "7A2BFF"
+        },
+        {
+          "name": "magenta",
+          "hex": "FF2FB9"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated tactile texture"
+    },
+    {
+      "n": 10,
+      "grp": "C",
+      "shape": "배경형",
+      "axis_subject": "소프트 듄 (C 텍스처)",
+      "axis_color": "비비드 코랄-옐로",
+      "label_ko": "소프트 듄 표면",
+      "title_en": "A rippled soft 3D dune surface like sculpted sand",
+      "title_ko": "조각한 모래 같은 소프트 3D 듄 표면",
+      "core_en": [
+        "dune",
+        "sand",
+        "ripple",
+        "wave surface",
+        "sculpted",
+        "undulating"
+      ],
+      "core_ko": [
+        "듄",
+        "모래",
+        "물결",
+        "웨이브 표면",
+        "조각된",
+        "기복"
+      ],
+      "color_en": [
+        "coral",
+        "yellow"
+      ],
+      "color_ko": [
+        "코랄",
+        "옐로"
+      ],
+      "subject": "a rippled soft 3D dune surface like sculpted sand",
+      "camera": "abstract",
+      "lighting": "warm raking light with soft shadows",
+      "palette": [
+        {
+          "name": "vivid coral",
+          "hex": "FF4D6D"
+        },
+        {
+          "name": "sunny yellow",
+          "hex": "FFD400"
+        }
+      ],
+      "copy_space": "generous clean copy space in the sky area",
+      "style": "vivid saturated tactile texture"
+    },
+    {
+      "n": 11,
+      "grp": "C",
+      "shape": "배경형",
+      "axis_subject": "니트 울 (C 텍스처)",
+      "axis_color": "비비드 캔디핑크-라임",
+      "label_ko": "니트 울 텍스처",
+      "title_en": "Macro of soft plush knitted wool texture",
+      "title_ko": "부드러운 니트 울 텍스처 매크로",
+      "core_en": [
+        "knit",
+        "wool",
+        "yarn",
+        "knitted",
+        "cozy",
+        "plush texture"
+      ],
+      "core_ko": [
+        "니트",
+        "울",
+        "실",
+        "니팅",
+        "포근한",
+        "플러시 텍스처"
+      ],
+      "color_en": [
+        "candy pink",
+        "lime"
+      ],
+      "color_ko": [
+        "캔디 핑크",
+        "라임"
+      ],
+      "subject": "macro of soft plush knitted wool texture",
+      "camera": "macro",
+      "lighting": "cozy tactile soft light",
+      "palette": [
+        {
+          "name": "vivid candy pink",
+          "hex": "FF7EC8"
+        },
+        {
+          "name": "acid lime",
+          "hex": "B6FF3C"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated tactile texture"
+    },
+    {
+      "n": 12,
+      "grp": "C",
+      "shape": "배경형",
+      "axis_subject": "글로시 젤 (C 텍스처)",
+      "axis_color": "비비드 앰버-핑크",
+      "label_ko": "글로시 젤·허니",
+      "title_en": "Macro of glossy dripping gel and honey-like liquid",
+      "title_ko": "흘러내리는 광택 젤과 허니 리퀴드 매크로",
+      "core_en": [
+        "gel",
+        "honey",
+        "drip",
+        "glossy liquid",
+        "syrup",
+        "viscous"
+      ],
+      "core_ko": [
+        "젤",
+        "허니",
+        "드립",
+        "광택 리퀴드",
+        "시럽",
+        "점성"
+      ],
+      "color_en": [
+        "amber",
+        "pink"
+      ],
+      "color_ko": [
+        "앰버",
+        "핑크"
+      ],
+      "subject": "macro of glossy dripping gel and honey-like liquid",
+      "camera": "macro",
+      "lighting": "glistening sensory highlights",
+      "palette": [
+        {
+          "name": "vivid amber",
+          "hex": "FF9E1B"
+        },
+        {
+          "name": "pink",
+          "hex": "FF2FB9"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated tactile texture"
+    },
+    {
+      "n": 13,
+      "grp": "D",
+      "shape": "배경형",
+      "axis_subject": "볼드 플랫 지오메트리 (D 기하)",
+      "axis_color": "비비드 프라이머리",
+      "label_ko": "볼드 플랫 지오메트리",
+      "title_en": "Bold overlapping flat geometric shapes with circles arcs and triangles",
+      "title_ko": "원·아크·삼각형이 겹친 볼드 플랫 지오메트리",
+      "core_en": [
+        "flat design",
+        "circle",
+        "arc",
+        "triangle",
+        "overlapping shapes",
+        "bold shapes"
+      ],
+      "core_ko": [
+        "플랫 디자인",
+        "원",
+        "아크",
+        "삼각형",
+        "겹친 도형",
+        "볼드 도형"
+      ],
+      "color_en": [
+        "magenta",
+        "cyan",
+        "yellow"
+      ],
+      "color_ko": [
+        "마젠타",
+        "시안",
+        "옐로"
+      ],
+      "subject": "bold overlapping flat geometric shapes, circles arcs and triangles",
+      "camera": "flat composition",
+      "lighting": "even",
+      "palette": [
+        {
+          "name": "vivid primary and neon magenta",
+          "hex": "FF2FB9"
+        },
+        {
+          "name": "cyan",
+          "hex": "00E5FF"
+        },
+        {
+          "name": "yellow",
+          "hex": "FFD400"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated geometric art"
+    },
+    {
+      "n": 14,
+      "grp": "D",
+      "shape": "배경형",
+      "axis_subject": "3D 프리미티브 (D 기하)",
+      "axis_color": "비비드 탠저린-바이올렛",
+      "label_ko": "3D 지오메트릭 프리미티브",
+      "title_en": "Floating 3D geometric primitives with cubes spheres and cones",
+      "title_ko": "큐브·구체·콘이 떠 있는 3D 기하 프리미티브",
+      "core_en": [
+        "cube",
+        "sphere",
+        "cone",
+        "primitive",
+        "isometric",
+        "3d shapes"
+      ],
+      "core_ko": [
+        "큐브",
+        "구체",
+        "콘",
+        "프리미티브",
+        "아이소메트릭",
+        "3d 도형"
+      ],
+      "color_en": [
+        "tangerine",
+        "ultraviolet"
+      ],
+      "color_ko": [
+        "탠저린",
+        "울트라바이올렛"
+      ],
+      "subject": "floating 3D geometric primitives, cubes spheres and cones",
+      "camera": "isometric",
+      "lighting": "soft shadows",
+      "palette": [
+        {
+          "name": "vivid gradient tangerine",
+          "hex": "FF7A18"
+        },
+        {
+          "name": "ultraviolet",
+          "hex": "7A2BFF"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated geometric art"
+    },
+    {
+      "n": 15,
+      "grp": "D",
+      "shape": "배경형",
+      "axis_subject": "콘센트릭 아크 (D 기하)",
+      "axis_color": "비비드 레트로 탠저린",
+      "label_ko": "콘센트릭 아크·닷",
+      "title_en": "Rhythmic concentric arcs and dots pattern in retro vivid tones",
+      "title_ko": "레트로 비비드 톤의 리드미컬한 동심원 아크와 도트",
+      "core_en": [
+        "concentric",
+        "arc",
+        "dot",
+        "rhythm",
+        "retro pattern",
+        "circles"
+      ],
+      "core_ko": [
+        "동심원",
+        "아크",
+        "도트",
+        "리듬",
+        "레트로 패턴",
+        "원형"
+      ],
+      "color_en": [
+        "tangerine",
+        "teal",
+        "magenta"
+      ],
+      "color_ko": [
+        "탠저린",
+        "틸",
+        "마젠타"
+      ],
+      "subject": "rhythmic concentric arcs and dots pattern",
+      "camera": "flat",
+      "lighting": "even",
+      "palette": [
+        {
+          "name": "vivid retro tangerine",
+          "hex": "FF7A18"
+        },
+        {
+          "name": "teal",
+          "hex": "12C4B6"
+        },
+        {
+          "name": "magenta",
+          "hex": "FF2FB9"
+        }
+      ],
+      "copy_space": "generous clean copy space in the center",
+      "style": "vivid saturated geometric art"
+    },
+    {
+      "n": 16,
+      "grp": "D",
+      "shape": "배경형",
+      "axis_subject": "페이퍼컷 힐 (D 기하)",
+      "axis_color": "비비드 코랄-시안",
+      "label_ko": "페이퍼컷 힐",
+      "title_en": "Layered paper-cut style abstract rolling hills",
+      "title_ko": "겹겹이 쌓인 페이퍼컷 스타일 추상 언덕",
+      "core_en": [
+        "paper cut",
+        "layered",
+        "hills",
+        "papercraft",
+        "layers",
+        "paper art"
+      ],
+      "core_ko": [
+        "페이퍼컷",
+        "레이어",
+        "언덕",
+        "페이퍼크래프트",
+        "겹",
+        "페이퍼 아트"
+      ],
+      "color_en": [
+        "coral",
+        "magenta",
+        "ultraviolet",
+        "cyan"
+      ],
+      "color_ko": [
+        "코랄",
+        "마젠타",
+        "울트라바이올렛",
+        "시안"
+      ],
+      "subject": "layered paper-cut style abstract rolling hills",
+      "camera": "abstract",
+      "lighting": "soft depth shadows",
+      "palette": [
+        {
+          "name": "vivid coral",
+          "hex": "FF4D6D"
+        },
+        {
+          "name": "magenta",
+          "hex": "FF2FB9"
+        },
+        {
+          "name": "ultraviolet",
+          "hex": "7A2BFF"
+        },
+        {
+          "name": "cyan",
+          "hex": "00E5FF"
+        }
+      ],
+      "copy_space": "generous clean copy space in the sky",
+      "style": "vivid saturated geometric art"
+    },
+    {
+      "n": 17,
+      "grp": "E",
+      "shape": "배경형",
+      "axis_subject": "코튼캔디 구름 (E 초현실)",
+      "axis_color": "비비드 핑크-시안",
+      "label_ko": "초현실 코튼캔디 구름",
+      "title_en": "Surreal cotton-candy clouds drifting in a saturated dream sky",
+      "title_ko": "채도 높은 꿈결 하늘에 떠가는 초현실 솜사탕 구름",
+      "core_en": [
+        "cloud",
+        "cotton candy",
+        "dream sky",
+        "floating cloud",
+        "fluffy",
+        "sky"
+      ],
+      "core_ko": [
+        "구름",
+        "솜사탕",
+        "꿈결 하늘",
+        "떠 있는 구름",
+        "폭신한",
+        "하늘"
+      ],
+      "color_en": [
+        "pink",
+        "cyan"
+      ],
+      "color_ko": [
+        "핑크",
+        "시안"
+      ],
+      "subject": "surreal floating clouds made of cotton-candy pink and cyan drifting in a saturated dream sky",
+      "camera": "dreamlike abstract",
+      "lighting": "soft glow",
+      "palette": [
+        {
+          "name": "vivid pink",
+          "hex": "FF7EC8"
+        },
+        {
+          "name": "cyan",
+          "hex": "00E5FF"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated surreal art"
+    },
+    {
+      "n": 18,
+      "grp": "E",
+      "shape": "배경형",
+      "axis_subject": "그라디언트 포탈 (E 초현실)",
+      "axis_color": "비비드 바이올렛-시안",
+      "label_ko": "그라디언트 포탈",
+      "title_en": "A glowing vivid gradient portal doorway floating in an abstract void",
+      "title_ko": "추상 공간에 떠 있는 발광 그라데이션 포탈",
+      "core_en": [
+        "portal",
+        "doorway",
+        "gateway",
+        "glowing portal",
+        "void",
+        "arch"
+      ],
+      "core_ko": [
+        "포탈",
+        "문",
+        "게이트웨이",
+        "발광 포탈",
+        "보이드",
+        "아치"
+      ],
+      "color_en": [
+        "ultraviolet",
+        "magenta",
+        "cyan"
+      ],
+      "color_ko": [
+        "울트라바이올렛",
+        "마젠타",
+        "시안"
+      ],
+      "subject": "a glowing vivid gradient portal doorway floating in an abstract saturated void",
+      "camera": "surreal abstract",
+      "lighting": "inner glow",
+      "palette": [
+        {
+          "name": "vivid ultraviolet",
+          "hex": "7A2BFF"
+        },
+        {
+          "name": "magenta",
+          "hex": "FF2FB9"
+        },
+        {
+          "name": "cyan",
+          "hex": "00E5FF"
+        }
+      ],
+      "copy_space": "generous clean copy space around it",
+      "style": "vivid saturated surreal art"
+    },
+    {
+      "n": 19,
+      "grp": "E",
+      "shape": "배경형",
+      "axis_subject": "멜팅 지오메트리 (E 초현실)",
+      "axis_color": "비비드 네온 마젠타",
+      "label_ko": "멜팅 지오메트리",
+      "title_en": "Melting surreal geometric shapes dripping and stretching",
+      "title_ko": "흘러내리며 늘어나는 초현실 멜팅 지오메트리",
+      "core_en": [
+        "melting",
+        "drip",
+        "distortion",
+        "stretched",
+        "warped",
+        "surreal shape"
+      ],
+      "core_ko": [
+        "멜팅",
+        "드립",
+        "왜곡",
+        "늘어난",
+        "뒤틀린",
+        "초현실 도형"
+      ],
+      "color_en": [
+        "neon magenta",
+        "lime",
+        "cyan"
+      ],
+      "color_ko": [
+        "네온 마젠타",
+        "라임",
+        "시안"
+      ],
+      "subject": "melting surreal geometric shapes dripping and stretching",
+      "camera": "surreal abstract",
+      "lighting": "dreamy glossy",
+      "palette": [
+        {
+          "name": "vivid neon magenta",
+          "hex": "FF2FB9"
+        },
+        {
+          "name": "lime",
+          "hex": "B6FF3C"
+        },
+        {
+          "name": "cyan",
+          "hex": "00E5FF"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated surreal art"
+    },
+    {
+      "n": 20,
+      "grp": "E",
+      "shape": "배경형",
+      "axis_subject": "프로즌 스플래시 (E 초현실)",
+      "axis_color": "비비드 코랄-시안",
+      "label_ko": "프로즌 리퀴드 스플래시",
+      "title_en": "An abstract liquid splash frozen mid-air into floating droplets",
+      "title_ko": "공중에 멈춘 추상 리퀴드 스플래시",
+      "core_en": [
+        "splash",
+        "frozen motion",
+        "droplet",
+        "mid air",
+        "liquid splash",
+        "suspended"
+      ],
+      "core_ko": [
+        "스플래시",
+        "정지된 순간",
+        "물방울",
+        "공중",
+        "리퀴드 스플래시",
+        "부유"
+      ],
+      "color_en": [
+        "hot coral",
+        "tangerine",
+        "cyan"
+      ],
+      "color_ko": [
+        "핫 코랄",
+        "탠저린",
+        "시안"
+      ],
+      "subject": "an abstract liquid splash frozen mid-air into surreal floating droplets and ribbons",
+      "camera": "surreal abstract",
+      "lighting": "luminous",
+      "palette": [
+        {
+          "name": "vivid hot coral",
+          "hex": "FF4D6D"
+        },
+        {
+          "name": "tangerine",
+          "hex": "FF7A18"
+        },
+        {
+          "name": "cyan",
+          "hex": "00E5FF"
+        }
+      ],
+      "copy_space": "generous clean copy space",
+      "style": "vivid saturated surreal art"
+    }
+  ],
+  "mj_flags": "--ar 16:9 --s 350 --v 8.2",
+  "mj_negative": "text, letters, words, numbers, logo, watermark, brand, signature, people, faces, low resolution, jpeg artifacts"
+}

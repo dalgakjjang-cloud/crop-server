@@ -1,0 +1,94 @@
+# 미리캔버스 가을 배경·텍스처 24컷 — 어도비 시즌 선점용 (축제 소재는 autumn-moon-60이 담당) (GPT용)
+# ─────────────────────────────────────────────────────────
+# 미캔 시그니처 유지: 밝은 톤 + 넉넉한 텍스트 여백 + 배경까지 선명
+# 사용자가 자기 한글 문구를 얹기 좋게 → 중앙 또는 여백 텍스트 자리 확보
+# HEX 팔레트 명시 → 색감 정확도 향상
+# ─────────────────────────────────────────────────────────
+
+# ══════════════════════════════════════════
+# 🍂 A. 가을 컬러 그라데이션·추상 (AB-A)
+# ══════════════════════════════════════════
+
+--- 01 웜 앰버 그라데이션 ---
+a smooth warm amber to rust gradient filling the frame, soft continuous blend with no banding, camera: abstract, lighting: bright soft even light, palette: warm amber #E8A33D and deep rust #B85C38, generous clean copy space in the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, soft autumn abstract background styling
+
+--- 02 단풍 워터컬러 워시 ---
+a loose autumn watercolor wash bleeding softly across textured paper, visible paper grain and soft pigment edges, camera: overhead flat, lighting: bright soft daylight, palette: burnt orange #D2691E and golden yellow #E3B23C, generous clean copy space in the lower half, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, soft autumn abstract background styling
+
+--- 03 베이지 테라코타 블러 ---
+a softly blurred beige and terracotta backdrop with gentle tonal shift, creamy out-of-focus gradient, camera: abstract, lighting: diffused warm light, palette: warm beige #D9C3A5 and terracotta #C1704F, generous clean copy space throughout, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, soft autumn abstract background styling
+
+--- 04 낙엽 실루엣 추상 ---
+a few minimal falling leaf silhouettes scattered on a warm cream background, clean flat shapes with generous negative space, camera: overhead flat, lighting: bright even light, palette: warm cream #F3E6D2 and olive #7C7A44, generous clean copy space in the middle, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, soft autumn abstract background styling
+
+--- 05 가을 컬러블록 ---
+a calm autumn color block layout of soft rectangles, clean hard edges with balanced proportions, camera: overhead flat, lighting: bright even studio light, palette: mustard #D9A441 and clay #A9705B, generous clean copy space on the right, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, soft autumn abstract background styling
+
+--- 06 앰버 잉크 마블 ---
+swirling amber and burgundy ink marbling spreading softly, delicate feathered veins, camera: macro abstract, lighting: bright soft light, palette: amber #D99A2B and burgundy #7B2D3A, generous clean copy space on one side, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, soft autumn abstract background styling
+
+# ══════════════════════════════════════════
+# 🧶 B. 가을 소재 텍스처 (AB-B)
+# ══════════════════════════════════════════
+
+--- 07 오트밀 니트 텍스처 ---
+an extreme macro of soft oatmeal knitted wool, visible loops and gentle fiber halo, camera: extreme macro, lighting: soft tactile raking light, palette: oatmeal #E0D5C0 and warm cream #F5EDE0, generous clean copy space across the surface, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cozy autumn material texture styling
+
+--- 08 러스트 코듀로이 ---
+an extreme macro of rust corduroy fabric with even ribs, soft velvety pile catching the light, camera: extreme macro, lighting: soft raking light, palette: rust #A85830 and warm brown #6E4630, generous clean copy space across the surface, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cozy autumn material texture styling
+
+--- 09 크래프트 종이 질감 ---
+a flat sheet of warm kraft paper filling the frame, fine visible fibers and gentle tonal variation, camera: overhead flat, lighting: bright even light, palette: kraft brown #B08968 and tan #D8C0A0, generous clean copy space across the sheet, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cozy autumn material texture styling
+
+--- 10 린넨 원단 베이지 ---
+a natural beige linen weave filling the frame, soft irregular threads and gentle folds, camera: overhead flat, lighting: soft diffused daylight, palette: beige #DCCDB4 and sand #C4B091, generous clean copy space across the fabric, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cozy autumn material texture styling
+
+--- 11 오크 나무결 ---
+a warm oak wood surface with flowing grain, natural rings and soft satin finish, camera: overhead flat, lighting: bright soft daylight, palette: oak brown #9C6B45 and honey #D2A24C, generous clean copy space across the board, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cozy autumn material texture styling
+
+--- 12 펠트 울 텍스처 ---
+a soft mustard wool felt surface filling the frame, dense matte fibers with a gentle nap, camera: extreme macro, lighting: soft even light, palette: mustard #D6A038 and camel #B98F5F, generous clean copy space across the surface, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, cozy autumn material texture styling
+
+# ══════════════════════════════════════════
+# 🌅 C. 가을 빛·보케 배경 (AB-C)
+# ══════════════════════════════════════════
+
+--- 13 골든아워 보케 ---
+warm golden hour bokeh circles drifting across a soft dark-warm field, round out-of-focus highlights of varying size, camera: abstract, lighting: backlit golden hour glow, palette: golden #E5A93C and honey #C98A3E, generous clean copy space in the lower area, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm autumn light background styling
+
+--- 14 창가 가을 그림자 ---
+soft window light casting a gentle shadow pattern across a warm plain wall, clean geometric shadow edges, camera: eye-level composed, lighting: warm directional daylight, palette: warm white #F0E7DA and sand #C9B79C, generous clean copy space on the lit area, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm autumn light background styling
+
+--- 15 나뭇잎 사이 햇빛 ---
+dappled sunlight filtering softly through autumn foliage, soft light pools and gentle leaf shadows, camera: abstract, lighting: warm backlit sunlight, palette: golden green #A8A560 and amber #D79A3C, generous clean copy space, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm autumn light background styling
+
+--- 16 캔들 웜 글로우 ---
+a soft warm candle glow blooming into gentle bokeh in a cozy dim setting, smooth falloff from glow to shadow, camera: abstract, lighting: warm low-key candlelight, palette: warm orange #D98038 and deep brown #3A2A1F, generous clean copy space in the dark area, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm autumn light background styling
+
+--- 17 안개 낀 가을 아침 ---
+a soft misty autumn morning haze glowing with low sunlight, layered atmospheric depth, camera: abstract, lighting: soft low morning sun, palette: misty grey #C6C3BA and soft gold #DDB877, generous clean copy space in the upper area, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm autumn light background styling
+
+--- 18 석양 웜 하늘 ---
+a wide warm autumn sunset sky fading from orange to dusty pink, smooth cloudless gradient, camera: eye-level composed, lighting: golden hour sunset light, palette: sunset orange #E58A4B and dusty pink #D2A0A0, generous clean copy space across the sky, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, warm autumn light background styling
+
+# ══════════════════════════════════════════
+# 🍁 D. 가을 플랫레이 여백 배경 (AB-D)
+# ══════════════════════════════════════════
+
+--- 19 니트 스웨터 위 여백 ---
+a cozy oatmeal knit sweater laid flat filling the frame, soft folds gathered toward one edge, camera: overhead flat, lighting: soft diffused daylight, palette: oatmeal #E2D6C0 and caramel #B98A55, generous clean copy space in the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, styled autumn flat lay background styling
+
+--- 20 크래프트 노트 + 낙엽 ---
+a plain kraft notebook with a few dry autumn leaves arranged in one corner, clean uncluttered arrangement, camera: overhead flat, lighting: bright soft daylight, palette: kraft brown #B58B60 and russet #9C4A28, generous clean copy space beside the notebook, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, styled autumn flat lay background styling
+
+--- 21 커피잔 코너 여백 ---
+a warm coffee cup placed in one corner of a clean light surface, soft steam and a calm minimal setup, camera: overhead flat, lighting: bright soft daylight, palette: warm cream #F2E8DA and espresso brown #5A3B28, generous clean copy space across the rest, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, styled autumn flat lay background styling
+
+--- 22 유칼립투스 코너 프레임 ---
+dried eucalyptus stems arranged as a soft corner frame on a warm ivory surface, delicate leaves curving inward, camera: overhead flat, lighting: bright soft daylight, palette: sage #9AA88B and warm ivory #F2EADB, generous clean copy space inside the frame, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, styled autumn flat lay background styling
+
+--- 23 도토리·솔방울 보더 ---
+acorns and small pine cones lined along the bottom of a warm beige surface, evenly spaced natural arrangement, camera: overhead flat, lighting: bright soft daylight, palette: nut brown #8B5E3C and warm beige #E5D8C3, generous clean copy space above the border, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, styled autumn flat lay background styling
+
+--- 24 체크 담요 여백 ---
+a warm plaid blanket laid flat filling the frame, soft woven check with gentle folds, camera: overhead flat, lighting: soft diffused daylight, palette: burgundy #8C3A44 and warm grey #A9A096, generous clean copy space in the center, tack-sharp with everything in focus, plain unlettered unbranded surface, one continuous scene, styled autumn flat lay background styling
