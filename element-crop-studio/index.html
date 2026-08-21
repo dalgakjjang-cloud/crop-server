@@ -1,0 +1,1525 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>미리캔버스 요소 크롭 스튜디오</title>
+<style>
+  :root{
+    --bg:#0d1017; --bg2:#141925; --panel:#171d2b; --panel2:#1d2536;
+    --line:#28324a; --line2:#324061;
+    --txt:#e7ecf5; --mut:#9aa7be; --dim:#6b7890;
+    --acc:#5b8cff; --acc2:#8a6bff;
+    --ok:#33c26b; --warn:#f2b23a; --bad:#ff5d6c;
+    --chk1:#2a3348; --chk2:#222a3c;
+    --r:14px; --r2:10px;
+    --shadow:0 10px 40px rgba(0,0,0,.45);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 600px at 80% -10%,rgba(91,140,255,.12),transparent 60%),
+               radial-gradient(1000px 500px at -10% 10%,rgba(138,107,255,.10),transparent 55%),
+               var(--bg);
+    color:var(--txt);
+    font-family:"Pretendard","Apple SD Gothic Neo",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Malgun Gothic",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--acc);text-decoration:none}
+  .wrap{max-width:1320px;margin:0 auto;padding:22px 20px 80px}
+  header.top{display:flex;align-items:center;gap:14px;margin-bottom:18px;flex-wrap:wrap}
+  .logo{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;
+    background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 6px 20px rgba(91,140,255,.4);font-size:22px}
+  .title h1{font-size:19px;margin:0;letter-spacing:-.2px}
+  .title p{margin:2px 0 0;color:var(--mut);font-size:12.5px}
+  .hdright{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+  .badge{font-size:11.5px;color:var(--dim);border:1px solid var(--line);padding:5px 10px;border-radius:99px;background:var(--panel)}
+  .skillmap{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--txt);
+    border:1px solid var(--line2);background:var(--panel2);padding:7px 13px;border-radius:99px;transition:.15s;white-space:nowrap}
+  .skillmap:hover{border-color:var(--acc);color:#fff;background:linear-gradient(135deg,var(--acc),var(--acc2));box-shadow:0 4px 14px rgba(91,140,255,.35)}
+
+  .grid{display:grid;grid-template-columns:300px 1fr;gap:18px;align-items:start}
+  @media(max-width:960px){.grid{grid-template-columns:1fr}}
+
+  .card{background:linear-gradient(180deg,var(--panel),var(--bg2));border:1px solid var(--line);
+    border-radius:var(--r);box-shadow:var(--shadow)}
+  .card .hd{padding:13px 16px;border-bottom:1px solid var(--line);font-size:13px;font-weight:600;
+    display:flex;align-items:center;gap:8px;color:#cdd6ea}
+  .card .bd{padding:16px}
+  .sec{position:sticky;top:14px}
+
+  label.f{display:block;font-size:12px;color:var(--mut);margin:0 0 6px}
+  .row{display:flex;gap:10px}
+  .row>*{flex:1}
+  input[type=text],input[type=number],textarea,select{
+    width:100%;background:var(--bg);border:1px solid var(--line2);color:var(--txt);
+    border-radius:var(--r2);padding:9px 11px;font-size:13px;font-family:inherit;outline:none;transition:border .15s}
+  input:focus,textarea:focus,select:focus{border-color:var(--acc)}
+  textarea{resize:vertical;min-height:52px;line-height:1.5}
+  .mb{margin-bottom:14px}
+  .hint{font-size:11px;color:var(--dim);margin-top:5px;line-height:1.5}
+
+  .range{display:flex;align-items:center;gap:10px}
+  input[type=range]{flex:1;accent-color:var(--acc)}
+  .rv{font-size:12px;color:var(--mut);min-width:46px;text-align:right;font-variant-numeric:tabular-nums}
+
+  .seg{display:flex;background:var(--bg);border:1px solid var(--line2);border-radius:var(--r2);padding:3px;gap:3px}
+  .seg button{flex:1;background:transparent;border:0;color:var(--mut);font-size:12px;padding:7px 4px;border-radius:7px;cursor:pointer;font-family:inherit;transition:.15s}
+  .seg button.on{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;font-weight:600}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;border:0;cursor:pointer;
+    border-radius:var(--r2);font-size:13px;font-weight:600;padding:11px 14px;font-family:inherit;transition:.15s;width:100%}
+  .btn.primary{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff;box-shadow:0 6px 18px rgba(91,140,255,.35)}
+  .btn.primary:hover{filter:brightness(1.08)}
+  .btn.ghost{background:var(--panel2);color:var(--txt);border:1px solid var(--line2)}
+  .btn.ghost:hover{border-color:var(--acc)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;filter:none;box-shadow:none}
+  .btn.sm{padding:7px 10px;font-size:12px;width:auto}
+
+  .drop{border:2px dashed var(--line2);border-radius:var(--r);padding:34px 18px;text-align:center;cursor:pointer;
+    transition:.18s;background:var(--bg)}
+  .drop:hover,.drop.drag{border-color:var(--acc);background:rgba(91,140,255,.06)}
+  .drop .ic{font-size:30px;margin-bottom:8px}
+  .drop b{font-size:13.5px}
+  .drop span{display:block;color:var(--dim);font-size:11.5px;margin-top:5px}
+  .dropbtns{display:flex;gap:10px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+
+  .empty{padding:70px 20px;text-align:center;color:var(--dim)}
+  .empty .ic{font-size:46px;margin-bottom:12px;opacity:.6}
+
+  /* item list */
+  .items{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cardw,190px),1fr));gap:14px}
+  .item{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:flex;flex-direction:column}
+  .item .pv{position:relative;aspect-ratio:1/1;
+    background-image:
+      linear-gradient(45deg,var(--chk1) 25%,transparent 25%),
+      linear-gradient(-45deg,var(--chk1) 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,var(--chk1) 75%),
+      linear-gradient(-45deg,transparent 75%,var(--chk1) 75%);
+    background-size:18px 18px;background-position:0 0,0 9px,9px -9px,-9px 0;
+    background-color:var(--chk2);display:grid;place-items:center;overflow:hidden}
+  .item .pv img{position:absolute;inset:6px;width:calc(100% - 12px);height:calc(100% - 12px);object-fit:contain;display:block}
+  .item .pv .num{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.6);color:#fff;font-size:11px;
+    padding:2px 8px;border-radius:99px;font-variant-numeric:tabular-nums;backdrop-filter:blur(4px)}
+  .item .pv .del{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.55);color:#fff;border:0;width:26px;height:26px;
+    border-radius:8px;cursor:pointer;font-size:14px;display:grid;place-items:center}
+  .item .pv .del:hover{background:var(--bad)}
+  .item .pv .spin{position:absolute;inset:0;display:grid;place-items:center;background:rgba(13,16,23,.6);color:var(--mut);font-size:12px}
+  .item .meta{padding:11px 12px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+  .item .meta .fn{font-size:11px;color:var(--acc);font-variant-numeric:tabular-nums;word-break:break-all}
+  .item .meta input,.item .meta textarea{font-size:12px;padding:7px 9px}
+  .item .dims{font-size:11px;color:var(--dim);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .item .gates{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}
+  .g{font-size:10.5px;padding:2px 7px;border-radius:99px;border:1px solid var(--line2);color:var(--mut);display:inline-flex;gap:4px;align-items:center}
+  .g.ok{color:var(--ok);border-color:rgba(51,194,107,.4);background:rgba(51,194,107,.08)}
+  .g.bad{color:var(--bad);border-color:rgba(255,93,108,.4);background:rgba(255,93,108,.08)}
+  .g.warn{color:var(--warn);border-color:rgba(242,178,58,.4);background:rgba(242,178,58,.08)}
+  .item .acts{display:flex;gap:7px}
+  .item .acts .btn{flex:1}
+  /* 썸네일(compact) 모드: 정확히 3열 그리드, 편집 UI 접고 이미지 위주로 */
+  .items.compact{grid-template-columns:repeat(3,1fr);gap:10px}
+  @media(max-width:560px){.items.compact{grid-template-columns:repeat(2,1fr)}}
+  .items.compact .meta .ttl,
+  .items.compact .meta .kw,
+  .items.compact .acts,
+  .items.compact .gates{display:none}
+  .items.compact .meta{padding:7px 9px;gap:4px}
+  .items.compact .fn{font-size:10px}
+  .items.compact .dims{font-size:10px}
+
+  .toolbar{display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap}
+  .toolbar .count{font-size:12.5px;color:var(--mut)}
+  .toolbar .sp{flex:1}
+
+  .divider{height:1px;background:var(--line);margin:16px 0}
+  .k{font-weight:600;color:#cdd6ea}
+  .warnbox{font-size:11.5px;color:var(--warn);background:rgba(242,178,58,.08);border:1px solid rgba(242,178,58,.3);
+    border-radius:9px;padding:9px 11px;line-height:1.55;margin-top:10px}
+  .okbox{font-size:11.5px;color:var(--ok);background:rgba(51,194,107,.08);border:1px solid rgba(51,194,107,.3);
+    border-radius:9px;padding:9px 11px;line-height:1.55;margin-top:10px}
+
+  /* modal */
+  .modal{position:fixed;inset:0;background:rgba(6,8,13,.78);backdrop-filter:blur(4px);z-index:50;display:none;
+    align-items:center;justify-content:center;padding:20px}
+  .modal.on{display:flex}
+  .modal .box{background:var(--panel);border:1px solid var(--line2);border-radius:16px;max-width:820px;width:100%;
+    max-height:92vh;display:flex;flex-direction:column;box-shadow:var(--shadow)}
+  .modal .box .mh{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:10px}
+  .modal .box .mh b{font-size:14px}
+  .modal .box .mh .x{margin-left:auto;background:var(--panel2);border:1px solid var(--line2);color:var(--txt);
+    width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:16px}
+  .modal .box .mb{padding:16px 18px;overflow:auto}
+  .cropstage{position:relative;margin:0 auto;background:
+      linear-gradient(45deg,var(--chk1) 25%,transparent 25%),
+      linear-gradient(-45deg,var(--chk1) 25%,transparent 25%),
+      linear-gradient(45deg,transparent 75%,var(--chk1) 75%),
+      linear-gradient(-45deg,transparent 75%,var(--chk1) 75%);
+    background-size:20px 20px;background-color:var(--chk2);touch-action:none;user-select:none;overflow:hidden;border-radius:8px}
+  .cropstage img{display:block;width:100%;height:100%;pointer-events:none}
+  .cropbox{position:absolute;border:2px solid var(--acc);box-shadow:0 0 0 9999px rgba(6,8,13,.55);cursor:move}
+  .cropbox .h{position:absolute;width:14px;height:14px;background:#fff;border:2px solid var(--acc);border-radius:3px}
+  .h.nw{left:-8px;top:-8px;cursor:nwse-resize}.h.ne{right:-8px;top:-8px;cursor:nesw-resize}
+  .h.sw{left:-8px;bottom:-8px;cursor:nesw-resize}.h.se{right:-8px;bottom:-8px;cursor:nwse-resize}
+  .modal .mf{padding:13px 18px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
+  .modal .mf .btn{width:auto}
+
+  .foot{margin-top:26px;text-align:center;color:var(--dim);font-size:11.5px;line-height:1.7}
+  .kbd{font-family:ui-monospace,Menlo,monospace;background:var(--bg);border:1px solid var(--line2);border-radius:5px;padding:1px 6px;font-size:11px}
+  .progress{height:4px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:10px;display:none}
+  .progress.on{display:block}
+  .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));width:0;transition:width .2s}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo">✂️</div>
+    <div class="title">
+      <h1>미리캔버스 요소 크롭 스튜디오</h1>
+      <p>어떤 이미지든 배경 제거 · 타이트 크롭 · 규격 맞춤 · 300 DPI · 업로드 패키지까지 — 브라우저에서 바로</p>
+    </div>
+    <div class="hdright">
+      <a class="skillmap" href="https://claude.ai/code/artifact/a205bc88-865c-4f70-b06a-cf666604c98d" target="_blank" rel="noopener noreferrer" title="FreeJJang 총 스킬 맵으로 이동">← 스킬 맵</a>
+      <span class="badge">서버 불필요 · 100% 로컬 처리</span>
+    </div>
+  </header>
+
+  <div class="grid">
+    <!-- ═══ LEFT: settings ═══ -->
+    <aside class="card sec">
+      <div class="hd">⚙️ 처리 설정</div>
+      <div class="bd">
+        <div class="mb">
+          <label class="f">배경 제거 방식</label>
+          <div class="seg" id="bgSeg">
+            <button data-v="auto" class="on">자동</button>
+            <button data-v="white">흰 배경</button>
+            <button data-v="chroma">크로마</button>
+            <button data-v="none">투명유지</button>
+          </div>
+          <div class="hint" id="bgHint">가장자리와 연결된 배경색만 제거해 오브젝트 내부 같은 색은 보존합니다.</div>
+        </div>
+
+        <div class="mb" id="thrWrap">
+          <label class="f">배경 감도 (threshold)</label>
+          <div class="range">
+            <input type="range" id="thr" min="8" max="140" value="42">
+            <span class="rv" id="thrV">42</span>
+            <button class="btn ghost sm" id="thrAuto" style="width:auto;padding:5px 9px" title="가장자리 색 분산으로 적정값 추천">🎯 자동</button>
+          </div>
+          <div class="hint" id="thrRec"></div>
+        </div>
+
+        <div class="mb">
+          <label class="f">경계 다듬기 (feather / 프린지 제거)</label>
+          <div class="range">
+            <input type="range" id="feather" min="0" max="3" step="1" value="1">
+            <span class="rv" id="featherV">1 px</span>
+          </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="row mb">
+          <div>
+            <label class="f">출력 긴 축(px)</label>
+            <input type="number" id="longAxis" value="4096" min="700" max="9800">
+          </div>
+          <div>
+            <label class="f">DPI</label>
+            <input type="number" id="dpi" value="300" min="72" max="1200">
+          </div>
+        </div>
+        <div class="row mb">
+          <div>
+            <label class="f">최대 축(px)</label>
+            <input type="number" id="maxAxis" value="9800" min="700" max="9800">
+          </div>
+          <div>
+            <label class="f">여백(px)</label>
+            <input type="number" id="margin" value="0" min="0" max="200">
+          </div>
+        </div>
+
+        <div class="mb">
+          <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="pockets" checked style="width:auto;accent-color:var(--acc)">
+            갇힌 배경 조각 제거 (팔·다리 사이 흰 부분)
+          </label>
+        </div>
+        <div class="mb">
+          <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="shadows" style="width:auto;accent-color:var(--acc)">
+            바닥 그림자 제거 (회색 그라데이션)
+          </label>
+        </div>
+        <div class="mb">
+          <label class="f" style="display:flex;align-items:center;gap:8px;cursor:pointer">
+            <input type="checkbox" id="sanitize" checked style="width:auto;accent-color:var(--acc)">
+            금지색 세척 (#FFFFFF · #353840 불투명 픽셀)
+          </label>
+        </div>
+
+        <div class="divider"></div>
+
+        <label class="f">파일명 형식 (원하는 조합)</label>
+        <input type="text" id="fnPattern" class="mb" placeholder="{날짜}_{제목}_{번호}" value="{날짜}_{제목}_{번호}" autocomplete="off">
+        <div class="hint" style="margin-top:-8px;margin-bottom:10px">
+          토큰: <code class="kbd">{날짜}</code> <code class="kbd">{제목}</code> <code class="kbd">{번호}</code> <code class="kbd">{원본}</code> · 자유롭게 배치·구분자 사용
+        </div>
+        <div class="seg mb" id="fnPreset" style="flex-wrap:wrap">
+          <button data-v="{날짜}_{제목}_{번호}">날짜_제목_번호</button>
+          <button data-v="{제목}_{날짜}_{번호}">제목_날짜_번호</button>
+          <button data-v="{제목}_{번호}">제목_번호</button>
+        </div>
+        <div class="row mb">
+          <div style="max-width:140px;flex:0 0 140px">
+            <label class="f">등록일 YYMMDD</label>
+            <input type="text" id="date" maxlength="6" placeholder="260706">
+          </div>
+          <div style="max-width:120px;flex:0 0 120px">
+            <label class="f">제목 글자수</label>
+            <input type="number" id="slugLen" value="8" min="2" max="20">
+          </div>
+          <div>
+            <label class="f">폴백(제목 없을 때)</label>
+            <input type="text" id="slug" placeholder="요소" maxlength="20" autocomplete="off">
+          </div>
+        </div>
+        <div class="hint" id="fnPreview">최종 파일명 미리보기: —</div>
+        <div id="acctMsg"></div>
+
+        <div class="divider"></div>
+        <label class="f">🪄 AI 제목·키워드 (SEO 자동)</label>
+        <div class="row mb">
+          <select id="aiProvider" style="flex:0 0 42%">
+            <option value="gemini">Gemini</option>
+            <option value="openai">OpenAI</option>
+            <option value="claude">Claude</option>
+          </select>
+          <input type="text" id="aiModel" value="gemini-2.5-flash" placeholder="모델">
+        </div>
+        <input type="password" id="aiKey" class="mb" placeholder="API 키 (이 브라우저에만 저장, 전송 안 됨)" autocomplete="off">
+        <button class="btn ghost" id="aiFill">🪄 제목·키워드 AI 자동생성</button>
+        <div id="aiMsg"></div>
+        <div class="hint">이미지가 무엇인지 AI가 보고 SEO 키워드(≤25개)와 제목(≤100자)을 채웁니다.
+          이 단계에서만 썸네일이 선택한 AI 제공사로 전송됩니다.</div>
+
+        <div class="divider"></div>
+        <button class="btn primary" id="processAll">✨ 전체 처리 / 재처리</button>
+        <div class="progress" id="prog"><i></i></div>
+      </div>
+    </aside>
+
+    <!-- ═══ RIGHT: workspace ═══ -->
+    <main>
+      <div class="card" style="margin-bottom:16px">
+        <div class="bd">
+          <div class="drop" id="drop">
+            <div class="ic">🖼️</div>
+            <b>이미지를 여기로 끌어다 놓으세요</b>
+            <span>PNG · JPG · WEBP · 여러 장 동시 · 붙여넣기(Ctrl+V)도 가능</span>
+            <div class="dropbtns">
+              <button class="btn primary sm" id="pickFiles">📁 파일 선택</button>
+              <button class="btn ghost sm" id="pickFolder">🗂 폴더 전체 가져오기</button>
+            </div>
+          </div>
+          <input type="file" id="file" accept="image/png,image/jpeg,image/webp" multiple hidden>
+          <input type="file" id="folder" accept="image/png,image/jpeg,image/webp" webkitdirectory multiple hidden>
+        </div>
+      </div>
+
+      <div class="toolbar" id="toolbar" style="display:none">
+        <span class="count" id="count">0개</span>
+        <div class="seg" id="sizeSeg" style="flex:0 0 auto;width:auto">
+          <button data-v="thumb" class="on" title="썸네일 — 여러 장 한눈에">▦ 썸네일</button>
+          <button data-v="normal" title="보통">▧ 보통</button>
+          <button data-v="large" title="크게 — 디테일 확인">▢ 크게</button>
+        </div>
+        <span class="sp"></span>
+        <button class="btn ghost sm" id="clearAll">전체 삭제</button>
+        <button class="btn ghost sm" id="dlSimple" title="제목·키워드·CSV 없이 처리된 PNG만 ZIP으로">🖼 그림만 ZIP</button>
+        <button class="btn ghost sm" id="dlZip">📦 업로드 패키지 ZIP</button>
+      </div>
+
+      <div id="stage">
+        <div class="card"><div class="empty">
+          <div class="ic">📥</div>
+          <div>아직 이미지가 없습니다. 위에 이미지를 올려 시작하세요.</div>
+        </div></div>
+      </div>
+
+      <div class="foot">
+        미리캔버스 규격: 최소 단축 700px · 최대 축 9800px · 최대 50MB · 투명 PNG · 타이트 크롭 ·
+        불필요한 그림자 없음. 이 도구는 프린트 대응을 위해 긴 축 4096px / 300 DPI 로 출력합니다.<br>
+        이미지 처리는 모두 브라우저 안에서만 일어납니다. (AI 제목·키워드 자동생성을 쓸 때만 해당 썸네일이 선택한 AI 제공사로 전송됩니다.)
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Crop modal -->
+<div class="modal" id="cropModal">
+  <div class="box">
+    <div class="mh">
+      <b>✂️ 수동 크롭 영역 지정</b>
+      <span style="font-size:12px;color:var(--mut)">드래그로 영역을 그리고, 핸들로 조절하세요.</span>
+      <button class="x" id="cropX">×</button>
+    </div>
+    <div class="mb">
+      <div class="cropstage" id="cropStage">
+        <img id="cropImg" alt="">
+        <div class="cropbox" id="cropBox" style="display:none">
+          <div class="h nw"></div><div class="h ne"></div><div class="h sw"></div><div class="h se"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn ghost" id="cropReset">전체(자동)로</button>
+      <button class="btn primary" id="cropApply" style="max-width:180px">이 영역 적용</button>
+    </div>
+  </div>
+</div>
+
+<!-- Retouch modal (지우개/복원 브러시) -->
+<div class="modal" id="rtModal">
+  <div class="box" style="max-width:920px">
+    <div class="mh">
+      <b>🩹 리터치 — 지우개 / 복원 브러시</b>
+      <span style="font-size:12px;color:var(--mut)">남은 배경은 지우개로, 잘못 뚫린 곳은 복원으로 칠하세요.</span>
+      <button class="x" id="rtX">×</button>
+    </div>
+    <div class="mb">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:12px">
+        <div class="seg" style="flex:0 0 auto;min-width:220px" id="rtMode">
+          <button data-v="erase" class="on">🧽 지우개</button>
+          <button data-v="restore">🖌 복원</button>
+        </div>
+        <div class="range" style="flex:1;min-width:180px">
+          <span style="font-size:12px;color:var(--mut)">브러시</span>
+          <input type="range" id="rtSize" min="4" max="120" value="30">
+          <span class="rv" id="rtSizeV">30</span>
+        </div>
+        <button class="btn ghost sm" id="rtUndo">↩ 되돌리기</button>
+        <button class="btn ghost sm" id="rtClear">전체 초기화</button>
+      </div>
+      <div class="cropstage" id="rtStage" style="cursor:none">
+        <canvas id="rtCanvas"></canvas>
+        <div id="rtCursor" style="position:absolute;border:2px solid var(--acc);border-radius:50%;pointer-events:none;display:none;transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(0,0,0,.5)"></div>
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn ghost" id="rtCancel">취소</button>
+      <button class="btn primary" id="rtApply" style="max-width:180px">적용</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ══════════════════════════════════════════════════════════════
+   미리캔버스 요소 크롭 스튜디오 — 단일 파일, 클라이언트 전용
+   파이프라인:  배경제거 → 알파 타이트크롭 → 규격 리사이즈 →
+               금지색 세척 → 300DPI PNG(pHYs) → CSV + ZIP 패키지
+   ══════════════════════════════════════════════════════════════ */
+
+/* ---------- CRC32 (PNG pHYs + ZIP 공용) ---------- */
+const CRC_TABLE = (()=>{
+  const t = new Uint32Array(256);
+  for(let n=0;n<256;n++){
+    let c=n;
+    for(let k=0;k<8;k++) c = (c&1) ? (0xEDB88320 ^ (c>>>1)) : (c>>>1);
+    t[n]=c>>>0;
+  }
+  return t;
+})();
+function crc32(buf, start=0, end=buf.length){
+  let c = 0xFFFFFFFF;
+  for(let i=start;i<end;i++) c = CRC_TABLE[(c ^ buf[i]) & 0xFF] ^ (c>>>8);
+  return (c ^ 0xFFFFFFFF)>>>0;
+}
+
+/* ---------- PNG: pHYs 청크 삽입(DPI) ---------- */
+function setPngDpi(bytes, dpi){
+  // 이미 pHYs 가 있으면(캔버스 PNG엔 없음) 그대로 반환
+  const ppm = Math.round(dpi/0.0254); // pixels per metre
+  const insertPos = 8 + 25;           // signature(8) + IHDR chunk(4+4+13+4=25)
+  const chunk = new Uint8Array(21);
+  const dv = new DataView(chunk.buffer);
+  dv.setUint32(0, 9);                 // data length
+  chunk[4]=0x70; chunk[5]=0x48; chunk[6]=0x59; chunk[7]=0x73; // 'pHYs'
+  dv.setUint32(8, ppm);
+  dv.setUint32(12, ppm);
+  chunk[16]=1;                        // unit = metre
+  dv.setUint32(17, crc32(chunk,4,17));
+  const out = new Uint8Array(bytes.length + 21);
+  out.set(bytes.subarray(0,insertPos),0);
+  out.set(chunk, insertPos);
+  out.set(bytes.subarray(insertPos), insertPos+21);
+  return out;
+}
+
+/* ---------- 최소 ZIP (store, 무압축) ---------- */
+function dosDateTime(d){
+  const time = ((d.getHours()&0x1f)<<11)|((d.getMinutes()&0x3f)<<5)|((d.getSeconds()>>1)&0x1f);
+  const date = (((d.getFullYear()-1980)&0x7f)<<9)|(((d.getMonth()+1)&0xf)<<5)|(d.getDate()&0x1f);
+  return {time,date};
+}
+function strBytes(s){ return new TextEncoder().encode(s); }
+function buildZip(files){
+  // files: [{name, data:Uint8Array}]
+  const now = new Date();
+  const {time,date} = dosDateTime(now);
+  const chunks=[]; const central=[]; let offset=0;
+  for(const f of files){
+    const nameB = strBytes(f.name);
+    const crc = crc32(f.data);
+    const size = f.data.length;
+    // local header
+    const lh = new Uint8Array(30 + nameB.length);
+    const dv = new DataView(lh.buffer);
+    dv.setUint32(0,0x04034b50,true);
+    dv.setUint16(4,20,true); dv.setUint16(6,0,true);
+    dv.setUint16(8,0,true);                 // method = store
+    dv.setUint16(10,time,true); dv.setUint16(12,date,true);
+    dv.setUint32(14,crc,true);
+    dv.setUint32(18,size,true); dv.setUint32(22,size,true);
+    dv.setUint16(26,nameB.length,true); dv.setUint16(28,0,true);
+    lh.set(nameB,30);
+    chunks.push(lh, f.data);
+    // central directory
+    const cd = new Uint8Array(46 + nameB.length);
+    const cv = new DataView(cd.buffer);
+    cv.setUint32(0,0x02014b50,true);
+    cv.setUint16(4,20,true); cv.setUint16(6,20,true); cv.setUint16(8,0,true);
+    cv.setUint16(10,0,true);
+    cv.setUint16(12,time,true); cv.setUint16(14,date,true);
+    cv.setUint32(16,crc,true);
+    cv.setUint32(20,size,true); cv.setUint32(24,size,true);
+    cv.setUint16(28,nameB.length,true);
+    cv.setUint32(42,offset,true);
+    cd.set(nameB,46);
+    central.push(cd);
+    offset += lh.length + size;
+  }
+  let cdSize=0; central.forEach(c=>cdSize+=c.length);
+  const end = new Uint8Array(22);
+  const ev = new DataView(end.buffer);
+  ev.setUint32(0,0x06054b50,true);
+  ev.setUint16(8,files.length,true); ev.setUint16(10,files.length,true);
+  ev.setUint32(12,cdSize,true); ev.setUint32(16,offset,true);
+  const all=[...chunks,...central,end];
+  let total=0; all.forEach(a=>total+=a.length);
+  const buf=new Uint8Array(total); let p=0;
+  for(const a of all){ buf.set(a,p); p+=a.length; }
+  return new Blob([buf],{type:'application/zip'});
+}
+
+/* ---------- 이미지 처리 ---------- */
+function allTransparentCorners(id){
+  const {data,width:w,height:h}=id;
+  const a=(x,y)=>data[(y*w+x)*4+3];
+  return a(0,0)<=6 && a(w-1,0)<=6 && a(0,h-1)<=6 && a(w-1,h-1)<=6;
+}
+function median(arr){ const a=[...arr].sort((x,y)=>x-y); return a[Math.floor(a.length/2)]; }
+function detectKey(data,w,h){
+  const pts=[[2,2],[w-3,2],[2,h-3],[w-3,h-3],[(w>>1),2],[(w>>1),h-3],[2,(h>>1)],[w-3,(h>>1)]];
+  const R=[],G=[],B=[];
+  for(const [x,y] of pts){ const i=(y*w+x)*4; if(data[i+3]<8) continue; R.push(data[i]);G.push(data[i+1]);B.push(data[i+2]); }
+  if(!R.length) return [255,255,255];
+  return [median(R),median(G),median(B)];
+}
+
+/* 가장자리 색 분산으로 적정 threshold 추천.
+   배경 픽셀들이 키 색에서 얼마나 퍼져 있는지(92 백분위 거리)를 재고,
+   상한 hi(=thr*1.4)가 그 분산을 막 덮도록 thr 을 역산 → 배경은 다 잡고
+   오브젝트(키에서 더 먼 색)는 안 건드리는 값. */
+function edgeStats(img){
+  const max=420;
+  const s=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+  const w=Math.max(2,Math.round(img.naturalWidth*s)), h=Math.max(2,Math.round(img.naturalHeight*s));
+  const c=document.createElement('canvas'); c.width=w; c.height=h;
+  const x=c.getContext('2d',{willReadFrequently:true});
+  x.drawImage(img,0,0,w,h);
+  const {data}=x.getImageData(0,0,w,h);
+  const corners=[[0,0],[w-1,0],[0,h-1],[w-1,h-1]].map(([px,py])=>data[(py*w+px)*4+3]);
+  if(corners.every(a=>a<=6)) return {transparent:true};
+  const key=detectKey(data,w,h);
+  const band=Math.max(2,Math.round(Math.min(w,h)*0.06)); // 가장자리 6% 두께
+  const dists=[];
+  for(let y=0;y<h;y++) for(let px=0;px<w;px++){
+    if(px>=band&&px<w-band&&y>=band&&y<h-band) continue;
+    const i=(y*w+px)*4; if(data[i+3]<8) continue;
+    const dr=data[i]-key[0],dg=data[i+1]-key[1],db=data[i+2]-key[2];
+    dists.push(Math.sqrt(dr*dr+dg*dg+db*db));
+  }
+  if(dists.length<20) return {transparent:false, thr:42, spread:0};
+  dists.sort((a,b)=>a-b);
+  const p92=dists[Math.floor(dists.length*0.92)];
+  const thr=Math.max(24,Math.min(100,Math.round((p92+10)/1.4)));
+  return {transparent:false, thr, spread:Math.round(p92)};
+}
+function recommendThr(){
+  const vals=[]; let anyTransparent=false;
+  for(const it of state.items.slice(0,8)){
+    const st=edgeStats(it.img);
+    if(st.transparent){ anyTransparent=true; continue; }
+    if(st.thr) vals.push(st.thr);
+  }
+  if(!vals.length) return {thr:null, transparent:anyTransparent};
+  vals.sort((a,b)=>a-b);
+  return {thr:vals[Math.floor(vals.length/2)], transparent:anyTransparent}; // 여러 장이면 중앙값
+}
+function setThr(v){ $('#thr').value=v; $('#thrV').textContent=v; }
+function maybeAutoThreshold(){ // 첫 로드 시, 사용자가 슬라이더를 만진 적 없으면 자동 적용
+  if(state.thrTouched) return;
+  if($('#bgSeg .on').dataset.v==='none'){ $('#thrRec').textContent=''; return; }
+  const r=recommendThr();
+  if(r.thr!=null){ setThr(r.thr); $('#thrRec').innerHTML=`권장 감도 <b class="k">${r.thr}</b> 자동 적용 · 슬라이더로 조절 가능`; saveSettings(); }
+  else if(r.transparent){ $('#thrRec').textContent='이미 투명한 이미지 — 감도 불필요.'; }
+}
+
+/* 배경 제거 v2 — 캔바 스타일 2단 구조의 자동 단계
+   1) 엣지-스톱 하이스테리시스 flood: 배경은 매끈하므로 픽셀 간 급격한
+      색 변화(오브젝트 경계)에서 확산을 멈춤 → 밝은 오브젝트 내부로 누수 방지
+   2) 갇힌 배경 포켓 제거: 오브젝트에 둘러싸여 flood 가 못 닿는
+      배경색 조각(로켓·팔 사이 등)을 성분 분석으로 제거
+   3) 그림자 제거(옵션): 배경과 이어진 저채도 회색 그라데이션 제거
+   4) 경계 소프트 알파 + 색 오염 제거(decontamination)                 */
+function removeBackground(id, mode, thr, o){
+  o = o || {};
+  const {data,width:w,height:h}=id;
+  const key = mode==='white' ? [255,255,255] : detectKey(data,w,h);
+  const N=w*h;
+
+  // 키 색과의 거리 맵
+  const dist=new Uint16Array(N);
+  for(let idx=0;idx<N;idx++){
+    const i=idx*4;
+    if(data[i+3]<8){ dist[idx]=0; continue; }
+    const dr=data[i]-key[0], dg=data[i+1]-key[1], db=data[i+2]-key[2];
+    dist[idx]=Math.sqrt(dr*dr+dg*dg+db*db)|0;
+  }
+  const lo=Math.max(10,Math.round(thr*0.5));   // 확실한 배경
+  const hi=Math.max(lo+8,Math.round(thr*1.4)); // 배경 후보 상한
+  const STEP=16;                                // 픽셀 간 채널당 허용 스텝(엣지-스톱)
+
+  const visited=new Uint8Array(N);
+  const stack=new Int32Array(N);
+  let sp=0;
+  const stepOK=(a,b)=>{
+    const i=a*4,j=b*4;
+    return Math.abs(data[i]-data[j])<=STEP &&
+           Math.abs(data[i+1]-data[j+1])<=STEP &&
+           Math.abs(data[i+2]-data[j+2])<=STEP;
+  };
+  // 씨앗: 가장자리에서 확실한 배경(d<=lo)만
+  const seed=(idx)=>{ if(!visited[idx]&&(dist[idx]<=lo||data[idx*4+3]<8)){visited[idx]=1;stack[sp++]=idx;} };
+  for(let x=0;x<w;x++){ seed(x); seed((h-1)*w+x); }
+  for(let y=0;y<h;y++){ seed(y*w); seed(y*w+w-1); }
+  if(sp===0){ // 확실 씨앗이 없으면 완화 (오브젝트가 4변 모두에 닿는 특수 케이스)
+    for(let x=0;x<w;x++){ if(dist[x]<=hi){visited[x]=1;stack[sp++]=x;} const b=(h-1)*w+x; if(!visited[b]&&dist[b]<=hi){visited[b]=1;stack[sp++]=b;} }
+    for(let y=0;y<h;y++){ const l=y*w,r=y*w+w-1; if(!visited[l]&&dist[l]<=hi){visited[l]=1;stack[sp++]=l;} if(!visited[r]&&dist[r]<=hi){visited[r]=1;stack[sp++]=r;} }
+  }
+  // 하이스테리시스 확산: d<=hi 이고 이웃과 색이 연속(stepOK)일 때만
+  while(sp>0){
+    const idx=stack[--sp];
+    const x=idx%w, y=(idx-x)/w;
+    const tryN=(n)=>{ if(!visited[n] && (dist[n]<=lo || (dist[n]<=hi && stepOK(idx,n)))){visited[n]=1;stack[sp++]=n;} };
+    if(x>0)tryN(idx-1); if(x<w-1)tryN(idx+1);
+    if(y>0)tryN(idx-w); if(y<h-1)tryN(idx+w);
+  }
+
+  // (옵션) 바닥 그림자: 배경에서 이어지는 저채도·중간밝기 회색을 추가 확산
+  if(o.shadows){
+    const keyV=Math.max(key[0],key[1],key[2]);
+    sp=0;
+    for(let idx=0;idx<N;idx++) if(visited[idx]) stack[sp++]=idx;
+    const shadowish=(n)=>{
+      const i=n*4;
+      const r=data[i],g=data[i+1],b=data[i+2];
+      const mx=Math.max(r,g,b),mn=Math.min(r,g,b);
+      return (mx-mn)<=30 && mx>=70 && mx<=keyV-8;
+    };
+    while(sp>0){
+      const idx=stack[--sp];
+      const x=idx%w, y=(idx-x)/w;
+      const tryN=(n)=>{ if(!visited[n] && shadowish(n) && stepOK(idx,n)){visited[n]=1;stack[sp++]=n;} };
+      if(x>0)tryN(idx-1); if(x<w-1)tryN(idx+1);
+      if(y>0)tryN(idx-w); if(y<h-1)tryN(idx+w);
+    }
+  }
+
+  // 갇힌 배경 포켓 제거: 미방문이지만 키 색과 거의 같은 성분 → 충분히 크고
+  // 평균 거리도 매우 작으면(=진짜 배경 조각) 제거. 작은 흰 눈동자 등은 보존.
+  if(o.pockets!==false){
+    const loP=Math.max(14,Math.round(thr*0.42));
+    const minSize=Math.max(48,Math.round(N*0.0004));
+    const labeled=new Uint8Array(N); // 1=검사됨
+    const comp=new Int32Array(N);
+    for(let s=0;s<N;s++){
+      if(visited[s]||labeled[s]||dist[s]>loP) continue;
+      let cp=0; comp[cp++]=s; labeled[s]=1;
+      let head=0, sumD=0;
+      while(head<cp){
+        const idx=comp[head++]; sumD+=dist[idx];
+        const x=idx%w, y=(idx-x)/w;
+        const tryN=(n)=>{ if(!visited[n]&&!labeled[n]&&dist[n]<=loP){labeled[n]=1;comp[cp++]=n;} };
+        if(x>0)tryN(idx-1); if(x<w-1)tryN(idx+1);
+        if(y>0)tryN(idx-w); if(y<h-1)tryN(idx+w);
+      }
+      if(cp>=minSize && (sumD/cp)<=loP*0.7){
+        for(let k=0;k<cp;k++) visited[comp[k]]=1;
+      }
+    }
+  }
+
+  // 경계 밴드(배경 2px 이내의 오브젝트 픽셀) → 소프트 알파 + 색 오염 제거
+  const band=new Uint8Array(N);
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+    const idx=y*w+x;
+    if(visited[idx]) continue;
+    let near=false;
+    for(let yy=Math.max(0,y-2);yy<=Math.min(h-1,y+2)&&!near;yy++)
+      for(let xx=Math.max(0,x-2);xx<=Math.min(w-1,x+2);xx++)
+        if(visited[yy*w+xx]){near=true;break;}
+    if(near) band[idx]=1;
+  }
+
+  const isGreen = key[1]>key[0]+60 && key[1]>key[2]+60;
+  const isMagenta = key[0]>key[1]+60 && key[2]>key[1]+60;
+  for(let idx=0;idx<N;idx++){
+    const i=idx*4;
+    if(visited[idx]){ data[i]=data[i+1]=data[i+2]=data[i+3]=0; continue; }
+    if(band[idx] && dist[idx]<hi){
+      let a=(dist[idx]-lo)/(hi-lo);
+      a=Math.max(0,Math.min(1,a));
+      a=a*a*(3-2*a); // smoothstep
+      if(a<=0.01){ data[i]=data[i+1]=data[i+2]=data[i+3]=0; continue; }
+      if(a<0.995){ // 배경색 오염 제거: c = (c - (1-a)·key) / a
+        data[i]  =Math.max(0,Math.min(255,Math.round((data[i]  -(1-a)*key[0])/a)));
+        data[i+1]=Math.max(0,Math.min(255,Math.round((data[i+1]-(1-a)*key[1])/a)));
+        data[i+2]=Math.max(0,Math.min(255,Math.round((data[i+2]-(1-a)*key[2])/a)));
+      }
+      data[i+3]=Math.min(data[i+3],Math.round(255*a));
+    }
+    if(data[i+3]>0){
+      if(isGreen) data[i+1]=Math.min(data[i+1],Math.max(data[i],data[i+2]));
+      else if(isMagenta){ const nz=Math.max(data[i+1],Math.min(data[i],data[i+2])); data[i]=Math.min(data[i],nz); data[i+2]=Math.min(data[i+2],nz); }
+    }
+  }
+}
+// 알파 최소필터(프린지 축소) feather 회수만큼
+function erodeAlpha(id, passes){
+  const {data,width:w,height:h}=id;
+  for(let p=0;p<passes;p++){
+    const alpha=new Uint8Array(w*h);
+    for(let k=0;k<w*h;k++) alpha[k]=data[k*4+3];
+    for(let y=1;y<h-1;y++) for(let x=1;x<w-1;x++){
+      let m=255;
+      for(let yy=y-1;yy<=y+1;yy++) for(let xx=x-1;xx<=x+1;xx++){ const a=alpha[yy*w+xx]; if(a<m)m=a; }
+      data[(y*w+x)*4+3]=m;
+    }
+  }
+}
+function alphaBBox(id){
+  const {data,width:w,height:h}=id;
+  let minX=w,minY=h,maxX=-1,maxY=-1;
+  for(let y=0;y<h;y++) for(let x=0;x<w;x++){
+    if(data[(y*w+x)*4+3]>8){ if(x<minX)minX=x; if(x>maxX)maxX=x; if(y<minY)minY=y; if(y>maxY)maxY=y; }
+  }
+  if(maxX<0) return null;
+  return {x:minX,y:minY,w:maxX-minX+1,h:maxY-minY+1};
+}
+function sanitizeColors(id){
+  const {data}=id;
+  for(let i=0;i<data.length;i+=4){
+    if(data[i+3]===255){
+      const r=data[i],g=data[i+1],b=data[i+2];
+      if(r>=252&&g>=252&&b>=252){ data[i]=250;data[i+1]=248;data[i+2]=244; }
+      else if(r===0x35&&g===0x38&&b===0x40){ data[i]=0x36;data[i+1]=0x39;data[i+2]=0x41; }
+    }
+  }
+}
+
+async function canvasToPngBytes(canvas){
+  const blob = await new Promise(res=>canvas.toBlob(res,'image/png'));
+  return new Uint8Array(await blob.arrayBuffer());
+}
+
+/* 자동 배경 제거 결과(소스 해상도) + 원본 사본 — 처리·리터치 미리보기 공용 */
+function autoRemoved(item, S){
+  const img=item.img;
+  const w0=img.naturalWidth, h0=img.naturalHeight;
+  const src=document.createElement('canvas'); src.width=w0; src.height=h0;
+  const sctx=src.getContext('2d',{willReadFrequently:true});
+  sctx.drawImage(img,0,0);
+  const id=sctx.getImageData(0,0,w0,h0);
+  const orig=new Uint8ClampedArray(id.data); // 복원 브러시용 원본
+  if(S.bgMode!=='none' && !allTransparentCorners(id)){
+    removeBackground(id, S.bgMode, S.thr, S);
+  }
+  return {src, sctx, id, orig, w0, h0};
+}
+/* 리터치 마스크 적용: 1=지우개(투명) 2=복원(원본 픽셀) */
+function applyRetouch(id, orig, mask){
+  const d=id.data;
+  for(let p=0;p<mask.length;p++){
+    if(mask[p]===1) d[p*4+3]=0;
+    else if(mask[p]===2){ const i=p*4; d[i]=orig[i]; d[i+1]=orig[i+1]; d[i+2]=orig[i+2]; d[i+3]=orig[i+3]; }
+  }
+}
+
+/* 한 항목 전체 처리 */
+async function processItem(item, S){
+  const {src, sctx, id, orig, w0, h0}=autoRemoved(item, S);
+
+  // 1-b) 수동 리터치 반영
+  if(item.retouch && item.retouchHas) applyRetouch(id, orig, item.retouch);
+  if(S.feather>0) erodeAlpha(id, S.feather);
+  sctx.putImageData(id,0,0);
+
+  // 2) 크롭 영역 결정 (수동 우선, 없으면 알파 bbox)
+  let box = item.manualCrop || alphaBBox(id);
+  if(!box) box = {x:0,y:0,w:w0,h:h0};
+  // 여백
+  const m=S.margin;
+  box = { x:Math.max(0,box.x-m), y:Math.max(0,box.y-m),
+          w:Math.min(w0-Math.max(0,box.x-m), box.w+m*2),
+          h:Math.min(h0-Math.max(0,box.y-m), box.h+m*2) };
+
+  // 3) 리사이즈 (긴 축 → longAxis, 최대 축 clamp)
+  let scale = S.longAxis/Math.max(box.w,box.h);
+  if(Math.max(box.w,box.h)*scale > S.maxAxis) scale = S.maxAxis/Math.max(box.w,box.h);
+  const outW=Math.max(1,Math.round(box.w*scale));
+  const outH=Math.max(1,Math.round(box.h*scale));
+
+  const out=document.createElement('canvas'); out.width=outW; out.height=outH;
+  const octx=out.getContext('2d',{willReadFrequently:true});
+  octx.imageSmoothingEnabled=true; octx.imageSmoothingQuality='high';
+  octx.drawImage(src, box.x,box.y,box.w,box.h, 0,0,outW,outH);
+
+  // 4) 금지색 세척
+  if(S.sanitize){
+    const oid=octx.getImageData(0,0,outW,outH);
+    sanitizeColors(oid);
+    octx.putImageData(oid,0,0);
+  }
+
+  // 5) 투명픽셀 수 / 검증
+  const fid=octx.getImageData(0,0,outW,outH).data;
+  let transp=0, whiteOpaque=0, darkOpaque=0;
+  for(let i=0;i<fid.length;i+=4){
+    if(fid[i+3]===0) transp++;
+    else if(fid[i+3]===255){
+      if(fid[i]===255&&fid[i+1]===255&&fid[i+2]===255) whiteOpaque++;
+      else if(fid[i]===0x35&&fid[i+1]===0x38&&fid[i+2]===0x40) darkOpaque++;
+    }
+  }
+
+  // 6) PNG + DPI
+  let bytes = await canvasToPngBytes(out);
+  bytes = setPngDpi(bytes, S.dpi);
+  const blob = new Blob([bytes],{type:'image/png'});
+
+  item.out = {
+    w:outW, h:outH, bytes, blob,
+    url: URL.createObjectURL(blob),
+    transp, whiteOpaque, darkOpaque,
+    srcLong: Math.max(w0,h0),
+    sizeMB: bytes.length/1048576,
+  };
+  return item.out;
+}
+
+/* ---------- 검증 게이트 ---------- */
+function gatesOf(item,S){
+  const o=item.out; if(!o) return [];
+  const g=[];
+  g.push({k:'투명', ok:o.transp>0});
+  g.push({k:'단축≥700', ok:Math.min(o.w,o.h)>=700});
+  g.push({k:'긴축≥'+S.longAxis, ok:Math.max(o.w,o.h)>=S.longAxis});
+  g.push({k:'≤'+S.maxAxis+'px', ok:Math.max(o.w,o.h)<=S.maxAxis});
+  g.push({k:S.dpi+'DPI', ok:true});
+  g.push({k:'≤50MB', ok:o.sizeMB<=50});
+  g.push({k:'금지색', ok:o.whiteOpaque===0&&o.darkOpaque===0});
+  const warn=[];
+  if(o.srcLong<2048) warn.push({k:'원본<2048(업스케일)', warn:true});
+  return {g,warn};
+}
+
+/* ══════════════════════ UI / 상태 ══════════════════════ */
+const state = { items:[], settings:{} };
+let uid=0;
+const $=(s)=>document.querySelector(s);
+
+function readSettings(){
+  return {
+    bgMode: $('#bgSeg .on').dataset.v,
+    thr: +$('#thr').value,
+    feather: +$('#feather').value,
+    longAxis: Math.max(700,Math.min(9800,+$('#longAxis').value||4096)),
+    maxAxis: Math.max(700,Math.min(9800,+$('#maxAxis').value||9800)),
+    dpi: Math.max(72,Math.min(1200,+$('#dpi').value||300)),
+    margin: Math.max(0,+$('#margin').value||0),
+    sanitize: $('#sanitize').checked,
+    pockets: $('#pockets').checked,
+    shadows: $('#shadows').checked,
+  };
+}
+/* 파일명용 한글 슬러그: 한글/영숫자만 남기고 지정 글자수로 자름 */
+function slugLen(){ return Math.max(2,Math.min(20,+$('#slugLen').value||8)); }
+function koSlug(text, fallback, len){
+  len = len || slugLen();
+  const s = String(text||'').replace(/[^가-힣A-Za-z0-9]/g,'');
+  const fb = String(fallback||'요소').replace(/[^가-힣A-Za-z0-9]/g,'') || '요소';
+  return (s || fb).slice(0,len);
+}
+function validDate(){
+  const d=$('#date').value.trim();
+  if(!/^\d{6}$/.test(d)) return {ok:false,msg:'등록일을 YYMMDD 6자리로 입력하세요.'};
+  const mm=+d.slice(2,4), dd=+d.slice(4,6);
+  if(mm<1||mm>12||dd<1||dd>31) return {ok:false,msg:'등록일의 월/일이 올바르지 않습니다.'};
+  return {ok:true,date:d};
+}
+/* 파일명에 못 쓰는 문자 정리 */
+function safeName(s){ return String(s).replace(/[\\/:*?"<>|]+/g,'').replace(/\s+/g,'_').replace(/_+/g,'_').replace(/^_|_$/g,''); }
+/* 전체 파일명 — 사용자 지정 패턴({날짜}{제목}{번호}{원본}) 적용, 중복은 숫자 접미사로 해소.
+   카드 표시·개별 다운로드·ZIP 이 모두 이 결과를 공유. */
+function allBaseNames(){
+  const v=validDate();
+  const date=v.ok?v.date:'______';
+  const pattern=($('#fnPattern').value.trim())||'{날짜}_{제목}_{번호}';
+  const L=slugLen();
+  const seen=new Map();
+  return state.items.map((it,i)=>{
+    let slug=koSlug(it.title, $('#slug').value, L);
+    const cnt=(seen.get(slug)||0)+1; seen.set(slug,cnt);
+    if(cnt>1){ const sfx=String(cnt); slug=slug.slice(0,Math.max(1,L-sfx.length))+sfx; }
+    const origBase=(it.name||'').replace(/\.[^.]+$/,'');
+    const name=pattern
+      .replace(/\{날짜\}/g,date)
+      .replace(/\{제목\}/g,slug)
+      .replace(/\{번호\}/g,String(i+1).padStart(2,'0'))
+      .replace(/\{원본\}/g,koSlug(origBase,'원본',20));
+    return safeName(name)||`요소_${String(i+1).padStart(2,'0')}`;
+  });
+}
+
+/* ---------- 렌더 ---------- */
+function render(){
+  const S=readSettings();
+  const stage=$('#stage');
+  $('#toolbar').style.display = state.items.length ? 'flex':'none';
+  $('#count').textContent = state.items.length+'개';
+  if(!state.items.length){
+    stage.innerHTML=`<div class="card"><div class="empty"><div class="ic">📥</div><div>아직 이미지가 없습니다. 위에 이미지를 올려 시작하세요.</div></div></div>`;
+    updateFnPreview();
+    return;
+  }
+  const wrap=document.createElement('div'); wrap.className='items';
+  const vm=state.viewMode||'thumb';
+  if(vm==='thumb') wrap.classList.add('compact');
+  else wrap.style.setProperty('--cardw', vm==='large' ? '300px' : '210px');
+  const names=allBaseNames();
+  state.items.forEach((item,i)=>{
+    const o=item.out;
+    const gv = o? gatesOf(item,S):{g:[],warn:[]};
+    const el=document.createElement('div'); el.className='item';
+    const gatesHtml = o ? gv.g.map(x=>`<span class="g ${x.ok?'ok':'bad'}">${x.ok?'✓':'✕'} ${x.k}</span>`).join('')
+                          + gv.warn.map(x=>`<span class="g warn">⚠ ${x.k}</span>`).join('') : '';
+    el.innerHTML=`
+      <div class="pv">
+        <span class="num">#${String(i+1).padStart(2,'0')}</span>
+        <button class="del" title="삭제">×</button>
+        ${o?`<img src="${o.url}" alt="">`:`<div class="spin">처리 대기…</div>`}
+      </div>
+      <div class="meta">
+        <div class="fn">${names[i]}.png</div>
+        ${o?`<div class="dims"><span>${o.w}×${o.h}px</span><span>${o.sizeMB.toFixed(2)}MB</span><span>${S.dpi}DPI</span>${item.manualCrop?'<span style="color:var(--acc)">수동크롭</span>':''}</div>`:''}
+        <div class="gates">${gatesHtml}</div>
+        <input type="text" class="ttl" placeholder="한글 제목 (≤100자)" value="${(item.title||'').replace(/"/g,'&quot;')}">
+        <textarea class="kw" placeholder="키워드 (쉼표로 구분, ≤25개)">${item.keywords||''}</textarea>
+        <div class="acts">
+          <button class="btn ghost sm crop">✂️ 크롭</button>
+          <button class="btn ghost sm rt">🩹 리터치</button>
+          <button class="btn ghost sm dl" ${o?'':'disabled'}>⬇ PNG</button>
+        </div>
+      </div>`;
+    // events
+    el.querySelector('.del').onclick=()=>{ if(o)URL.revokeObjectURL(o.url); state.items.splice(i,1); render(); };
+    el.querySelector('.ttl').oninput=e=>item.title=e.target.value;
+    el.querySelector('.ttl').onchange=()=>render(); // 입력 확정 시 파일명 갱신
+    el.querySelector('.kw').oninput=e=>item.keywords=e.target.value;
+    el.querySelector('.crop').onclick=()=>openCrop(item);
+    el.querySelector('.rt').onclick=()=>openRetouch(item);
+    el.querySelector('.dl').onclick=()=>{ if(o) downloadBlob(o.blob, allBaseNames()[i]+'.png'); };
+    wrap.appendChild(el);
+  });
+  stage.innerHTML=''; stage.appendChild(wrap);
+  updateFnPreview();
+}
+
+function downloadBlob(blob,name){
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download=name; a.rel='noopener';
+  document.body.appendChild(a); a.click(); a.remove();
+  // 큰 파일은 브라우저가 blob URL 을 다 읽을 때까지 시간이 필요 → 넉넉히 뒤 해제
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+  // 샌드박스 iframe 등에서 클릭 다운로드가 막힐 때 대비한 폴백
+  return url;
+}
+// iframe(아티팩트 미리보기) 안에서 실행 중인지
+const inIframe = (()=>{ try{ return window.self!==window.top; }catch(_){ return true; } })();
+
+/* ---------- 파일 로딩 ---------- */
+function loadFiles(fileList){
+  const files=[...fileList].filter(f=>/^image\/(png|jpeg|webp)$/.test(f.type));
+  let pending=files.length;
+  if(!pending) return;
+  files.forEach(f=>{
+    const img=new Image();
+    img.onload=()=>{
+      state.items.push({ id:++uid, name:f.name, img, title:'', keywords:'', manualCrop:null, retouch:null, retouchHas:false, out:null });
+      if(--pending===0){ maybeAutoThreshold(); render(); processAll(); }
+    };
+    img.onerror=()=>{ if(--pending===0){ maybeAutoThreshold(); render(); processAll(); } };
+    img.src=URL.createObjectURL(f);
+  });
+}
+
+/* ---------- 전체 처리 ---------- */
+let processing=false;
+async function processAll(){
+  if(processing || !state.items.length) return;
+  processing=true;
+  const S=readSettings();
+  const prog=$('#prog'); prog.classList.add('on'); const bar=prog.querySelector('i');
+  $('#processAll').disabled=true;
+  for(let i=0;i<state.items.length;i++){
+    const it=state.items[i];
+    if(it.out){ URL.revokeObjectURL(it.out.url); it.out=null; }
+    await processItem(it,S);
+    bar.style.width=((i+1)/state.items.length*100)+'%';
+    render();
+    await new Promise(r=>setTimeout(r,0)); // UI yield
+  }
+  $('#processAll').disabled=false;
+  setTimeout(()=>{ prog.classList.remove('on'); bar.style.width='0'; },500);
+  processing=false;
+}
+
+/* 아직 처리 안 된 항목이 있으면 처리 후 "다시 눌러주세요" 안내(사용자 제스처 보존).
+   반환 true = 준비완료(동기 다운로드 진행 가능), false = 준비 중 */
+function ensureReadyThen(retryLabel, cb){
+  const S=readSettings();
+  const notReady=state.items.filter(it=>!it.out);
+  if(notReady.length){
+    showAcct(`이미지 처리 중… 끝나면 <b>${retryLabel}</b> 을 한 번 더 눌러주세요.`,'warn');
+    (async()=>{ for(const it of notReady){ if(!it.out) await processItem(it,S); } render(); showAcct(`준비 완료 — <b>${retryLabel}</b> 을 다시 누르세요.`,'ok'); })();
+    return false;
+  }
+  return true;
+}
+
+/* ---------- 심플 패키지: 처리된 PNG만 (제목·키워드·CSV·API 불필요) ---------- */
+function downloadSimpleZip(){
+  if(!state.items.length){ showAcct('먼저 이미지를 올려주세요.','warn'); return; }
+  if(!ensureReadyThen('🖼 그림만 ZIP', downloadSimpleZip)) return;
+  try{
+    const names=allBaseNames();
+    const files=state.items.map((it,i)=>({name:`${names[i]}.png`, data:it.out.bytes}));
+    const v=validDate();
+    downloadBlob(buildZip(files), `elements_${v.ok?v.date:'save'}.zip`);
+    showAcct(`그림만 ZIP 저장됨 ✓ (${files.length}장 · 제목/CSV 없이)${inIframe?' · 저장 안 되면 index.html 파일을 직접 열어 사용하세요.':''}`, true);
+  }catch(e){ showAcct('그림만 ZIP 실패: '+(e.message||e),'warn'); }
+}
+
+/* ---------- ZIP 패키지 ---------- */
+function downloadZip(){
+  const v=validDate();
+  if(!v.ok){ showAcct(v.msg,false); $('#date').focus(); return; }
+  if(!state.items.length) return;
+  if(!ensureReadyThen('📦 업로드 패키지 ZIP', downloadZip)) return;
+
+  const files=[];
+  const rows=[['fileName','uniqueId','elementName','keywords','status','licenseType']];
+  const map=[['sourceFile','fileName']];
+  const problems=[];
+  const names=allBaseNames(); // 카드 표시와 동일한 파일명(중복 자동 해소)
+  state.items.forEach((it,i)=>{
+    const base=names[i];
+    files.push({name:`PNG/${base}.png`, data:it.out.bytes});
+    const title=(it.title||'').trim();
+    let kw=(it.keywords||'').split(',').map(x=>x.trim()).filter(Boolean);
+    kw=[...new Set(kw)];
+    if(!title) problems.push(`#${i+1} 제목 없음`);
+    if(title.length>100) problems.push(`#${i+1} 제목 100자 초과`);
+    if(kw.length>25) problems.push(`#${i+1} 키워드 25개 초과`);
+    if(it.out.sizeMB>50) problems.push(`#${i+1} 50MB 초과`);
+    rows.push([base,'',title,kw.join(','),'ACTIVE','STANDARD']);
+    map.push([it.name,base]);
+  });
+  const csvEsc=v=>{ const s=String(v??''); return /[",\r\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s; };
+  const toCsv=arr=>'﻿'+arr.map(r=>r.map(csvEsc).join(',')).join('\r\n')+'\r\n';
+  files.push({name:'CSV/miricanvas_metadata.csv', data:strBytes(toCsv(rows))});
+  files.push({name:'CSV/filename_mapping.csv', data:strBytes(toCsv(map))});
+
+  downloadBlob(buildZip(files), `miricanvas_upload_${v.date}.zip`);
+  const tail = inIframe?' · 저장 안 되면 index.html 파일을 직접 열어 사용하세요.':'';
+  if(problems.length) showAcct('패키지 저장됨 (경고: '+problems.join(' · ')+')'+tail, 'warn');
+  else showAcct('업로드 패키지 ZIP 저장됨 ✓'+tail, true);
+}
+
+function showAcct(msg,ok){
+  const el=$('#acctMsg');
+  const cls = ok===true?'okbox':(ok==='warn'?'warnbox':'warnbox');
+  el.innerHTML=`<div class="${cls}">${msg}</div>`;
+}
+
+/* ══════════════════════ AI 제목·키워드 (SEO) ══════════════════════ */
+const AI_PROMPT =
+`당신은 미리캔버스(디자인 요소 스톡) SEO 전문가입니다. 첨부 이미지는 배경이 투명한 PNG 그래픽 요소 하나입니다(흰색은 확인용 배경).
+이 요소를 미리캔버스에 등록할 메타데이터를 한국어로 작성하세요.
+규칙:
+- title: 요소가 무엇인지 자연스럽고 구체적으로. 20~40자 권장, 최대 100자. 과장·특수문자·따옴표 금지.
+- keywords: SEO 최적화 한국어 검색어 배열. 최대 25개, 중복 없음.
+  · 핵심 사물/주제 + 상위 개념 + 스타일(예: 3D, 캐릭터, 일러스트, 아이콘) + 용도/감정/계절 + 동의어를 고루 포함.
+  · 실제 검색량이 있을 일반 단어 우선, 한 단어~두 단어 위주. 문장·해시태그(#)·영어 금지(고유명사 제외).
+반드시 JSON만 출력: {"title":"...","keywords":["...", "..."]}`;
+
+const AI_MODELS = { gemini:'gemini-2.5-flash', openai:'gpt-4o-mini', claude:'claude-3-5-sonnet-latest' };
+
+async function makeThumb(blob, max){
+  const bmp = await createImageBitmap(blob);
+  const s = Math.min(1, max/Math.max(bmp.width,bmp.height));
+  const w = Math.max(1,Math.round(bmp.width*s)), h = Math.max(1,Math.round(bmp.height*s));
+  const c = document.createElement('canvas'); c.width=w; c.height=h;
+  const x = c.getContext('2d');
+  x.fillStyle='#ffffff'; x.fillRect(0,0,w,h);   // 투명 요소를 흰 배경에 합성(인식 도움)
+  x.drawImage(bmp,0,0,w,h);
+  bmp.close && bmp.close();
+  return c.toDataURL('image/jpeg',0.85).split(',')[1];
+}
+
+async function callAI(provider, key, model, prompt, b64){
+  if(provider==='gemini'){
+    const url=`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(key)}`;
+    const body={contents:[{parts:[{text:prompt},{inline_data:{mime_type:'image/jpeg',data:b64}}]}],
+      generationConfig:{temperature:0.45,responseMimeType:'application/json'}};
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json();
+    if(!r.ok) throw new Error(j.error?.message||('HTTP '+r.status));
+    return (j.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+  }
+  if(provider==='openai'){
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model,temperature:0.45,response_format:{type:'json_object'},
+        messages:[{role:'user',content:[{type:'text',text:prompt},{type:'image_url',image_url:{url:'data:image/jpeg;base64,'+b64}}]}]})});
+    const j=await r.json();
+    if(!r.ok) throw new Error(j.error?.message||('HTTP '+r.status));
+    return j.choices?.[0]?.message?.content||'';
+  }
+  // claude
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',
+    headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model,max_tokens:500,
+      messages:[{role:'user',content:[
+        {type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},
+        {type:'text',text:prompt}]}]})});
+  const j=await r.json();
+  if(!r.ok) throw new Error(j.error?.message||('HTTP '+r.status));
+  return (j.content||[]).map(c=>c.text||'').join('');
+}
+
+function parseMeta(text){
+  let t=String(text||'').trim().replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+  const s=t.indexOf('{'), e=t.lastIndexOf('}');
+  if(s>=0&&e>=0) t=t.slice(s,e+1);
+  const obj=JSON.parse(t);
+  const title=String(obj.title||'').replace(/["\r\n]/g,' ').trim().slice(0,100);
+  let kw=Array.isArray(obj.keywords)?obj.keywords:String(obj.keywords||'').split(',');
+  kw=kw.map(x=>String(x).trim().replace(/^#/,'')).filter(Boolean);
+  kw=[...new Set(kw)].slice(0,25);
+  return {title, keywords:kw.join(', ')};
+}
+
+function aiMsg(msg,kind){ $('#aiMsg').innerHTML=`<div class="${kind==='ok'?'okbox':'warnbox'}">${msg}</div>`; }
+
+let aiRunning=false;
+async function aiFill(){
+  if(aiRunning) return;
+  const provider=$('#aiProvider').value, key=$('#aiKey').value.trim(), model=$('#aiModel').value.trim()||AI_MODELS[provider];
+  if(!key){ aiMsg('API 키가 없습니다. 제목·키워드 없이 그림만 저장하려면 상단 <b>🖼 그림만 ZIP</b> 을 쓰세요.','warn'); $('#aiKey').focus(); return; }
+  if(!state.items.length){ aiMsg('먼저 이미지를 올려주세요.','warn'); return; }
+  aiRunning=true; $('#aiFill').disabled=true;
+  const S=readSettings();
+  for(const it of state.items){ if(!it.out) await processItem(it,S); }
+  let done=0; const errs=[];
+  const friendly=(e)=>/failed to fetch|networkerror|load failed/i.test(e.message||'')
+    ? '외부 API 연결 차단/실패 — 아티팩트 미리보기에서는 API가 차단됩니다. index.html 파일을 내려받아 직접 여세요.'
+    : e.message;
+  for(let i=0;i<state.items.length;i++){
+    const it=state.items[i];
+    aiMsg(`AI 생성 중… ${i+1}/${state.items.length}`,'warn');
+    let ok=false;
+    for(let attempt=1;attempt<=2 && !ok;attempt++){ // 일시 오류 1회 재시도
+      try{
+        const b64=await makeThumb(it.out.blob, 512);
+        const text=await callAI(provider,key,model,AI_PROMPT,b64);
+        const m=parseMeta(text);
+        if(!m.title) throw new Error('빈 응답');
+        it.title=m.title; it.keywords=m.keywords; done++; ok=true; render();
+      }catch(e){
+        if(attempt===2) errs.push(`#${i+1}: ${friendly(e)}`);
+        else await new Promise(r=>setTimeout(r,700));
+      }
+    }
+    await new Promise(r=>setTimeout(r,120));
+  }
+  aiRunning=false; $('#aiFill').disabled=false;
+  if(done && !errs.length) aiMsg(`제목·키워드 자동생성 완료 (${done}개) — 이제 📦 업로드 패키지 ZIP 을 누르세요.`,'ok');
+  else if(done) aiMsg(`완료 ${done}개 · 오류 ${errs.length}개: ${errs.slice(0,2).join(' / ')}${errs.length>2?' …':''}`,'warn');
+  else aiMsg(`실패: ${errs.slice(0,2).join(' / ')} · 키/모델 확인. 지금 그림만 받으려면 상단 <b>🖼 그림만 ZIP</b> 을 누르세요.`,'warn');
+}
+
+/* ══════════════════════ 수동 크롭 모달 ══════════════════════ */
+let cropCtx=null; // {item, scale, natW, natH, box:{x,y,w,h}(natural)}
+function openCrop(item){
+  const modal=$('#cropModal'), stage=$('#cropStage'), img=$('#cropImg'), boxEl=$('#cropBox');
+  const natW=item.img.naturalWidth, natH=item.img.naturalHeight;
+  const maxW=Math.min(760, window.innerWidth-80), maxH=window.innerHeight*0.6;
+  let scale=Math.min(maxW/natW, maxH/natH, 1);
+  const dispW=Math.round(natW*scale), dispH=Math.round(natH*scale);
+  stage.style.width=dispW+'px'; stage.style.height=dispH+'px';
+  img.src=item.img.src;
+  cropCtx={item,scale,natW,natH,dispW,dispH,box:null};
+  // 기존 수동크롭 표시
+  if(item.manualCrop){ cropCtx.box={...item.manualCrop}; drawCropBox(); boxEl.style.display='block'; }
+  else { boxEl.style.display='none'; }
+  modal.classList.add('on');
+}
+function drawCropBox(){
+  const {box,scale}=cropCtx; const boxEl=$('#cropBox');
+  boxEl.style.left=(box.x*scale)+'px';
+  boxEl.style.top=(box.y*scale)+'px';
+  boxEl.style.width=(box.w*scale)+'px';
+  boxEl.style.height=(box.h*scale)+'px';
+}
+(function cropInteractions(){
+  const stage=$('#cropStage'), boxEl=$('#cropBox');
+  let mode=null, startX,startY, orig, handle;
+  function toNat(e){
+    const r=stage.getBoundingClientRect();
+    const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left;
+    const cy=(e.touches?e.touches[0].clientY:e.clientY)-r.top;
+    return { x:Math.max(0,Math.min(cropCtx.natW, cx/cropCtx.scale)),
+             y:Math.max(0,Math.min(cropCtx.natH, cy/cropCtx.scale)) };
+  }
+  stage.addEventListener('pointerdown',e=>{
+    if(!cropCtx) return;
+    const t=e.target;
+    const p=toNat(e);
+    if(t.classList.contains('h')){ mode='resize'; handle=[...t.classList].find(c=>['nw','ne','sw','se'].includes(c)); orig={...cropCtx.box}; }
+    else if(t===boxEl){ mode='move'; startX=p.x; startY=p.y; orig={...cropCtx.box}; }
+    else { mode='draw'; startX=p.x; startY=p.y; cropCtx.box={x:p.x,y:p.y,w:0,h:0}; boxEl.style.display='block'; }
+    stage.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  stage.addEventListener('pointermove',e=>{
+    if(!mode||!cropCtx) return;
+    const p=toNat(e); const b=cropCtx.box; const N={w:cropCtx.natW,h:cropCtx.natH};
+    if(mode==='draw'){
+      b.x=Math.min(startX,p.x); b.y=Math.min(startY,p.y);
+      b.w=Math.abs(p.x-startX); b.h=Math.abs(p.y-startY);
+    } else if(mode==='move'){
+      let nx=orig.x+(p.x-startX), ny=orig.y+(p.y-startY);
+      b.x=Math.max(0,Math.min(N.w-orig.w,nx)); b.y=Math.max(0,Math.min(N.h-orig.h,ny));
+    } else if(mode==='resize'){
+      let x1=orig.x, y1=orig.y, x2=orig.x+orig.w, y2=orig.y+orig.h;
+      if(handle.includes('n')) y1=Math.min(p.y,y2-10);
+      if(handle.includes('s')) y2=Math.max(p.y,y1+10);
+      if(handle.includes('w')) x1=Math.min(p.x,x2-10);
+      if(handle.includes('e')) x2=Math.max(p.x,x1+10);
+      b.x=x1;b.y=y1;b.w=x2-x1;b.h=y2-y1;
+    }
+    drawCropBox();
+  });
+  const end=e=>{ if(mode){ mode=null; try{stage.releasePointerCapture(e.pointerId);}catch(_){} } };
+  stage.addEventListener('pointerup',end);
+  stage.addEventListener('pointercancel',end);
+})();
+$('#cropApply').onclick=async()=>{
+  if(cropCtx && cropCtx.box && cropCtx.box.w>4 && cropCtx.box.h>4){
+    const b=cropCtx.box;
+    cropCtx.item.manualCrop={x:Math.round(b.x),y:Math.round(b.y),w:Math.round(b.w),h:Math.round(b.h)};
+  }
+  const it=cropCtx.item;
+  $('#cropModal').classList.remove('on');
+  if(it.out){URL.revokeObjectURL(it.out.url);it.out=null;}
+  await processItem(it,readSettings()); render();
+};
+$('#cropReset').onclick=async()=>{
+  const it=cropCtx.item; it.manualCrop=null;
+  $('#cropModal').classList.remove('on');
+  if(it.out){URL.revokeObjectURL(it.out.url);it.out=null;}
+  await processItem(it,readSettings()); render();
+};
+$('#cropX').onclick=()=>$('#cropModal').classList.remove('on');
+$('#cropModal').addEventListener('pointerdown',e=>{ if(e.target===$('#cropModal')) $('#cropModal').classList.remove('on'); });
+
+/* ══════════════════════ 리터치(지우개/복원) 모달 ══════════════════════ */
+let rt=null; // {item,id,orig,mask,w,h,scale,ctx,history:[strokes],cur:[]}
+function openRetouch(item){
+  const S=readSettings();
+  const a=autoRemoved(item,S);
+  const mask=item.retouch ? new Uint8Array(item.retouch) : new Uint8Array(a.w0*a.h0);
+  if(item.retouchHas) applyRetouch(a.id, a.orig, mask);
+  const canvas=$('#rtCanvas');
+  canvas.width=a.w0; canvas.height=a.h0;
+  const ctx=canvas.getContext('2d',{willReadFrequently:true});
+  ctx.putImageData(a.id,0,0);
+  const maxW=Math.min(860,window.innerWidth-80), maxH=window.innerHeight*0.58;
+  const scale=Math.min(maxW/a.w0, maxH/a.h0, 1);
+  const stage=$('#rtStage');
+  stage.style.width=Math.round(a.w0*scale)+'px';
+  stage.style.height=Math.round(a.h0*scale)+'px';
+  canvas.style.width='100%'; canvas.style.height='100%';
+  rt={item,id:a.id,orig:a.orig,mask,w:a.w0,h:a.h0,scale,ctx,history:[],cur:null};
+  $('#rtModal').classList.add('on');
+}
+function rtStamp(sx,sy,srcR,mode){
+  // 원형 브러시를 소스 해상도 마스크·미리보기에 즉시 반영
+  const {mask,id,orig,w,h,cur}=rt;
+  const d=id.data;
+  const x0=Math.max(0,Math.floor(sx-srcR)), x1=Math.min(w-1,Math.ceil(sx+srcR));
+  const y0=Math.max(0,Math.floor(sy-srcR)), y1=Math.min(h-1,Math.ceil(sy+srcR));
+  const r2=srcR*srcR;
+  const v=mode==='erase'?1:2;
+  for(let y=y0;y<=y1;y++) for(let x=x0;x<=x1;x++){
+    const dx=x-sx, dy=y-sy;
+    if(dx*dx+dy*dy>r2) continue;
+    const p=y*w+x;
+    if(mask[p]===v) continue;
+    if(cur) cur.push(p,mask[p]);
+    mask[p]=v;
+    const i=p*4;
+    if(v===1) d[i+3]=0;
+    else { d[i]=orig[i]; d[i+1]=orig[i+1]; d[i+2]=orig[i+2]; d[i+3]=orig[i+3]; }
+  }
+  rt.ctx.putImageData(id, 0,0, x0,y0, x1-x0+1, y1-y0+1);
+}
+(function rtInteractions(){
+  const stage=$('#rtStage'), cursor=$('#rtCursor');
+  let painting=false, last=null;
+  const pos=(e)=>{
+    const r=stage.getBoundingClientRect();
+    return {dx:e.clientX-r.left, dy:e.clientY-r.top};
+  };
+  const modeOf=()=>$('#rtMode .on').dataset.v;
+  stage.addEventListener('pointermove',e=>{
+    const p=pos(e);
+    const sz=+$('#rtSize').value;
+    cursor.style.display='block';
+    cursor.style.left=p.dx+'px'; cursor.style.top=p.dy+'px';
+    cursor.style.width=sz+'px'; cursor.style.height=sz+'px';
+    if(painting&&rt){
+      const sx=p.dx/rt.scale, sy=p.dy/rt.scale;
+      const srcR=(sz/2)/rt.scale;
+      if(last){ // 선형 보간 스탬프
+        const dist=Math.hypot(sx-last.x,sy-last.y);
+        const steps=Math.max(1,Math.ceil(dist/(srcR/2)));
+        for(let s=1;s<=steps;s++) rtStamp(last.x+(sx-last.x)*s/steps, last.y+(sy-last.y)*s/steps, srcR, modeOf());
+      } else rtStamp(sx,sy,srcR,modeOf());
+      last={x:sx,y:sy};
+    }
+  });
+  stage.addEventListener('pointerleave',()=>{ cursor.style.display='none'; });
+  stage.addEventListener('pointerdown',e=>{
+    if(!rt) return;
+    painting=true; last=null;
+    rt.cur=[];
+    const p=pos(e);
+    const sz=+$('#rtSize').value;
+    rtStamp(p.dx/rt.scale, p.dy/rt.scale, (sz/2)/rt.scale, modeOf());
+    last={x:p.dx/rt.scale, y:p.dy/rt.scale};
+    stage.setPointerCapture(e.pointerId);
+    e.preventDefault();
+  });
+  const end=e=>{
+    if(painting&&rt&&rt.cur&&rt.cur.length){
+      rt.history.push(rt.cur);
+      if(rt.history.length>20) rt.history.shift();
+    }
+    if(rt) rt.cur=null;
+    painting=false; last=null;
+    try{stage.releasePointerCapture(e.pointerId);}catch(_){}
+  };
+  stage.addEventListener('pointerup',end);
+  stage.addEventListener('pointercancel',end);
+})();
+$('#rtMode').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  $('#rtMode .on').classList.remove('on'); b.classList.add('on');
+});
+$('#rtSize').oninput=e=>$('#rtSizeV').textContent=e.target.value;
+$('#rtUndo').onclick=()=>{
+  if(!rt||!rt.history.length) return;
+  const stroke=rt.history.pop();
+  for(let k=stroke.length-2;k>=0;k-=2) rt.mask[stroke[k]]=stroke[k+1];
+  // 0(자동 상태)으로 되돌아간 픽셀은 자동 결과가 필요 → 전체 재구성
+  const a=autoRemoved(rt.item,readSettings());
+  rt.id=a.id; rt.orig=a.orig;
+  applyRetouch(rt.id, rt.orig, rt.mask);
+  rt.ctx.putImageData(rt.id,0,0);
+};
+$('#rtClear').onclick=()=>{
+  if(!rt) return;
+  rt.mask.fill(0); rt.history=[];
+  const S=readSettings();
+  const a=autoRemoved(rt.item,S);
+  rt.id=a.id; rt.orig=a.orig;
+  rt.ctx.putImageData(rt.id,0,0);
+};
+$('#rtApply').onclick=async()=>{
+  if(!rt) return;
+  const it=rt.item;
+  it.retouch=rt.mask;
+  it.retouchHas=rt.mask.some(v=>v!==0);
+  $('#rtModal').classList.remove('on');
+  rt=null;
+  if(it.out){URL.revokeObjectURL(it.out.url);it.out=null;}
+  await processItem(it,readSettings()); render();
+};
+$('#rtCancel').onclick=()=>{ $('#rtModal').classList.remove('on'); rt=null; };
+$('#rtX').onclick=()=>{ $('#rtModal').classList.remove('on'); rt=null; };
+
+/* ══════════════════════ 이벤트 바인딩 ══════════════════════ */
+const drop=$('#drop'), file=$('#file'), folder=$('#folder');
+drop.onclick=()=>file.click();
+$('#pickFiles').onclick=e=>{ e.stopPropagation(); file.click(); };
+$('#pickFolder').onclick=e=>{ e.stopPropagation(); folder.click(); };
+file.onchange=e=>{ loadFiles(e.target.files); file.value=''; };
+folder.onchange=e=>{ loadFiles(e.target.files); folder.value=''; };
+['dragenter','dragover'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.add('drag');}));
+['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{e.preventDefault();drop.classList.remove('drag');}));
+drop.addEventListener('drop',e=>loadFiles(e.dataTransfer.files));
+window.addEventListener('paste',e=>{ if(e.clipboardData&&e.clipboardData.files.length) loadFiles(e.clipboardData.files); });
+
+$('#bgSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  $('#bgSeg .on').classList.remove('on'); b.classList.add('on');
+  const v=b.dataset.v;
+  $('#thrWrap').style.opacity = v==='none'?'.4':'1';
+  const hints={auto:'가장자리와 연결된 배경색만 제거해 오브젝트 내부 같은 색은 보존합니다.',
+    white:'흰색(밝은) 배경 전용. 흰 배경 이미지에 가장 깔끔합니다.',
+    chroma:'가장자리 색을 키로 추정해 제거. 초록/마젠타 크로마키에 적합.',
+    none:'이미 투명한 PNG. 배경 제거 없이 크롭·리사이즈만 수행합니다.'};
+  $('#bgHint').textContent=hints[v];
+});
+$('#thr').oninput=e=>{ $('#thrV').textContent=e.target.value; state.thrTouched=true; $('#thrRec').textContent='수동 설정됨'; };
+$('#thrAuto').onclick=()=>{
+  if(!state.items.length){ $('#thrRec').textContent='먼저 이미지를 올려주세요.'; return; }
+  if($('#bgSeg .on').dataset.v==='none'){ $('#thrRec').textContent='투명유지 모드에서는 감도가 사용되지 않습니다.'; return; }
+  const r=recommendThr();
+  if(r.thr==null){ $('#thrRec').textContent = r.transparent ? '이미 투명한 이미지 — 감도 불필요.' : '추천값을 계산할 수 없습니다.'; return; }
+  setThr(r.thr); $('#thrRec').innerHTML=`권장 감도 <b class="k">${r.thr}</b> 적용 · 가장자리 색분산 기준`; saveSettings();
+  processAll();
+};
+$('#feather').oninput=e=>$('#featherV').textContent=e.target.value+' px';
+$('#aiProvider').onchange=e=>{ $('#aiModel').value=AI_MODELS[e.target.value]||''; };
+$('#aiFill').onclick=aiFill;
+$('#processAll').onclick=processAll;
+$('#sizeSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  $('#sizeSeg .on').classList.remove('on'); b.classList.add('on');
+  state.viewMode=b.dataset.v; render();
+});
+$('#clearAll').onclick=()=>{ state.items.forEach(it=>it.out&&URL.revokeObjectURL(it.out.url)); state.items=[]; render(); };
+$('#dlZip').onclick=downloadZip;
+$('#dlSimple').onclick=downloadSimpleZip;
+function updateFnPreview(){
+  const names=state.items.length ? allBaseNames() : (()=>{ // 이미지 없을 때 샘플
+    const v=validDate(); const date=v.ok?v.date:'______';
+    const pattern=($('#fnPattern').value.trim())||'{날짜}_{제목}_{번호}';
+    const s=pattern.replace(/\{날짜\}/g,date).replace(/\{제목\}/g,koSlug('','예시제목',slugLen())).replace(/\{번호\}/g,'01').replace(/\{원본\}/g,'원본');
+    return [safeName(s)];
+  })();
+  $('#fnPreview').innerHTML=`최종 파일명 미리보기: <span class="k">${(names[0]||'—')}.png</span>`;
+}
+['#fnPattern','#slug','#slugLen'].forEach(sel=>$(sel).oninput=()=>{ render(); updateFnPreview(); });
+$('#fnPreset').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  $('#fnPattern').value=b.dataset.v; render(); updateFnPreview(); saveSettings();
+});
+$('#date').oninput=()=>{
+  render(); updateFnPreview();
+  const v=validDate();
+  if(v.ok) showAcct(`등록일 확인 ✓`, true);
+  else $('#acctMsg').innerHTML='';
+};
+
+/* ---------- 설정 저장/복원 (localStorage, 이 브라우저에만 보관) ---------- */
+const LS_KEY='element_crop_studio_v1';
+function saveSettings(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      bgMode:$('#bgSeg .on').dataset.v,
+      thr:$('#thr').value, feather:$('#feather').value,
+      longAxis:$('#longAxis').value, maxAxis:$('#maxAxis').value,
+      dpi:$('#dpi').value, margin:$('#margin').value,
+      sanitize:$('#sanitize').checked, pockets:$('#pockets').checked, shadows:$('#shadows').checked,
+      slug:$('#slug').value, fnPattern:$('#fnPattern').value, slugLen:$('#slugLen').value,
+      aiProvider:$('#aiProvider').value, aiModel:$('#aiModel').value, aiKey:$('#aiKey').value,
+      viewMode:state.viewMode||'thumb',
+    }));
+  }catch(_){}
+}
+function loadSettings(){
+  let s=null;
+  try{ s=JSON.parse(localStorage.getItem(LS_KEY)||'null'); }catch(_){}
+  if(!s) return;
+  if(s.bgMode && $(`#bgSeg button[data-v="${s.bgMode}"]`)){
+    $('#bgSeg .on').classList.remove('on');
+    $(`#bgSeg button[data-v="${s.bgMode}"]`).classList.add('on');
+  }
+  if(s.thr){$('#thr').value=s.thr;$('#thrV').textContent=s.thr;}
+  if(s.feather!=null){$('#feather').value=s.feather;$('#featherV').textContent=s.feather+' px';}
+  if(s.longAxis)$('#longAxis').value=s.longAxis;
+  if(s.maxAxis)$('#maxAxis').value=s.maxAxis;
+  if(s.dpi)$('#dpi').value=s.dpi;
+  if(s.margin!=null)$('#margin').value=s.margin;
+  if(typeof s.sanitize==='boolean')$('#sanitize').checked=s.sanitize;
+  if(typeof s.pockets==='boolean')$('#pockets').checked=s.pockets;
+  if(typeof s.shadows==='boolean')$('#shadows').checked=s.shadows;
+  if(s.slug)$('#slug').value=s.slug;
+  if(s.fnPattern)$('#fnPattern').value=s.fnPattern;
+  if(s.slugLen)$('#slugLen').value=s.slugLen;
+  if(s.aiProvider)$('#aiProvider').value=s.aiProvider;
+  if(s.aiModel)$('#aiModel').value=s.aiModel;
+  if(s.aiKey)$('#aiKey').value=s.aiKey;
+  if(s.viewMode && $(`#sizeSeg button[data-v="${s.viewMode}"]`)){
+    state.viewMode=s.viewMode;
+    $('#sizeSeg .on').classList.remove('on');
+    $(`#sizeSeg button[data-v="${s.viewMode}"]`).classList.add('on');
+  }
+}
+// 설정 변경 시 자동 저장
+['#thr','#feather','#longAxis','#maxAxis','#dpi','#margin','#sanitize','#pockets','#shadows','#slug','#fnPattern','#slugLen','#aiProvider','#aiModel','#aiKey']
+  .forEach(sel=>{ const el=$(sel); if(el) el.addEventListener('change',saveSettings); });
+$('#bgSeg').addEventListener('click',saveSettings);
+$('#sizeSeg').addEventListener('click',saveSettings);
+
+// 등록일 기본값 = 오늘(YYMMDD) — 항상 오늘 날짜로 시작
+(function(){
+  const d=new Date();
+  $('#date').value = String(d.getFullYear()).slice(-2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0');
+})();
+
+loadSettings();
+render();
+</script>
+</body>
+</html>
